@@ -21,10 +21,7 @@ enum LocationErrorType {
 }
 
 /// Simplified location service for getting current position
-class LocationService {
-  static final LocationService _instance = LocationService._internal();
-  factory LocationService() => _instance;
-  LocationService._internal();
+class GeoLocationService {
 
   /// Default location settings
   static const LocationSettings _defaultSettings = LocationSettings(

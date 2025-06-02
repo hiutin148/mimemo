@@ -2,6 +2,8 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:mimemo/common/blocs/main/main_cubit.dart';
+import 'package:mimemo/common/utils/overlay_loading.dart';
 import 'package:mimemo/core/extension/context_extension.dart';
 import 'package:mimemo/core/extension/text_style_extension.dart';
 import 'package:mimemo/generated/l10n.dart';
@@ -24,20 +26,27 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => OnboardingCubit(appSettingRepository: locator<AppSettingRepository>()),
+      create:
+          (context) => OnboardingCubit(
+            appSettingRepository: locator<AppSettingRepository>(),
+          ),
       child: Scaffold(
         body: PageView(
           controller: _pageController,
-          onPageChanged: (int page) {
-            setState(() {
-              // _currentPage = page;
-            });
-          },
           children: [
             WelcomeScreen(onNext: () => _nextPage()),
-            FeaturesScreen(onNext: () => _nextPage(), onSkip: () => _skipToPermissions()),
-            LocationPermissionScreen(onNext: () => _nextPage(), onSkip: () => _nextPage()),
-            NotificationPermissionScreen(onNext: () => _nextPage(), onSkip: () => _nextPage()),
+            FeaturesScreen(
+              onNext: () => _nextPage(),
+              onSkip: () => _skipToPermissions(),
+            ),
+            LocationPermissionScreen(
+              onNext: () => _nextPage(),
+              onSkip: () => _nextPage(),
+            ),
+            NotificationPermissionScreen(
+              onNext: () => _nextPage(),
+              onSkip: () => _nextPage(),
+            ),
             GetStartedScreen(),
           ],
         ),
@@ -46,7 +55,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _nextPage() {
-    _pageController.nextPage(duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+    _pageController.nextPage(
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
   }
 
   void _skipToPermissions() {
@@ -133,10 +145,15 @@ class WelcomeScreen extends StatelessWidget {
                     backgroundColor: Colors.white,
                     foregroundColor: Color(0xFF1E90FF),
                     padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
                     elevation: 0,
                   ),
-                  child: Text(S.of(context).getStarted, style: context.textTheme.bodyLarge?.w700),
+                  child: Text(
+                    S.of(context).getStarted,
+                    style: context.textTheme.bodyLarge?.w700,
+                  ),
                 ),
               ),
 
@@ -162,7 +179,11 @@ class FeaturesScreen extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Colors.white, Colors.black.withValues(alpha: 0.5), Colors.black],
+          colors: [
+            Colors.white,
+            Colors.black.withValues(alpha: 0.5),
+            Colors.black,
+          ],
         ),
       ),
       child: SafeArea(
@@ -222,10 +243,15 @@ class FeaturesScreen extends StatelessWidget {
                     backgroundColor: Colors.white,
                     foregroundColor: Color(0xFF2F1B69),
                     padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
                     elevation: 0,
                   ),
-                  child: Text(S.of(context).continueT, style: context.textTheme.bodyLarge?.w700),
+                  child: Text(
+                    S.of(context).continueT,
+                    style: context.textTheme.bodyLarge?.w700,
+                  ),
                 ),
               ),
 
@@ -275,10 +301,17 @@ class LocationPermissionScreen extends StatelessWidget {
   final VoidCallback onNext;
   final VoidCallback onSkip;
 
-  const LocationPermissionScreen({super.key, required this.onNext, required this.onSkip});
+  const LocationPermissionScreen({
+    super.key,
+    required this.onNext,
+    required this.onSkip,
+  });
 
-  void _requestPermission() {
-    // LocationService().initialize();
+  void _requestPermission(BuildContext context) async {
+    await OverlayLoading.runWithLoading(
+      context,
+      () => context.read<MainCubit>().init(),
+    );
     onNext.call();
   }
 
@@ -289,7 +322,11 @@ class LocationPermissionScreen extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Colors.white, Colors.black.withValues(alpha: 0.5), Colors.black],
+          colors: [
+            Colors.white,
+            Colors.black.withValues(alpha: 0.5),
+            Colors.black,
+          ],
         ),
       ),
       child: SafeArea(
@@ -307,21 +344,29 @@ class LocationPermissionScreen extends StatelessWidget {
                   color: Colors.white.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
-                child: Center(child: Icon(Icons.location_on, size: 80, color: Colors.white)),
+                child: Center(
+                  child: Icon(Icons.location_on, size: 80, color: Colors.white),
+                ),
               ),
 
               Gap(60),
 
               Text(
                 S.of(context).enableLocationAccess,
-                style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
                 textAlign: TextAlign.center,
               ),
 
               Gap(20),
 
               Text(
-                S.of(context).allowAccuweatherToAccessYourLocationToProvideHyperlocalWeather,
+                S
+                    .of(context)
+                    .allowAccuweatherToAccessYourLocationToProvideHyperlocalWeather,
                 style: TextStyle(
                   color: Colors.white.withValues(alpha: 0.9),
                   fontSize: 16,
@@ -341,11 +386,23 @@ class LocationPermissionScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    _buildBenefitItem(context, '🎯', S.of(context).preciseLocalForecasts),
+                    _buildBenefitItem(
+                      context,
+                      '🎯',
+                      S.of(context).preciseLocalForecasts,
+                    ),
                     Gap(12),
-                    _buildBenefitItem(context, '⚡', S.of(context).realtimeWeatherAlerts),
+                    _buildBenefitItem(
+                      context,
+                      '⚡',
+                      S.of(context).realtimeWeatherAlerts,
+                    ),
                     Gap(12),
-                    _buildBenefitItem(context, '🗺️', S.of(context).interactiveRadarMaps),
+                    _buildBenefitItem(
+                      context,
+                      '🗺️',
+                      S.of(context).interactiveRadarMaps,
+                    ),
                   ],
                 ),
               ),
@@ -356,11 +413,13 @@ class LocationPermissionScreen extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _requestPermission,
+                  onPressed: () => _requestPermission(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
                     elevation: 0,
                   ),
                   child: Text(
@@ -393,7 +452,11 @@ class NotificationPermissionScreen extends StatelessWidget {
   final VoidCallback onNext;
   final VoidCallback onSkip;
 
-  const NotificationPermissionScreen({super.key, required this.onNext, required this.onSkip});
+  const NotificationPermissionScreen({
+    super.key,
+    required this.onNext,
+    required this.onSkip,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -475,11 +538,23 @@ class NotificationPermissionScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    _buildNotificationItem(context, '⚠️', S.of(context).severeWeatherAlerts),
+                    _buildNotificationItem(
+                      context,
+                      '⚠️',
+                      S.of(context).severeWeatherAlerts,
+                    ),
                     Gap(12),
-                    _buildNotificationItem(context, '🌅', S.of(context).dailyWeatherSummary),
+                    _buildNotificationItem(
+                      context,
+                      '🌅',
+                      S.of(context).dailyWeatherSummary,
+                    ),
                     Gap(12),
-                    _buildNotificationItem(context, '🌧️', S.of(context).rainSnowNotifications),
+                    _buildNotificationItem(
+                      context,
+                      '🌧️',
+                      S.of(context).rainSnowNotifications,
+                    ),
                   ],
                 ),
               ),
@@ -495,7 +570,9 @@ class NotificationPermissionScreen extends StatelessWidget {
                     backgroundColor: Colors.white,
                     foregroundColor: Color(0xFFDC143C),
                     padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
                     elevation: 0,
                   ),
                   child: Text(
@@ -513,7 +590,11 @@ class NotificationPermissionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNotificationItem(BuildContext context, String emoji, String text) {
+  Widget _buildNotificationItem(
+    BuildContext context,
+    String emoji,
+    String text,
+  ) {
     return Row(
       children: [
         Text(emoji, style: context.textTheme.titleLarge),
@@ -552,7 +633,9 @@ class GetStartedScreen extends StatelessWidget {
                   color: Colors.white.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
-                child: Center(child: Icon(Icons.check, size: 80, color: Colors.white)),
+                child: Center(
+                  child: Icon(Icons.check, size: 80, color: Colors.white),
+                ),
               ),
               Gap(60),
               Text(
@@ -578,7 +661,9 @@ class GetStartedScreen extends StatelessWidget {
                     backgroundColor: Colors.white,
                     foregroundColor: Color(0xFF006400),
                     padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
                     elevation: 0,
                   ),
                   child: Text(

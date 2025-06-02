@@ -2,7 +2,10 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:mimemo/common/blocs/main/main_cubit.dart';
+import 'package:mimemo/models/entities/position_info/position_info.dart';
 import 'package:mimemo/ui/screens/bottom_nav/bottom_nav_screen.dart';
 
 class WeatherHomePage extends StatefulWidget {
@@ -18,60 +21,82 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
     // final current = WeatherData.currentConditions;
     // final temp = current['Temperature']['Imperial']['Value'].toInt();
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color(0xFF4A90E2),
-        iconTheme: IconThemeData(color: Colors.white),
-        centerTitle: true,
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.location_on, color: Colors.white, size: 20),
-            Gap(4),
-            Text(
-              'New York, NY',
-              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500),
+    return BlocSelector<MainCubit, MainState, PositionInfo?>(
+      builder: (context, positionInfo) {
+        final position = positionInfo?.localizedName ?? '';
+        final city =
+            positionInfo?.parentCity?.localizedName != null
+                ? (', ${positionInfo?.parentCity?.localizedName!}')
+                : '';
+        return Scaffold(
+          appBar: AppBar(
+            backgroundColor: Color(0xFF4A90E2),
+            iconTheme: IconThemeData(color: Colors.white),
+            centerTitle: true,
+            title: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.location_on, color: Colors.white, size: 20),
+                Gap(4),
+                Text(
+                  '$position$city',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
-      drawer: Container(),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF4A90E2), Color(0xFF7BB3F0), Color(0xFFA8D0F5)],
           ),
-        ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CustomPaint(size: Size(280, 280), painter: TemperatureArcPainter()),
-                  _buildCurrentWeather(),
-                  Gap( 30),
-                  _buildHourlyPreview(),
-                  Gap( 30),
-                  _buildWeatherDetails(),
-                  Gap( 30),
-                  _buildDailyPreview(),
+          drawer: Container(),
+          body: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFF4A90E2),
+                  Color(0xFF7BB3F0),
+                  Color(0xFFA8D0F5),
                 ],
               ),
             ),
+            child: SafeArea(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CustomPaint(
+                        size: Size(280, 280),
+                        painter: TemperatureArcPainter(),
+                      ),
+                      _buildCurrentWeather(),
+                      Gap(30),
+                      _buildHourlyPreview(),
+                      Gap(30),
+                      _buildWeatherDetails(),
+                      Gap(30),
+                      _buildDailyPreview(),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
+      selector: (state) => state.positionInfo,
     );
   }
 
   Widget _buildCurrentWeather() {
     final current = WeatherData.currentConditions;
     final temp = current['Temperature']['Imperial']['Value'].toInt();
-    final feelsLike = current['RealFeelTemperature']['Imperial']['Value'].toInt();
+    final feelsLike =
+        current['RealFeelTemperature']['Imperial']['Value'].toInt();
 
     return Container(
       padding: EdgeInsets.all(24),
@@ -88,20 +113,34 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
       ),
       child: Column(
         children: [
-          Text(WeatherData.getWeatherIcon(current['WeatherIcon']), style: TextStyle(fontSize: 80)),
-          Gap( 16),
+          Text(
+            WeatherData.getWeatherIcon(current['WeatherIcon']),
+            style: TextStyle(fontSize: 80),
+          ),
+          Gap(16),
           Text(
             '$temp°',
-            style: TextStyle(color: Colors.white, fontSize: 72, fontWeight: FontWeight.w300),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 72,
+              fontWeight: FontWeight.w300,
+            ),
           ),
           Text(
             current['WeatherText'],
-            style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w400),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.w400,
+            ),
           ),
-          Gap( 8),
+          Gap(8),
           Text(
             'Feels like $feelsLike°',
-            style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 16),
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.8),
+              fontSize: 16,
+            ),
           ),
         ],
       ),
@@ -117,21 +156,28 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
           children: [
             Text(
               'Hourly Forecast',
-              style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
             ),
             GestureDetector(
               onTap:
-                  () => Navigator.of(
-                    context,
-                  ).pushReplacement(MaterialPageRoute(builder: (_) => BottomNavScreen())),
+                  () => Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (_) => BottomNavScreen()),
+                  ),
               child: Text(
                 'View All',
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 14),
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.8),
+                  fontSize: 14,
+                ),
               ),
             ),
           ],
         ),
-        Gap( 16),
+        Gap(16),
         SizedBox(
           height: 120,
           child: ListView.builder(
@@ -204,9 +250,13 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
         children: [
           Text(
             'Weather Details',
-            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-          Gap( 16),
+          Gap(16),
           Row(
             children: [
               Expanded(
@@ -225,7 +275,7 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
               ),
             ],
           ),
-          Gap( 16),
+          Gap(16),
           Row(
             children: [
               Expanded(
@@ -244,7 +294,7 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
               ),
             ],
           ),
-          Gap( 16),
+          Gap(16),
           Row(
             children: [
               Expanded(
@@ -255,7 +305,11 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
                 ),
               ),
               Expanded(
-                child: _buildDetailItem('Cloud Cover', '${current['CloudCover']}%', Icons.cloud),
+                child: _buildDetailItem(
+                  'Cloud Cover',
+                  '${current['CloudCover']}%',
+                  Icons.cloud,
+                ),
               ),
             ],
           ),
@@ -268,18 +322,25 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
     return Row(
       children: [
         Icon(icon, color: Colors.white.withValues(alpha: 0.7), size: 20),
-        Gap( 8),
+        Gap(8),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 label,
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12),
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.7),
+                  fontSize: 12,
+                ),
               ),
               Text(
                 value,
-                style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ],
           ),
@@ -297,15 +358,22 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
           children: [
             Text(
               '7-Day Forecast',
-              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
             ),
             Text(
               'View All',
-              style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 14),
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.8),
+                fontSize: 14,
+              ),
             ),
           ],
         ),
-        Gap( 16),
+        Gap(16),
         Container(
           padding: EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -336,7 +404,7 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
                           WeatherData.getWeatherIcon(day['Day']['Icon']),
                           style: TextStyle(fontSize: 24),
                         ),
-                        Gap( 16),
+                        Gap(16),
                         Expanded(
                           flex: 2,
                           child: Text(
@@ -354,7 +422,7 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
                             fontSize: 16,
                           ),
                         ),
-                        Gap( 16),
+                        Gap(16),
                         Text(
                           '${day['Temperature']['Maximum']['Value']}°',
                           style: TextStyle(
@@ -405,7 +473,8 @@ class TemperatureArcPainter extends CustomPainter {
     // Draw exactly 60 segments around the circle with clear gaps
     const totalSegments = 60;
     const segmentAngle = 3.0 * pi / 180; // Each segment is 3 degrees
-    const gapAngle = 30 * pi / 180; // 3 degree gap between segments for clear separation
+    const gapAngle =
+        30 * pi / 180; // 3 degree gap between segments for clear separation
 
     for (int i = 0; i < totalSegments; i++) {
       final progress = i / (totalSegments - 1);
@@ -419,11 +488,17 @@ class TemperatureArcPainter extends CustomPainter {
       if (colorIndex >= colors.length - 1) {
         segmentColor = colors.last;
       } else {
-        segmentColor = Color.lerp(colors[colorIndex], colors[colorIndex + 1], colorProgress)!;
+        segmentColor =
+            Color.lerp(
+              colors[colorIndex],
+              colors[colorIndex + 1],
+              colorProgress,
+            )!;
       }
 
       // Make segments dimmer after the current temperature (around segment 36 for 70°)
-      final currentTempPosition = 36; // Roughly 70°F position out of 60 segments
+      final currentTempPosition =
+          36; // Roughly 70°F position out of 60 segments
       if (i > currentTempPosition) {
         segmentColor = segmentColor.withValues(alpha: 0.25);
       }
