@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mimemo/common/blocs/main/main_cubit.dart';
 import 'package:mimemo/locator.dart';
 import 'package:mimemo/repositories/app_setting_repository.dart';
 import 'package:mimemo/router/app_router.gr.dart';
@@ -14,7 +15,10 @@ class SplashScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create:
-          (context) => SplashCubit(appSettingRepository: locator<AppSettingRepository>())..init(),
+          (context) => SplashCubit(
+            appSettingRepository: locator<AppSettingRepository>(),
+            mainCubit: context.read<MainCubit>(),
+          )..init(),
       child: SplashView(),
     );
   }

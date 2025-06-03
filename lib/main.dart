@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:mimemo/common/blocs/main/main_cubit.dart';
 import 'package:mimemo/locator.dart';
+import 'package:mimemo/repositories/forecast_repository.dart';
 import 'package:mimemo/repositories/position_repository.dart';
 import 'package:mimemo/router/app_router.dart';
 import 'package:mimemo/services/geolocation_service.dart';
@@ -33,6 +34,7 @@ class WeatherApp extends StatelessWidget {
               (context) => MainCubit(
                 positionRepository: locator<PositionRepository>(),
                 geoLocationService: locator<GeoLocationService>(),
+                forecastRepository: locator<ForecastRepository>(),
               ),
         ),
       ],
