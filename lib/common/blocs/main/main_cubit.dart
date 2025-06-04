@@ -40,4 +40,14 @@ class MainCubit extends Cubit<MainState> {
       emit(state.copyWith(loadStatus: LoadStatus.failure));
     }
   }
+
+  Future<(double lat, double long)> getCurrentLatLong() async {
+    if (state.positionInfo?.geoPosition?.latitude == null ||
+        state.positionInfo?.geoPosition?.longitude == null) {
+      await init();
+    }
+    final lat = state.positionInfo?.geoPosition?.latitude ?? 0;
+    final long = state.positionInfo?.geoPosition?.longitude ?? 0;
+    return (lat, long);
+  }
 }

@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:mimemo/repositories/app_setting_repository.dart';
+import 'package:mimemo/repositories/current_condition_repository.dart';
 import 'package:mimemo/repositories/forecast_repository.dart';
 import 'package:mimemo/repositories/position_repository.dart';
 import 'package:mimemo/services/api/api_client.dart';
@@ -22,5 +23,9 @@ void initLocator() {
   );
   locator.registerLazySingleton<ForecastRepository>(
     () => ForecastRepositoryImpl(apiClient: locator<ApiClient>()),
+  );
+
+  locator.registerLazySingleton<CurrentConditionRepository>(
+        () => CurrentConditionRepositoryImpl(apiClient: locator<ApiClient>()),
   );
 }

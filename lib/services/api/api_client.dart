@@ -20,16 +20,16 @@ abstract class ApiClient {
 
   // Forecast
   @GET('/forecasts/v1/minute/1minute')
-  Future<OneMinuteCast> get1MinuteCast(@Query("q") String latLong);
+  Future<OneMinuteCast> get1MinuteCast(@Query('q') String latLong);
 
   @GET('/forecasts/v1/minute/colors/simple')
   Future<List<MinuteColor>> getMinuteColors();
 
   // Current condition
   @GET('/currentconditions/v1/{locationKey}')
-  Future<CurrentConditions> getCurrentConditions(@Path("locationKey") String locationKey);
+  Future<List<CurrentConditions>> getCurrentConditions(@Path('locationKey') String locationKey);
 
   @GET('/airquality/v2/currentconditions/{locationKey}')
-  Future<CurrentAirQuality> getCurrentAirQuality(@Path("locationKey") String locationKey);
+  Future<CurrentAirQuality> getCurrentAirQuality(@Path('locationKey') String locationKey);
 
 }

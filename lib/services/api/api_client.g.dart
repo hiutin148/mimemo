@@ -104,12 +104,14 @@ class _ApiClient implements ApiClient {
   }
 
   @override
-  Future<CurrentConditions> getCurrentConditions(String locationKey) async {
+  Future<List<CurrentConditions>> getCurrentConditions(
+    String locationKey,
+  ) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<CurrentConditions>(
+    final _options = _setStreamType<List<CurrentConditions>>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -119,10 +121,16 @@ class _ApiClient implements ApiClient {
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
-    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late CurrentConditions _value;
+    final _result = await _dio.fetch<List<dynamic>>(_options);
+    late List<CurrentConditions> _value;
     try {
-      _value = CurrentConditions.fromJson(_result.data!);
+      _value =
+          _result.data!
+              .map(
+                (dynamic i) =>
+                    CurrentConditions.fromJson(i as Map<String, dynamic>),
+              )
+              .toList();
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;

@@ -38,7 +38,7 @@ class _BottomNavViewState extends State<BottomNavView> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> screens = [
-      WeatherHomePage(),
+      HomeScreen(),
       RadarPage(),
       HourlyPage(),
       DailyPage(),
@@ -85,154 +85,154 @@ class _BottomNavViewState extends State<BottomNavView> {
 // Mock API Data Structure
 class WeatherData {
   static final Map<String, dynamic> currentConditions = {
-    "WeatherText": "Partly cloudy",
-    "WeatherIcon": 3,
-    "HasPrecipitation": false,
-    "Temperature": {
-      "Metric": {"Value": 22.2, "Unit": "C"},
-      "Imperial": {"Value": 72.0, "Unit": "F"},
+    'WeatherText': 'Partly cloudy',
+    'WeatherIcon': 3,
+    'HasPrecipitation': false,
+    'Temperature': {
+      'Metric': {'Value': 22.2, 'Unit': 'C'},
+      'Imperial': {'Value': 72.0, 'Unit': 'F'},
     },
-    "RealFeelTemperature": {
-      "Imperial": {"Value": 75.0, "Unit": "F"},
+    'RealFeelTemperature': {
+      'Imperial': {'Value': 75.0, 'Unit': 'F'},
     },
-    "RelativeHumidity": 65,
-    "Wind": {
-      "Speed": {
-        "Imperial": {"Value": 8.1, "Unit": "mi/h"},
+    'RelativeHumidity': 65,
+    'Wind': {
+      'Speed': {
+        'Imperial': {'Value': 8.1, 'Unit': 'mi/h'},
       },
     },
-    "UVIndex": 6,
-    "UVIndexText": "High",
-    "Visibility": {
-      "Imperial": {"Value": 10.0, "Unit": "mi"},
+    'UVIndex': 6,
+    'UVIndexText': 'High',
+    'Visibility': {
+      'Imperial': {'Value': 10.0, 'Unit': 'mi'},
     },
-    "Pressure": {
-      "Imperial": {"Value": 30.12, "Unit": "inHg"},
+    'Pressure': {
+      'Imperial': {'Value': 30.12, 'Unit': 'inHg'},
     },
-    "CloudCover": 45,
+    'CloudCover': 45,
   };
 
   static final List<Map<String, dynamic>> hourlyForecast = [
     {
-      "DateTime": "2024-01-15T12:00:00",
-      "WeatherIcon": 3,
-      "IconPhrase": "Partly sunny",
-      "Temperature": {"Value": 72, "Unit": "F"},
-      "PrecipitationProbability": 15,
+      'DateTime': '2024-01-15T12:00:00',
+      'WeatherIcon': 3,
+      'IconPhrase': 'Partly sunny',
+      'Temperature': {'Value': 72, 'Unit': 'F'},
+      'PrecipitationProbability': 15,
     },
     {
-      "DateTime": "2024-01-15T13:00:00",
-      "WeatherIcon": 1,
-      "IconPhrase": "Sunny",
-      "Temperature": {"Value": 74, "Unit": "F"},
-      "PrecipitationProbability": 5,
+      'DateTime': '2024-01-15T13:00:00',
+      'WeatherIcon': 1,
+      'IconPhrase': 'Sunny',
+      'Temperature': {'Value': 74, 'Unit': 'F'},
+      'PrecipitationProbability': 5,
     },
     {
-      "DateTime": "2024-01-15T14:00:00",
-      "WeatherIcon": 1,
-      "IconPhrase": "Sunny",
-      "Temperature": {"Value": 76, "Unit": "F"},
-      "PrecipitationProbability": 0,
+      'DateTime': '2024-01-15T14:00:00',
+      'WeatherIcon': 1,
+      'IconPhrase': 'Sunny',
+      'Temperature': {'Value': 76, 'Unit': 'F'},
+      'PrecipitationProbability': 0,
     },
     {
-      "DateTime": "2024-01-15T15:00:00",
-      "WeatherIcon": 3,
-      "IconPhrase": "Partly sunny",
-      "Temperature": {"Value": 75, "Unit": "F"},
-      "PrecipitationProbability": 10,
+      'DateTime': '2024-01-15T15:00:00',
+      'WeatherIcon': 3,
+      'IconPhrase': 'Partly sunny',
+      'Temperature': {'Value': 75, 'Unit': 'F'},
+      'PrecipitationProbability': 10,
     },
     {
-      "DateTime": "2024-01-15T16:00:00",
-      "WeatherIcon": 7,
-      "IconPhrase": "Cloudy",
-      "Temperature": {"Value": 73, "Unit": "F"},
-      "PrecipitationProbability": 25,
+      'DateTime': '2024-01-15T16:00:00',
+      'WeatherIcon': 7,
+      'IconPhrase': 'Cloudy',
+      'Temperature': {'Value': 73, 'Unit': 'F'},
+      'PrecipitationProbability': 25,
     },
     {
-      "DateTime": "2024-01-15T17:00:00",
-      "WeatherIcon": 12,
-      "IconPhrase": "Showers",
-      "Temperature": {"Value": 71, "Unit": "F"},
-      "PrecipitationProbability": 60,
+      'DateTime': '2024-01-15T17:00:00',
+      'WeatherIcon': 12,
+      'IconPhrase': 'Showers',
+      'Temperature': {'Value': 71, 'Unit': 'F'},
+      'PrecipitationProbability': 60,
     },
     {
-      "DateTime": "2024-01-15T18:00:00",
-      "WeatherIcon": 18,
-      "IconPhrase": "Rain",
-      "Temperature": {"Value": 69, "Unit": "F"},
-      "PrecipitationProbability": 80,
+      'DateTime': '2024-01-15T18:00:00',
+      'WeatherIcon': 18,
+      'IconPhrase': 'Rain',
+      'Temperature': {'Value': 69, 'Unit': 'F'},
+      'PrecipitationProbability': 80,
     },
     {
-      "DateTime": "2024-01-15T19:00:00",
-      "WeatherIcon": 12,
-      "IconPhrase": "Showers",
-      "Temperature": {"Value": 67, "Unit": "F"},
-      "PrecipitationProbability": 55,
+      'DateTime': '2024-01-15T19:00:00',
+      'WeatherIcon': 12,
+      'IconPhrase': 'Showers',
+      'Temperature': {'Value': 67, 'Unit': 'F'},
+      'PrecipitationProbability': 55,
     },
   ];
 
   static final List<Map<String, dynamic>> dailyForecast = [
     {
-      "Date": "2024-01-15",
-      "Day": {"Icon": 3, "IconPhrase": "Partly sunny", "PrecipitationProbability": 25},
-      "Night": {"Icon": 35, "IconPhrase": "Partly cloudy"},
-      "Temperature": {
-        "Maximum": {"Value": 76},
-        "Minimum": {"Value": 62},
+      'Date': '2024-01-15',
+      'Day': {'Icon': 3, 'IconPhrase': 'Partly sunny', 'PrecipitationProbability': 25},
+      'Night': {'Icon': 35, 'IconPhrase': 'Partly cloudy'},
+      'Temperature': {
+        'Maximum': {'Value': 76},
+        'Minimum': {'Value': 62},
       },
     },
     {
-      "Date": "2024-01-16",
-      "Day": {"Icon": 1, "IconPhrase": "Sunny", "PrecipitationProbability": 5},
-      "Night": {"Icon": 33, "IconPhrase": "Clear"},
-      "Temperature": {
-        "Maximum": {"Value": 78},
-        "Minimum": {"Value": 64},
+      'Date': '2024-01-16',
+      'Day': {'Icon': 1, 'IconPhrase': 'Sunny', 'PrecipitationProbability': 5},
+      'Night': {'Icon': 33, 'IconPhrase': 'Clear'},
+      'Temperature': {
+        'Maximum': {'Value': 78},
+        'Minimum': {'Value': 64},
       },
     },
     {
-      "Date": "2024-01-17",
-      "Day": {"Icon": 12, "IconPhrase": "Showers", "PrecipitationProbability": 75},
-      "Night": {"Icon": 12, "IconPhrase": "Showers"},
-      "Temperature": {
-        "Maximum": {"Value": 74},
-        "Minimum": {"Value": 59},
+      'Date': '2024-01-17',
+      'Day': {'Icon': 12, 'IconPhrase': 'Showers', 'PrecipitationProbability': 75},
+      'Night': {'Icon': 12, 'IconPhrase': 'Showers'},
+      'Temperature': {
+        'Maximum': {'Value': 74},
+        'Minimum': {'Value': 59},
       },
     },
     {
-      "Date": "2024-01-18",
-      "Day": {"Icon": 15, "IconPhrase": "Thunderstorms", "PrecipitationProbability": 85},
-      "Night": {"Icon": 15, "IconPhrase": "Thunderstorms"},
-      "Temperature": {
-        "Maximum": {"Value": 71},
-        "Minimum": {"Value": 56},
+      'Date': '2024-01-18',
+      'Day': {'Icon': 15, 'IconPhrase': 'Thunderstorms', 'PrecipitationProbability': 85},
+      'Night': {'Icon': 15, 'IconPhrase': 'Thunderstorms'},
+      'Temperature': {
+        'Maximum': {'Value': 71},
+        'Minimum': {'Value': 56},
       },
     },
     {
-      "Date": "2024-01-19",
-      "Day": {"Icon": 7, "IconPhrase": "Cloudy", "PrecipitationProbability": 15},
-      "Night": {"Icon": 38, "IconPhrase": "Mostly cloudy"},
-      "Temperature": {
-        "Maximum": {"Value": 69},
-        "Minimum": {"Value": 54},
+      'Date': '2024-01-19',
+      'Day': {'Icon': 7, 'IconPhrase': 'Cloudy', 'PrecipitationProbability': 15},
+      'Night': {'Icon': 38, 'IconPhrase': 'Mostly cloudy'},
+      'Temperature': {
+        'Maximum': {'Value': 69},
+        'Minimum': {'Value': 54},
       },
     },
     {
-      "Date": "2024-01-20",
-      "Day": {"Icon": 3, "IconPhrase": "Partly sunny", "PrecipitationProbability": 10},
-      "Night": {"Icon": 35, "IconPhrase": "Partly cloudy"},
-      "Temperature": {
-        "Maximum": {"Value": 73},
-        "Minimum": {"Value": 58},
+      'Date': '2024-01-20',
+      'Day': {'Icon': 3, 'IconPhrase': 'Partly sunny', 'PrecipitationProbability': 10},
+      'Night': {'Icon': 35, 'IconPhrase': 'Partly cloudy'},
+      'Temperature': {
+        'Maximum': {'Value': 73},
+        'Minimum': {'Value': 58},
       },
     },
     {
-      "Date": "2024-01-21",
-      "Day": {"Icon": 1, "IconPhrase": "Sunny", "PrecipitationProbability": 0},
-      "Night": {"Icon": 33, "IconPhrase": "Clear"},
-      "Temperature": {
-        "Maximum": {"Value": 77},
-        "Minimum": {"Value": 61},
+      'Date': '2024-01-21',
+      'Day': {'Icon': 1, 'IconPhrase': 'Sunny', 'PrecipitationProbability': 0},
+      'Night': {'Icon': 33, 'IconPhrase': 'Clear'},
+      'Temperature': {
+        'Maximum': {'Value': 77},
+        'Minimum': {'Value': 61},
       },
     },
   ];

@@ -2,18 +2,40 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:mimemo/common/blocs/main/main_cubit.dart';
-import 'package:mimemo/ui/screens/home/widgets/rain_condition.dart';
+import 'package:mimemo/core/const/app_colors.dart';
+import 'package:mimemo/locator.dart';
+import 'package:mimemo/repositories/current_condition_repository.dart';
+import 'package:mimemo/repositories/forecast_repository.dart';
+import 'package:mimemo/ui/screens/home/home_cubit.dart';
+import 'package:mimemo/ui/screens/home/widgets/current_condition.dart';
 import 'package:mimemo/models/entities/position_info/position_info.dart';
 import 'package:mimemo/ui/screens/bottom_nav/bottom_nav_screen.dart';
 
-class WeatherHomePage extends StatefulWidget {
-  const WeatherHomePage({super.key});
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
 
   @override
-  State<WeatherHomePage> createState() => _WeatherHomePageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create:
+          (context) => HomeCubit(
+            forecastRepository: locator<ForecastRepository>(),
+            mainCubit: context.read<MainCubit>(),
+            currentConditionRepository: locator<CurrentConditionRepository>(),
+          )..init(),
+      child: HomeView(),
+    );
+  }
 }
 
-class _WeatherHomePageState extends State<WeatherHomePage> {
+class HomeView extends StatefulWidget {
+  const HomeView({super.key});
+
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     // final current = WeatherData.currentConditions;
@@ -28,7 +50,7 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
                 : '';
         return Scaffold(
           appBar: AppBar(
-            backgroundColor: Color(0xFF4A90E2),
+            backgroundColor: AppColors.primary,
             iconTheme: IconThemeData(color: Colors.white),
             centerTitle: true,
             title: Row(
@@ -45,13 +67,7 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
           ),
           drawer: Container(),
           body: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Color(0xFF4A90E2), Color(0xFF7BB3F0), Color(0xFFA8D0F5)],
-              ),
-            ),
+            decoration: BoxDecoration(color: AppColors.primary),
             child: SafeArea(
               child: SingleChildScrollView(
                 child: Padding(
@@ -59,30 +75,12 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Center(
-                        child: RainConditionChart(
-                          value: 50,
-                          minValue: 0,
-                          maxValue: 100,
-                          centerText: '${50}°',
-                          subtitle: 'Temperature',
-                          colors: [
-                            Colors.red,
-                            Colors.orange,
-                            Colors.yellow,
-                            Colors.green,
-                            Colors.blue,
-                          ],
-                          strokeWidth: 4.0,
-                          size: 250.0,
-                        ),
-                      ),
-                      _buildCurrentWeather(),
-                      Gap(30),
+                      CurrentCondition(),
+                      Gap(24),
                       _buildHourlyPreview(),
-                      Gap(30),
+                      Gap(24),
                       _buildWeatherDetails(),
-                      Gap(30),
+                      Gap(24),
                       _buildDailyPreview(),
                     ],
                   ),
@@ -93,46 +91,6 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
         );
       },
       selector: (state) => state.positionInfo,
-    );
-  }
-
-  Widget _buildCurrentWeather() {
-    final current = WeatherData.currentConditions;
-    final temp = current['Temperature']['Imperial']['Value'].toInt();
-    final feelsLike = current['RealFeelTemperature']['Imperial']['Value'].toInt();
-
-    return Container(
-      padding: EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Text(WeatherData.getWeatherIcon(current['WeatherIcon']), style: TextStyle(fontSize: 80)),
-          Gap(16),
-          Text(
-            '$temp°',
-            style: TextStyle(color: Colors.white, fontSize: 72, fontWeight: FontWeight.w300),
-          ),
-          Text(
-            current['WeatherText'],
-            style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w400),
-          ),
-          Gap(8),
-          Text(
-            'Feels like $feelsLike°',
-            style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 16),
-          ),
-        ],
-      ),
     );
   }
 
@@ -182,7 +140,7 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
                 margin: EdgeInsets.only(right: 12),
                 padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: Colors.white24,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Column(
