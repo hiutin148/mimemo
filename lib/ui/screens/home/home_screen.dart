@@ -7,7 +7,7 @@ import 'package:mimemo/locator.dart';
 import 'package:mimemo/repositories/current_condition_repository.dart';
 import 'package:mimemo/repositories/forecast_repository.dart';
 import 'package:mimemo/ui/screens/home/home_cubit.dart';
-import 'package:mimemo/ui/screens/home/widgets/current_condition.dart';
+import 'package:mimemo/ui/screens/home/widgets/current_condition_gauge_chart.dart';
 import 'package:mimemo/models/entities/position_info/position_info.dart';
 import 'package:mimemo/ui/screens/bottom_nav/bottom_nav_screen.dart';
 
@@ -22,7 +22,7 @@ class HomeScreen extends StatelessWidget {
             forecastRepository: locator<ForecastRepository>(),
             mainCubit: context.read<MainCubit>(),
             currentConditionRepository: locator<CurrentConditionRepository>(),
-          )..init(),
+          ),
       child: HomeView(),
     );
   }
@@ -35,11 +35,19 @@ class HomeView extends StatefulWidget {
   State<HomeView> createState() => _HomeViewState();
 }
 
-class _HomeViewState extends State<HomeView> {
+class _HomeViewState extends State<HomeView> with AutomaticKeepAliveClientMixin<HomeView> {
+  late final HomeCubit _cubit;
+
+  @override
+  void initState() {
+    super.initState();
+    _cubit = context.read<HomeCubit>();
+    _cubit.init();
+  }
+
   @override
   Widget build(BuildContext context) {
-    // final current = WeatherData.currentConditions;
-    // final temp = current['Temperature']['Imperial']['Value'].toInt();
+    super.build(context);
 
     return BlocSelector<MainCubit, MainState, PositionInfo?>(
       builder: (context, positionInfo) {
@@ -75,7 +83,7 @@ class _HomeViewState extends State<HomeView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CurrentCondition(),
+                      CurrentConditionGaugeChart(),
                       Gap(24),
                       _buildHourlyPreview(),
                       Gap(24),
@@ -358,4 +366,7 @@ class _HomeViewState extends State<HomeView> {
       ],
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

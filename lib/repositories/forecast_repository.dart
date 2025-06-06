@@ -17,7 +17,7 @@ class ForecastRepositoryImpl extends ForecastRepository {
   Future<OneMinuteCast> get1MinuteCast(double lat, double long) {
     final q = '$lat,$long';
 
-    return apiClient.get1MinuteCast(q);
+    return apiClient.get1MinuteCast(latLong: q, minuteCount: 240);
   }
 
   @override

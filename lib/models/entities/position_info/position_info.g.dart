@@ -44,6 +44,10 @@ PositionInfo _$PositionInfoFromJson(Map<String, dynamic> json) => PositionInfo(
   supplementalAdminAreas: json['SupplementalAdminAreas'] as List<dynamic>?,
   dataSets:
       (json['DataSets'] as List<dynamic>?)?.map((e) => e as String).toList(),
+  details:
+      json['Details'] == null
+          ? null
+          : Details.fromJson(json['Details'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$PositionInfoToJson(PositionInfo instance) =>
@@ -64,7 +68,75 @@ Map<String, dynamic> _$PositionInfoToJson(PositionInfo instance) =>
       'ParentCity': instance.parentCity?.toJson(),
       'SupplementalAdminAreas': instance.supplementalAdminAreas,
       'DataSets': instance.dataSets,
+      'Details': instance.details?.toJson(),
     };
+
+Details _$DetailsFromJson(Map<String, dynamic> json) => Details(
+  key: json['Key'] as String?,
+  stationCode: json['StationCode'] as String?,
+  stationGmtOffset: (json['StationGmtOffset'] as num?)?.toDouble(),
+  bandMap: json['BandMap'] as String?,
+  climo: json['Climo'] as String?,
+  localRadar: json['LocalRadar'] as String?,
+  mediaRegion: json['MediaRegion'] as String?,
+  metar: json['Metar'] as String?,
+  nxMetro: json['NXMetro'] as String?,
+  nxState: json['NXState'] as String?,
+  population: (json['Population'] as num?)?.toInt(),
+  primaryWarningCountyCode: json['PrimaryWarningCountyCode'] as String?,
+  primaryWarningZoneCode: json['PrimaryWarningZoneCode'] as String?,
+  satellite: json['Satellite'] as String?,
+  synoptic: json['Synoptic'] as String?,
+  marineStation: json['MarineStation'] as String?,
+  marineStationGmtOffset: (json['MarineStationGMTOffset'] as num?)?.toDouble(),
+  videoCode: json['VideoCode'] as String?,
+  locationStem: json['LocationStem'] as String?,
+  partnerId: json['PartnerID'] as String?,
+  sources:
+      (json['Sources'] as List<dynamic>?)
+          ?.map((e) => Source.fromJson(e as Map<String, dynamic>))
+          .toList(),
+  canonicalPostalCode: json['CanonicalPostalCode'] as String?,
+  canonicalLocationKey: json['CanonicalLocationKey'] as String?,
+);
+
+Map<String, dynamic> _$DetailsToJson(Details instance) => <String, dynamic>{
+  'Key': instance.key,
+  'StationCode': instance.stationCode,
+  'StationGmtOffset': instance.stationGmtOffset,
+  'BandMap': instance.bandMap,
+  'Climo': instance.climo,
+  'LocalRadar': instance.localRadar,
+  'MediaRegion': instance.mediaRegion,
+  'Metar': instance.metar,
+  'NXMetro': instance.nxMetro,
+  'NXState': instance.nxState,
+  'Population': instance.population,
+  'PrimaryWarningCountyCode': instance.primaryWarningCountyCode,
+  'PrimaryWarningZoneCode': instance.primaryWarningZoneCode,
+  'Satellite': instance.satellite,
+  'Synoptic': instance.synoptic,
+  'MarineStation': instance.marineStation,
+  'MarineStationGMTOffset': instance.marineStationGmtOffset,
+  'VideoCode': instance.videoCode,
+  'LocationStem': instance.locationStem,
+  'PartnerID': instance.partnerId,
+  'Sources': instance.sources,
+  'CanonicalPostalCode': instance.canonicalPostalCode,
+  'CanonicalLocationKey': instance.canonicalLocationKey,
+};
+
+Source _$SourceFromJson(Map<String, dynamic> json) => Source(
+  dataType: json['DataType'] as String?,
+  source: json['Source'] as String?,
+  sourceId: (json['SourceId'] as num?)?.toInt(),
+);
+
+Map<String, dynamic> _$SourceToJson(Source instance) => <String, dynamic>{
+  'DataType': instance.dataType,
+  'Source': instance.source,
+  'SourceId': instance.sourceId,
+};
 
 Region _$RegionFromJson(Map<String, dynamic> json) => Region(
   id: json['ID'] as String?,

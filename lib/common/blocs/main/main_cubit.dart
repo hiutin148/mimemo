@@ -1,8 +1,10 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mimemo/common/utils/logger.dart';
 import 'package:mimemo/models/entities/minute_color/minute_color.dart';
 import 'package:mimemo/models/entities/position_info/position_info.dart';
 import 'package:mimemo/models/enums/load_status.dart';
+import 'package:mimemo/repositories/app_setting_repository.dart';
 import 'package:mimemo/repositories/forecast_repository.dart';
 import 'package:mimemo/repositories/position_repository.dart';
 import 'package:mimemo/services/geolocation_service.dart';
@@ -10,44 +12,78 @@ import 'package:mimemo/services/geolocation_service.dart';
 part 'main_state.dart';
 
 class MainCubit extends Cubit<MainState> {
-  final PositionRepository positionRepository;
-  final GeoLocationService geoLocationService;
-  final ForecastRepository forecastRepository;
+  final PositionRepository _positionRepository;
+  final GeoLocationService _geoLocationService;
+  final ForecastRepository _forecastRepository;
+  final AppSettingRepository _appSettingRepository;
 
   MainCubit({
-    required this.positionRepository,
-    required this.geoLocationService,
-    required this.forecastRepository,
-  }) : super(MainState());
+    required PositionRepository positionRepository,
+    required GeoLocationService geoLocationService,
+    required ForecastRepository forecastRepository,
+    required AppSettingRepository appSettingRepository,
+  }) : _positionRepository = positionRepository,
+       _geoLocationService = geoLocationService,
+       _forecastRepository = forecastRepository,
+       _appSettingRepository = appSettingRepository,
+       super(const MainState());
 
   Future<void> init() async {
+    if (state.loadStatus == LoadStatus.loading) return;
+
     try {
       emit(state.copyWith(loadStatus: LoadStatus.loading));
-      final position = await geoLocationService.getCurrentPosition();
-      final [positionInfo, minuteColors] = await Future.wait([
-        positionRepository.getGeoPosition(lat: position.latitude, long: position.longitude),
-        forecastRepository.getMinuteColors(),
-      ]);
+
+      final (positionInfo, minuteColors) =
+          await (_getPositionInfo(), _forecastRepository.getMinuteColors()).wait;
+
+      _appSettingRepository.setSavedLocationKey(positionInfo.key ?? '');
 
       emit(
         state.copyWith(
           loadStatus: LoadStatus.success,
-          positionInfo: positionInfo as PositionInfo,
-          minuteColors: minuteColors as List<MinuteColor>,
+          positionInfo: positionInfo,
+          minuteColors: minuteColors,
         ),
       );
-    } catch (e) {
+    } on Exception catch (e) {
+      logger.e(e);
       emit(state.copyWith(loadStatus: LoadStatus.failure));
     }
   }
 
-  Future<(double lat, double long)> getCurrentLatLong() async {
-    if (state.positionInfo?.geoPosition?.latitude == null ||
-        state.positionInfo?.geoPosition?.longitude == null) {
+  Future<(double lat, double lng)> getCurrentCoordinates() async {
+    await _ensureInitialized();
+
+    final geoPosition = state.positionInfo?.geoPosition;
+    return (geoPosition?.latitude ?? 0.0, geoPosition?.longitude ?? 0.0);
+  }
+
+  Future<void> refresh() async {
+    await init();
+  }
+
+  Future<void> _ensureInitialized() async {
+    if (!_hasValidPosition) {
       await init();
     }
-    final lat = state.positionInfo?.geoPosition?.latitude ?? 0;
-    final long = state.positionInfo?.geoPosition?.longitude ?? 0;
-    return (lat, long);
+  }
+
+  Future<PositionInfo> _getPositionInfo() async {
+    final savedLocationKey = await _appSettingRepository.getSavedLocationKey();
+
+    return savedLocationKey?.isNotEmpty == true
+        ? _positionRepository.getPositionByLocationKey(savedLocationKey!)
+        : _getPositionInfoByLatLong();
+  }
+
+  Future<PositionInfo> _getPositionInfoByLatLong() async {
+    final position = await _geoLocationService.getCurrentPosition();
+    return _positionRepository.getGeoPosition(lat: position.latitude, long: position.longitude);
+  }
+
+  bool get _hasValidPosition {
+    final geoPosition = state.positionInfo?.geoPosition;
+    return geoPosition?.latitude != null && geoPosition?.longitude != null;
   }
 }

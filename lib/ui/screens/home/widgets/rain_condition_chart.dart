@@ -19,11 +19,10 @@ class RainConditionChart extends StatelessWidget {
         builder: (context, homeState) {
           return BlocBuilder<MainCubit, MainState>(
             builder: (context, mainState) {
-              // Extract and process data once
               final rainData = _extractRainData(homeState, mainState);
 
               return Padding(
-                padding: const EdgeInsets.all(28.0),
+                padding: const EdgeInsets.only(top: 28.0),
                 child: SizedBox(
                   width: 300,
                   height: 300,

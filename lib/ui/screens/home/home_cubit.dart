@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mimemo/common/blocs/main/main_cubit.dart';
 import 'package:mimemo/common/utils/logger.dart';
+import 'package:mimemo/models/entities/current_air_quality/current_air_quality.dart';
 import 'package:mimemo/models/entities/current_conditions/current_conditions.dart';
 import 'package:mimemo/models/entities/one_minute_cast/one_minute_cast.dart';
 import 'package:mimemo/models/enums/load_status.dart';
@@ -25,6 +26,7 @@ class HomeCubit extends Cubit<HomeState> {
     try {
       getOneMinuteCast();
       getCurrentConditions();
+      getAirQuality();
     } catch (e) {
       logger.e(e);
     }
@@ -33,7 +35,7 @@ class HomeCubit extends Cubit<HomeState> {
   Future<void> getOneMinuteCast() async {
     try {
       emit(state.copyWith(oneMinuteCastStatus: LoadStatus.loading));
-      final (lat, long) = await mainCubit.getCurrentLatLong();
+      final (lat, long) = await mainCubit.getCurrentCoordinates();
       final oneMinuteCast = await forecastRepository.get1MinuteCast(lat, long);
       emit(state.copyWith(oneMinuteCastStatus: LoadStatus.success, oneMinuteCast: oneMinuteCast));
     } catch (e) {
@@ -57,6 +59,19 @@ class HomeCubit extends Cubit<HomeState> {
     } catch (e) {
       logger.e(e);
       emit(state.copyWith(currentConditionsStatus: LoadStatus.failure));
+    }
+  }
+
+  Future<void> getAirQuality() async {
+    try {
+      emit(state.copyWith(airQualityStatus: LoadStatus.loading));
+      final airQuality = await currentConditionRepository.getCurrentAirQuality(
+        mainCubit.state.positionInfo?.key ?? '',
+      );
+      emit(state.copyWith(airQualityStatus: LoadStatus.success, airQuality: airQuality));
+    } catch (e) {
+      logger.e(e);
+      emit(state.copyWith(airQualityStatus: LoadStatus.failure));
     }
   }
 }

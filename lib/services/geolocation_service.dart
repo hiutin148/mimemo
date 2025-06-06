@@ -1,4 +1,5 @@
 import 'package:geolocator/geolocator.dart';
+import 'package:mimemo/common/utils/logger.dart';
 
 /// Custom exception for location-related errors
 class LocationException implements Exception {
@@ -33,6 +34,7 @@ class GeoLocationService {
   Future<Position> getCurrentPosition() async {
     try {
       // Check if location services are enabled
+      logger.d('GeoLocationService: GETTING CURRENT POSITION');
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         throw LocationException(

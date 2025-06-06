@@ -5,8 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:mimemo/common/blocs/main/main_cubit.dart';
-import 'package:mimemo/core/const/app_colors.dart';
+import 'package:mimemo/core/const/app_theme.dart';
 import 'package:mimemo/locator.dart';
+import 'package:mimemo/repositories/app_setting_repository.dart';
 import 'package:mimemo/repositories/forecast_repository.dart';
 import 'package:mimemo/repositories/position_repository.dart';
 import 'package:mimemo/router/app_router.dart';
@@ -36,6 +37,7 @@ class WeatherApp extends StatelessWidget {
                 positionRepository: locator<PositionRepository>(),
                 geoLocationService: locator<GeoLocationService>(),
                 forecastRepository: locator<ForecastRepository>(),
+                appSettingRepository: locator<AppSettingRepository>(),
               ),
         ),
       ],
@@ -47,10 +49,7 @@ class WeatherApp extends StatelessWidget {
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        theme: ThemeData(
-          primarySwatch: AppColors.createMaterialColor(AppColors.primary),
-          fontFamily: 'Roboto',
-        ),
+        theme: AppTheme.themeData,
         routerConfig: _appRouter.config(),
         debugShowCheckedModeBanner: false,
       ),

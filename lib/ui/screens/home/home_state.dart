@@ -5,12 +5,16 @@ class HomeState extends Equatable {
   final OneMinuteCast? oneMinuteCast;
   final LoadStatus currentConditionsStatus;
   final CurrentConditions? currentConditions;
+  final LoadStatus airQualityStatus;
+  final CurrentAirQuality? airQuality;
 
   const HomeState({
     this.oneMinuteCast,
     this.oneMinuteCastStatus = LoadStatus.initial,
     this.currentConditions,
     this.currentConditionsStatus = LoadStatus.initial,
+    this.airQuality,
+    this.airQualityStatus = LoadStatus.initial,
   });
 
   @override
@@ -19,6 +23,8 @@ class HomeState extends Equatable {
     oneMinuteCastStatus,
     currentConditions,
     currentConditionsStatus,
+    airQuality,
+    airQualityStatus,
   ];
 
   HomeState copyWith({
@@ -26,10 +32,14 @@ class HomeState extends Equatable {
     LoadStatus? oneMinuteCastStatus,
     LoadStatus? currentConditionsStatus,
     CurrentConditions? currentConditions,
+    LoadStatus? airQualityStatus,
+    CurrentAirQuality? airQuality,
   }) => HomeState(
     oneMinuteCast: oneMinuteCast ?? this.oneMinuteCast,
     oneMinuteCastStatus: oneMinuteCastStatus ?? this.oneMinuteCastStatus,
     currentConditionsStatus: currentConditionsStatus ?? this.currentConditionsStatus,
     currentConditions: currentConditions ?? this.currentConditions,
+    airQualityStatus: airQualityStatus ?? this.airQualityStatus,
+    airQuality: airQuality ?? this.airQuality,
   );
 }

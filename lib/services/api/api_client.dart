@@ -18,9 +18,12 @@ abstract class ApiClient {
   @GET('/locations/v1/cities/geoposition/search')
   Future<PositionInfo> getGeoPosition(@Query('q') String latLong);
 
+  @GET('/locations/v1/{locationKey}')
+  Future<PositionInfo> getPositionByLocationKey(@Path('locationKey') String locationKey);
+
   // Forecast
   @GET('/forecasts/v1/minute/1minute')
-  Future<OneMinuteCast> get1MinuteCast(@Query('q') String latLong);
+  Future<OneMinuteCast> get1MinuteCast({@Query('q')required String latLong, @Query('minuteCount') int? minuteCount});
 
   @GET('/forecasts/v1/minute/colors/simple')
   Future<List<MinuteColor>> getMinuteColors();

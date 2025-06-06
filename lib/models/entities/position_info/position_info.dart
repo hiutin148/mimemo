@@ -52,6 +52,9 @@ class PositionInfo {
   @JsonKey(name: 'DataSets')
   final List<String>? dataSets;
 
+  @JsonKey(name: 'Details')
+  final Details? details;
+
   PositionInfo({
     this.version,
     this.key,
@@ -69,11 +72,134 @@ class PositionInfo {
     this.parentCity,
     this.supplementalAdminAreas,
     this.dataSets,
+    this.details,
   });
 
-  factory PositionInfo.fromJson(Map<String, dynamic> json) => _$PositionInfoFromJson(json);
+  factory PositionInfo.fromJson(Map<String, dynamic> json) =>
+      _$PositionInfoFromJson(json);
   Map<String, dynamic> toJson() => _$PositionInfoToJson(this);
 }
+
+@JsonSerializable()
+class Details {
+  @JsonKey(name: 'Key')
+  final String? key;
+
+  @JsonKey(name: 'StationCode')
+  final String? stationCode;
+
+  @JsonKey(name: 'StationGmtOffset')
+  final double? stationGmtOffset;
+
+  @JsonKey(name: 'BandMap')
+  final String? bandMap;
+
+  @JsonKey(name: 'Climo')
+  final String? climo;
+
+  @JsonKey(name: 'LocalRadar')
+  final String? localRadar;
+
+  @JsonKey(name: 'MediaRegion')
+  final String? mediaRegion;
+
+  @JsonKey(name: 'Metar')
+  final String? metar;
+
+  @JsonKey(name: 'NXMetro')
+  final String? nxMetro;
+
+  @JsonKey(name: 'NXState')
+  final String? nxState;
+
+  @JsonKey(name: 'Population')
+  final int? population;
+
+  @JsonKey(name: 'PrimaryWarningCountyCode')
+  final String? primaryWarningCountyCode;
+
+  @JsonKey(name: 'PrimaryWarningZoneCode')
+  final String? primaryWarningZoneCode;
+
+  @JsonKey(name: 'Satellite')
+  final String? satellite;
+
+  @JsonKey(name: 'Synoptic')
+  final String? synoptic;
+
+  @JsonKey(name: 'MarineStation')
+  final String? marineStation;
+
+  @JsonKey(name: 'MarineStationGMTOffset')
+  final double? marineStationGmtOffset;
+
+  @JsonKey(name: 'VideoCode')
+  final String? videoCode;
+
+  @JsonKey(name: 'LocationStem')
+  final String? locationStem;
+
+  @JsonKey(name: 'PartnerID')
+  final String? partnerId;
+
+  @JsonKey(name: 'Sources')
+  final List<Source>? sources;
+
+  @JsonKey(name: 'CanonicalPostalCode')
+  final String? canonicalPostalCode;
+
+  @JsonKey(name: 'CanonicalLocationKey')
+  final String? canonicalLocationKey;
+
+  Details({
+    this.key,
+    this.stationCode,
+    this.stationGmtOffset,
+    this.bandMap,
+    this.climo,
+    this.localRadar,
+    this.mediaRegion,
+    this.metar,
+    this.nxMetro,
+    this.nxState,
+    this.population,
+    this.primaryWarningCountyCode,
+    this.primaryWarningZoneCode,
+    this.satellite,
+    this.synoptic,
+    this.marineStation,
+    this.marineStationGmtOffset,
+    this.videoCode,
+    this.locationStem,
+    this.partnerId,
+    this.sources,
+    this.canonicalPostalCode,
+    this.canonicalLocationKey,
+  });
+
+  factory Details.fromJson(Map<String, dynamic> json) =>
+      _$DetailsFromJson(json);
+  Map<String, dynamic> toJson() => _$DetailsToJson(this);
+}
+
+@JsonSerializable()
+class Source {
+  @JsonKey(name: 'DataType')
+  final String? dataType;
+
+  @JsonKey(name: 'Source')
+  final String? source;
+
+  @JsonKey(name: 'SourceId')
+  final int? sourceId;
+
+  Source({this.dataType, this.source, this.sourceId});
+
+  factory Source.fromJson(Map<String, dynamic> json) =>
+      _$SourceFromJson(json);
+  Map<String, dynamic> toJson() => _$SourceToJson(this);
+}
+
 
 @JsonSerializable()
 class Region {

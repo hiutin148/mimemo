@@ -2,7 +2,6 @@ import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:mimemo/common/blocs/main/main_cubit.dart';
 import 'package:mimemo/ui/screens/bottom_nav/bottom_nav_cubit.dart';
 
 import '../daily/daily_screen.dart';
@@ -32,7 +31,6 @@ class _BottomNavViewState extends State<BottomNavView> {
   @override
   void initState() {
     super.initState();
-    context.read<MainCubit>().init();
   }
 
   @override

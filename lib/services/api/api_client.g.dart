@@ -45,9 +45,43 @@ class _ApiClient implements ApiClient {
   }
 
   @override
-  Future<OneMinuteCast> get1MinuteCast(String latLong) async {
+  Future<PositionInfo> getPositionByLocationKey(String locationKey) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{r'q': latLong};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<PositionInfo>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/locations/v1/${locationKey}',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late PositionInfo _value;
+    try {
+      _value = PositionInfo.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<OneMinuteCast> get1MinuteCast({
+    required String latLong,
+    int? minuteCount,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'q': latLong,
+      r'minuteCount': minuteCount,
+    };
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<OneMinuteCast>(
