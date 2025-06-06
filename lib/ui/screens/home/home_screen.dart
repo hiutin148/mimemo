@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:mimemo/common/blocs/main/main_cubit.dart';
+import 'package:mimemo/common/utils/utils.dart';
 import 'package:mimemo/core/const/app_colors.dart';
+import 'package:mimemo/core/const/date_format_pattern.dart';
+import 'package:mimemo/core/extension/datetime_extension.dart';
 import 'package:mimemo/locator.dart';
 import 'package:mimemo/repositories/current_condition_repository.dart';
 import 'package:mimemo/repositories/forecast_repository.dart';
@@ -10,6 +13,7 @@ import 'package:mimemo/ui/screens/home/home_cubit.dart';
 import 'package:mimemo/ui/screens/home/widgets/current_condition_gauge_chart.dart';
 import 'package:mimemo/models/entities/position_info/position_info.dart';
 import 'package:mimemo/ui/screens/bottom_nav/bottom_nav_screen.dart';
+import 'package:mimemo/ui/widgets/app_icon.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -57,22 +61,7 @@ class _HomeViewState extends State<HomeView> with AutomaticKeepAliveClientMixin<
                 ? (', ${positionInfo?.parentCity?.localizedName!}')
                 : '';
         return Scaffold(
-          appBar: AppBar(
-            backgroundColor: AppColors.primary,
-            iconTheme: IconThemeData(color: Colors.white),
-            centerTitle: true,
-            title: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.location_on, color: Colors.white, size: 20),
-                Gap(4),
-                Text(
-                  '$position$city',
-                  style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500),
-                ),
-              ],
-            ),
-          ),
+          appBar: _buildAppBar(position, city),
           drawer: Container(),
           body: Container(
             decoration: BoxDecoration(color: AppColors.primary),
@@ -102,85 +91,107 @@ class _HomeViewState extends State<HomeView> with AutomaticKeepAliveClientMixin<
     );
   }
 
+  AppBar _buildAppBar(String position, String city) {
+    return AppBar(
+      backgroundColor: AppColors.primary,
+      iconTheme: IconThemeData(color: Colors.white),
+      centerTitle: true,
+      title: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.location_on, color: Colors.white, size: 20),
+          Gap(4),
+          Text(
+            '$position$city',
+            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildHourlyPreview() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return BlocBuilder<HomeCubit, HomeState>(
+      buildWhen: (previous, current) {
+        return previous.next12HoursForecast != current.next12HoursForecast ||
+            previous.next12HoursForecastStatus != current.next12HoursForecastStatus;
+      },
+      builder: (context, state) {
+        final next12HoursForecast = state.next12HoursForecast;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Hourly Forecast',
-              style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Hourly Forecast',
+                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
+                ),
+                GestureDetector(
+                  onTap: () {},
+                  child: Text(
+                    'View All',
+                    style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 14),
+                  ),
+                ),
+              ],
             ),
-            GestureDetector(
-              onTap:
-                  () => Navigator.of(
-                    context,
-                  ).pushReplacement(MaterialPageRoute(builder: (_) => BottomNavScreen())),
-              child: Text(
-                'View All',
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 14),
+            Gap(16),
+            SizedBox(
+              height: 120,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: next12HoursForecast.length,
+                itemBuilder: (context, index) {
+                  final forecast = next12HoursForecast[index];
+                  final dateTime = DateTime.tryParse(forecast.dateTime ?? '')?.toLocal();
+                  final displayTime =
+                      dateTime != null ? dateTime.toFormatedString(DateFormatPattern.hour12) : '';
+                  final tem = forecast.temperature?.value?.toString() ?? '';
+                  final unit = forecast.temperature?.unit ?? '';
+                  return Container(
+                    width: 80,
+                    margin: EdgeInsets.only(right: 12),
+                    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white24,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          displayTime,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Expanded(
+                          child: AppIcon(
+                            icon: Utils.getIconAsset(forecast.weatherIcon ?? 0),
+                            size: 32,
+                          ),
+                        ),
+                        Text(
+                          '$tem °$unit',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ),
           ],
-        ),
-        Gap(16),
-        SizedBox(
-          height: 120,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: 6,
-            itemBuilder: (context, index) {
-              final hour = WeatherData.hourlyForecast[index];
-              final time = DateTime.parse(hour['DateTime']).hour;
-              final displayTime =
-                  time == 12
-                      ? '12 PM'
-                      : time > 12
-                      ? '${time - 12} PM'
-                      : time == 0
-                      ? '12 AM'
-                      : '$time AM';
-
-              return Container(
-                width: 80,
-                margin: EdgeInsets.only(right: 12),
-                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-                decoration: BoxDecoration(
-                  color: Colors.white24,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      displayTime,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    Text(
-                      WeatherData.getWeatherIcon(hour['WeatherIcon']),
-                      style: TextStyle(fontSize: 24),
-                    ),
-                    Text(
-                      '${hour['Temperature']['Value']}°',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
 

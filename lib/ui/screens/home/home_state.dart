@@ -7,6 +7,9 @@ class HomeState extends Equatable {
   final CurrentConditions? currentConditions;
   final LoadStatus airQualityStatus;
   final CurrentAirQuality? airQuality;
+  final LoadStatus next12HoursForecastStatus;
+
+  final List<HourlyForecast> next12HoursForecast;
 
   const HomeState({
     this.oneMinuteCast,
@@ -15,6 +18,8 @@ class HomeState extends Equatable {
     this.currentConditionsStatus = LoadStatus.initial,
     this.airQuality,
     this.airQualityStatus = LoadStatus.initial,
+    this.next12HoursForecastStatus = LoadStatus.initial,
+    this.next12HoursForecast = const [],
   });
 
   @override
@@ -25,6 +30,8 @@ class HomeState extends Equatable {
     currentConditionsStatus,
     airQuality,
     airQualityStatus,
+    next12HoursForecastStatus,
+    next12HoursForecast,
   ];
 
   HomeState copyWith({
@@ -34,6 +41,8 @@ class HomeState extends Equatable {
     CurrentConditions? currentConditions,
     LoadStatus? airQualityStatus,
     CurrentAirQuality? airQuality,
+    List<HourlyForecast>? next12HoursForecast,
+    LoadStatus? next12HoursForecastStatus,
   }) => HomeState(
     oneMinuteCast: oneMinuteCast ?? this.oneMinuteCast,
     oneMinuteCastStatus: oneMinuteCastStatus ?? this.oneMinuteCastStatus,
@@ -41,5 +50,7 @@ class HomeState extends Equatable {
     currentConditions: currentConditions ?? this.currentConditions,
     airQualityStatus: airQualityStatus ?? this.airQualityStatus,
     airQuality: airQuality ?? this.airQuality,
+    next12HoursForecastStatus: next12HoursForecastStatus ?? this.next12HoursForecastStatus,
+    next12HoursForecast: next12HoursForecast ?? this.next12HoursForecast,
   );
 }

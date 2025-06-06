@@ -10,6 +10,8 @@ class ApiInterceptor extends InterceptorsWrapper {
     options.queryParameters['details'] = true;
     options.queryParameters['language'] = 'en-us';
     options.queryParameters['Accept-Encoding'] = 'gzip,deflate';
+    // TODO
+    options.queryParameters['metric'] = true;
     logger.d(
       'REQUEST[${options.method}] => PATH: ${options.path}\nQUERY: ${options.queryParameters}\nBODY: ${options.data}',
     );

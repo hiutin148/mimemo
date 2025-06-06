@@ -11,6 +11,7 @@ import 'package:mimemo/locator.dart';
 import 'package:mimemo/repositories/app_setting_repository.dart';
 import 'package:mimemo/router/app_router.gr.dart';
 import 'package:mimemo/ui/screens/onboarding/onboarding_cubit.dart';
+import 'package:mimemo/ui/widgets/app_button.dart';
 
 @RoutePage()
 class OnboardingScreen extends StatefulWidget {
@@ -76,7 +77,6 @@ class WelcomeScreen extends StatelessWidget {
           child: Column(
             children: [
               Gap(60),
-
               // AccuWeather Logo
               Container(
                 width: 120,
@@ -124,15 +124,9 @@ class WelcomeScreen extends StatelessWidget {
               // Get Started Button
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
+                child: AppButton(
+                  padding: EdgeInsets.symmetric(vertical: 8),
                   onPressed: onNext,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Color(0xFF1E90FF),
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-                    elevation: 0,
-                  ),
                   child: Text(S.of(context).getStarted, style: context.textTheme.bodyLarge?.w700),
                 ),
               ),
@@ -213,15 +207,10 @@ class FeaturesScreen extends StatelessWidget {
               // Continue Button
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
+                child: AppButton(
+                  padding: EdgeInsets.symmetric(vertical: 8),
+
                   onPressed: onNext,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Color(0xFF2F1B69),
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-                    elevation: 0,
-                  ),
                   child: Text(S.of(context).continueT, style: context.textTheme.bodyLarge?.w700),
                 ),
               ),
@@ -352,14 +341,10 @@ class LocationPermissionScreen extends StatelessWidget {
               // Allow Location Button
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
+                child: AppButton(
+                  padding: EdgeInsets.symmetric(vertical: 8),
+
                   onPressed: () => _requestPermission(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-                    elevation: 0,
-                  ),
                   child: Text(
                     S.of(context).allowLocationAccess,
                     style: context.textTheme.bodyLarge?.w700,
@@ -486,15 +471,10 @@ class NotificationPermissionScreen extends StatelessWidget {
               // Enable Notifications Button
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
+                child: AppButton(
+                  padding: EdgeInsets.symmetric(vertical: 8),
+
                   onPressed: onNext,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Color(0xFFDC143C),
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-                    elevation: 0,
-                  ),
                   child: Text(
                     S.of(context).enableNotifications,
                     style: context.textTheme.bodyLarge?.w700,
@@ -566,7 +546,8 @@ class GetStartedScreen extends StatelessWidget {
               Spacer(),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
+                child: AppButton(
+                  padding: EdgeInsets.symmetric(vertical: 8),
                   onPressed: () async {
                     context.read<OnboardingCubit>().setIsFirstOpen();
                     await OverlayLoading.runWithLoading(
@@ -577,13 +558,6 @@ class GetStartedScreen extends StatelessWidget {
                       context.replaceRoute(BottomNavRoute());
                     }
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Color(0xFF006400),
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-                    elevation: 0,
-                  ),
                   child: Text(
                     S.of(context).startUsingApp,
                     style: context.textTheme.bodyLarge?.w700,

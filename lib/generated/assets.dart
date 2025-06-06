@@ -2,7 +2,14 @@
 class Assets {
   Assets._();
 
+  static const String iconsCloud = 'assets/icons/cloud.svg';
+  static const String iconsCloudAngledRainZap = 'assets/icons/cloud_angled_rain_zap.svg';
+  static const String iconsCloudLittleRain = 'assets/icons/cloud_little_rain.svg';
+  static const String iconsSlowWind = 'assets/icons/slow_wind.svg';
   static const String iconsSun = 'assets/icons/sun.svg';
+  static const String iconsSunCloud = 'assets/icons/sun_cloud.svg';
+  static const String iconsSunCloudLittleRain = 'assets/icons/sun_cloud_little_rain.svg';
+  static const String iconsSunCloudZap = 'assets/icons/sun_cloud_zap.svg';
   static const String iconsSunSlowWind = 'assets/icons/sun_slow_wind.svg';
 
 }

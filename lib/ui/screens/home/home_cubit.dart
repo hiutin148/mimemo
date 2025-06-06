@@ -4,6 +4,7 @@ import 'package:mimemo/common/blocs/main/main_cubit.dart';
 import 'package:mimemo/common/utils/logger.dart';
 import 'package:mimemo/models/entities/current_air_quality/current_air_quality.dart';
 import 'package:mimemo/models/entities/current_conditions/current_conditions.dart';
+import 'package:mimemo/models/entities/hourly_forecast/hourly_forecast.dart';
 import 'package:mimemo/models/entities/one_minute_cast/one_minute_cast.dart';
 import 'package:mimemo/models/enums/load_status.dart';
 import 'package:mimemo/repositories/current_condition_repository.dart';
@@ -27,6 +28,7 @@ class HomeCubit extends Cubit<HomeState> {
       getOneMinuteCast();
       getCurrentConditions();
       getAirQuality();
+      getNext12HoursForecast();
     } catch (e) {
       logger.e(e);
     }
@@ -72,6 +74,24 @@ class HomeCubit extends Cubit<HomeState> {
     } catch (e) {
       logger.e(e);
       emit(state.copyWith(airQualityStatus: LoadStatus.failure));
+    }
+  }
+
+  Future<void> getNext12HoursForecast() async {
+    try {
+      emit(state.copyWith(next12HoursForecastStatus: LoadStatus.loading));
+      final next12HoursForecast = await forecastRepository.getNext12HoursForecast(
+        mainCubit.state.positionInfo?.key ?? '',
+      );
+      emit(
+        state.copyWith(
+          next12HoursForecastStatus: LoadStatus.success,
+          next12HoursForecast: next12HoursForecast,
+        ),
+      );
+    } catch (e) {
+      logger.e(e);
+      emit(state.copyWith(next12HoursForecastStatus: LoadStatus.failure));
     }
   }
 }

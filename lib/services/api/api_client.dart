@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:mimemo/core/const/config.dart';
 import 'package:mimemo/models/entities/current_air_quality/current_air_quality.dart';
 import 'package:mimemo/models/entities/current_conditions/current_conditions.dart';
+import 'package:mimemo/models/entities/hourly_forecast/hourly_forecast.dart';
 import 'package:mimemo/models/entities/minute_color/minute_color.dart';
 import 'package:mimemo/models/entities/one_minute_cast/one_minute_cast.dart';
 import 'package:mimemo/models/entities/position_info/position_info.dart';
@@ -23,10 +24,16 @@ abstract class ApiClient {
 
   // Forecast
   @GET('/forecasts/v1/minute/1minute')
-  Future<OneMinuteCast> get1MinuteCast({@Query('q')required String latLong, @Query('minuteCount') int? minuteCount});
+  Future<OneMinuteCast> get1MinuteCast({
+    @Query('q') required String latLong,
+    @Query('minuteCount') int? minuteCount,
+  });
 
   @GET('/forecasts/v1/minute/colors/simple')
   Future<List<MinuteColor>> getMinuteColors();
+
+  @GET('/forecasts/v1/hourly/12hour/{locationKey}')
+  Future<List<HourlyForecast>> getNext12HoursForecast(@Path('locationKey') String locationKey);
 
   // Current condition
   @GET('/currentconditions/v1/{locationKey}')
@@ -34,5 +41,4 @@ abstract class ApiClient {
 
   @GET('/airquality/v2/currentconditions/{locationKey}')
   Future<CurrentAirQuality> getCurrentAirQuality(@Path('locationKey') String locationKey);
-
 }
