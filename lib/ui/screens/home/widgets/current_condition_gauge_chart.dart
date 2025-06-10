@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
@@ -5,6 +6,7 @@ import 'package:mimemo/common/utils/utils.dart';
 import 'package:mimemo/core/extension/context_extension.dart';
 import 'package:mimemo/core/extension/text_style_extension.dart';
 import 'package:mimemo/models/enums/aqi.dart';
+import 'package:mimemo/router/app_router.gr.dart';
 import 'package:mimemo/ui/screens/home/home_cubit.dart';
 import 'package:mimemo/ui/screens/home/widgets/air_quality_chart.dart';
 import 'package:mimemo/ui/screens/home/widgets/rain_condition_chart.dart';
@@ -16,15 +18,18 @@ class CurrentConditionGaugeChart extends StatefulWidget {
   const CurrentConditionGaugeChart({super.key});
 
   @override
-  State<CurrentConditionGaugeChart> createState() => _CurrentConditionGaugeChartState();
+  State<CurrentConditionGaugeChart> createState() =>
+      _CurrentConditionGaugeChartState();
 }
 
-class _CurrentConditionGaugeChartState extends State<CurrentConditionGaugeChart> {
+class _CurrentConditionGaugeChartState
+    extends State<CurrentConditionGaugeChart> {
   // Constants moved to static for better memory usage
   static const String _rainConditionButtonText = '4 hours';
   static const String _airQualityButtonText = 'Hourly';
   static const String _airQualityTitle = 'Current air pollutants are';
-  static const String _lastUpdatedText = 'Last updated at 11h37'; // TODO: Make dynamic
+  static const String _lastUpdatedText =
+      'Last updated at 11h37'; // TODO: Make dynamic
   static const String _excellentLabel = 'EXCELLENT';
   static const String _dangerousLabel = 'DANGEROUS';
 
@@ -59,15 +64,12 @@ class _CurrentConditionGaugeChartState extends State<CurrentConditionGaugeChart>
     }
   }
 
-  String get _currentButtonText => _currentTab == 0
-      ? _rainConditionButtonText
-      : _airQualityButtonText;
+  String get _currentButtonText =>
+      _currentTab == 0 ? _rainConditionButtonText : _airQualityButtonText;
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<HomeCubit, HomeState>(
-      builder: _buildContent,
-    );
+    return BlocBuilder<HomeCubit, HomeState>(builder: _buildContent);
   }
 
   Widget _buildContent(BuildContext context, HomeState state) {
@@ -88,18 +90,16 @@ class _CurrentConditionGaugeChartState extends State<CurrentConditionGaugeChart>
   Widget _buildHeader(BuildContext context, HomeState state) {
     return SizedBox(
       height: 48,
-      child: _currentTab == 0
-          ? _buildRainHeader(context, state)
-          : _buildAirQualityHeader(context, state),
+      child:
+          _currentTab == 0
+              ? _buildRainHeader(context, state)
+              : _buildAirQualityHeader(context, state),
     );
   }
 
   Widget _buildRainHeader(BuildContext context, HomeState state) {
     final phrase = state.oneMinuteCast?.summary?.phrase60 ?? '';
-    return Text(
-      phrase,
-      style: context.textTheme.titleMedium?.white.w400,
-    );
+    return Text(phrase, style: context.textTheme.titleMedium?.white.w400);
   }
 
   Widget _buildAirQualityHeader(BuildContext context, HomeState state) {
@@ -110,10 +110,7 @@ class _CurrentConditionGaugeChartState extends State<CurrentConditionGaugeChart>
           _airQualityTitle,
           style: context.textTheme.titleMedium?.white.w400,
         ),
-        Text(
-          category,
-          style: context.textTheme.titleMedium?.white.w700,
-        ),
+        Text(category, style: context.textTheme.titleMedium?.white.w700),
       ],
     );
   }
@@ -126,10 +123,7 @@ class _CurrentConditionGaugeChartState extends State<CurrentConditionGaugeChart>
           PageView(
             controller: _pageController,
             onPageChanged: _onTabSwitch,
-            children: const [
-              RainConditionChart(),
-              AirQualityChart(),
-            ],
+            children: const [RainConditionChart(), AirQualityChart()],
           ),
           _buildCenterContent(context, state),
         ],
@@ -152,17 +146,15 @@ class _CurrentConditionGaugeChartState extends State<CurrentConditionGaugeChart>
     final temperature = currentConditions?.temperature?.metric?.value;
     final unit = currentConditions?.temperature?.metric?.unit ?? '';
     final temperatureText = temperature != null ? '$temperature °$unit' : '';
-    final realFeel = currentConditions?.realFeelTemperature?.metric?.value ?? '';
+    final realFeel =
+        currentConditions?.realFeelTemperature?.metric?.value ?? '';
     final icon = currentConditions?.weatherIcon ?? 0;
 
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          AppIcon(
-            icon: Utils.getIconAsset(icon),
-            size: _iconSize,
-          ),
+          AppIcon(icon: Utils.getIconAsset(icon), size: _iconSize),
           Text(
             temperatureText,
             style: context.textTheme.headlineLarge?.w700.white,
@@ -183,7 +175,11 @@ class _CurrentConditionGaugeChartState extends State<CurrentConditionGaugeChart>
       width: _buttonWidth,
       padding: const EdgeInsets.symmetric(vertical: 4),
       onPressed: () {
-        // TODO: Implement button action
+        if (_currentTab == 0) {
+          context.pushRoute(const PrecipitationRoute());
+        } else if (_currentTab == 1) {
+          // TODO
+        }
       },
       child: Row(
         spacing: 2,
@@ -199,9 +195,10 @@ class _CurrentConditionGaugeChartState extends State<CurrentConditionGaugeChart>
   Widget _buildFooter(BuildContext context) {
     return SizedBox(
       height: 48,
-      child: _currentTab == 0
-          ? _buildRainFooter(context)
-          : _buildAirQualityFooter(context),
+      child:
+          _currentTab == 0
+              ? _buildRainFooter(context)
+              : _buildAirQualityFooter(context),
     );
   }
 
@@ -217,10 +214,7 @@ class _CurrentConditionGaugeChartState extends State<CurrentConditionGaugeChart>
       spacing: 4,
       children: [
         _buildAqiScale(context),
-        Text(
-          _lastUpdatedText,
-          style: context.textTheme.bodyMedium?.white.w400,
-        ),
+        Text(_lastUpdatedText, style: context.textTheme.bodyMedium?.white.w400),
       ],
     );
   }
@@ -252,11 +246,16 @@ class _CurrentConditionGaugeChartState extends State<CurrentConditionGaugeChart>
     return ClipRRect(
       borderRadius: BorderRadius.circular(50),
       child: Row(
-        children: Aqi.values.map((aqi) => Container(
-          width: _aqiBarWidth,
-          height: _aqiBarHeight,
-          color: aqi.color,
-        )).toList(),
+        children:
+            Aqi.values
+                .map(
+                  (aqi) => Container(
+                    width: _aqiBarWidth,
+                    height: _aqiBarHeight,
+                    color: aqi.color,
+                  ),
+                )
+                .toList(),
       ),
     );
   }

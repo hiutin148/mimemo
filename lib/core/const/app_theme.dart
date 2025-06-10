@@ -5,6 +5,12 @@ import 'package:mimemo/core/const/app_colors.dart';
 class AppTheme {
   static final ThemeData themeData = ThemeData(
     primarySwatch: AppColors.createMaterialColor(AppColors.primary),
+    scaffoldBackgroundColor: AppColors.primary,
+    appBarTheme: const AppBarTheme(
+      backgroundColor: AppColors.primary,
+      titleTextStyle: TextStyle(fontSize: 16, color: Colors.white),
+      iconTheme: IconThemeData(color: Colors.white),
+    ),
     fontFamily: 'Roboto',
     textTheme: const TextTheme(
       // Display
