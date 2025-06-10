@@ -1,3 +1,4 @@
+import 'package:mimemo/models/entities/daily_forecast/daily_forecast.dart';
 import 'package:mimemo/models/entities/hourly_forecast/hourly_forecast.dart';
 import 'package:mimemo/models/entities/minute_color/minute_color.dart';
 import 'package:mimemo/models/entities/one_minute_cast/one_minute_cast.dart';
@@ -9,12 +10,14 @@ abstract class ForecastRepository {
   Future<List<MinuteColor>> getMinuteColors();
 
   Future<List<HourlyForecast>> getNext12HoursForecast(String locationKey);
+
+  Future<DailyForecast> get10DaysForecast(String locationKey);
 }
 
 class ForecastRepositoryImpl extends ForecastRepository {
-  final ApiClient apiClient;
 
   ForecastRepositoryImpl({required this.apiClient});
+  final ApiClient apiClient;
 
   @override
   Future<OneMinuteCast> get1MinuteCast(double lat, double long) {
@@ -31,5 +34,10 @@ class ForecastRepositoryImpl extends ForecastRepository {
   @override
   Future<List<HourlyForecast>> getNext12HoursForecast(String locationKey) {
     return apiClient.getNext12HoursForecast(locationKey);
+  }
+
+  @override
+  Future<DailyForecast> get10DaysForecast(String locationKey) {
+    return apiClient.get10DaysForecast(locationKey);
   }
 }

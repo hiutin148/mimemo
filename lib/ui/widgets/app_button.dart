@@ -21,7 +21,7 @@ class AppButton extends StatelessWidget {
 
   final Widget? child;
   final String title;
-  final Function()? onPressed;
+  final void Function()? onPressed;
   final double? height;
   final double? width;
   final double radius;
@@ -43,7 +43,7 @@ class AppButton extends StatelessWidget {
         backgroundColor: backgroundColor,
         disabledBackgroundColor: disabledBackgroundColor,
         padding: padding,
-        minimumSize: const Size.square(0),
+        minimumSize: Size.zero,
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
       onPressed: enable ? onPressed : null,

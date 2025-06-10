@@ -9,17 +9,17 @@ class RadarPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Weather Radar', style: TextStyle(color: Colors.white)),
-        backgroundColor: Color(0xFF4A90E2),
+        title: const Text('Weather Radar', style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color(0xFF4A90E2),
         elevation: 0,
         leading: Container(),
         actions: [
-          IconButton(icon: Icon(Icons.layers, color: Colors.white), onPressed: () {}),
-          IconButton(icon: Icon(Icons.play_arrow, color: Colors.white), onPressed: () {}),
+          IconButton(icon: const Icon(Icons.layers, color: Colors.white), onPressed: () {}),
+          IconButton(icon: const Icon(Icons.play_arrow, color: Colors.white), onPressed: () {}),
         ],
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -30,7 +30,7 @@ class RadarPage extends StatelessWidget {
           children: [
             Expanded(
               child: Container(
-                margin: EdgeInsets.all(16),
+                margin: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16),
@@ -43,8 +43,8 @@ class RadarPage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.radar, size: 64, color: Colors.white.withValues(alpha: 0.6)),
-                          Gap( 16),
-                          Text(
+                          const Gap( 16),
+                          const Text(
                             'Weather Radar Map',
                             style: TextStyle(
                               color: Colors.white,
@@ -52,7 +52,7 @@ class RadarPage extends StatelessWidget {
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          Gap( 8),
+                          const Gap( 8),
                           Text(
                             'New York Metro Area',
                             style: TextStyle(
@@ -93,7 +93,7 @@ class RadarPage extends StatelessWidget {
               ),
             ),
             Container(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -114,7 +114,7 @@ class RadarPage extends StatelessWidget {
     return Column(
       children: [
         Container(
-          padding: EdgeInsets.all(12),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: isActive ? Colors.white.withValues(alpha: 0.2) : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
@@ -122,8 +122,8 @@ class RadarPage extends StatelessWidget {
           ),
           child: Icon(icon, color: Colors.white, size: 24),
         ),
-        Gap( 8),
-        Text(label, style: TextStyle(color: Colors.white, fontSize: 12)),
+        const Gap( 8),
+        Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
       ],
     );
   }

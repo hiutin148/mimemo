@@ -19,7 +19,7 @@ class SplashScreen extends StatelessWidget {
             appSettingRepository: locator<AppSettingRepository>(),
             mainCubit: context.read<MainCubit>(),
           )..init(),
-      child: SplashView(),
+      child: const SplashView(),
     );
   }
 }
@@ -31,13 +31,13 @@ class SplashView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocListener<SplashCubit, bool?>(
       listener: (BuildContext context, bool? state) {
-        if (state == true) {
-          context.replaceRoute(OnboardingRoute());
+        if (state ?? false) {
+          context.replaceRoute(const OnboardingRoute());
         } else if (state == false) {
-          context.replaceRoute(BottomNavRoute());
+          context.replaceRoute(const BottomNavRoute());
         }
       },
-      child: Scaffold(body: Center(child: Text('SPLASH'))),
+      child: const Scaffold(body: Center(child: Text('SPLASH'))),
     );
   }
 }

@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:mimemo/common/utils/logger.dart';
 import 'package:mimemo/core/const/config.dart';
-
-import '../../common/utils/logger.dart';
 
 class ApiInterceptor extends InterceptorsWrapper {
   @override
@@ -9,7 +8,7 @@ class ApiInterceptor extends InterceptorsWrapper {
     options.queryParameters['apikey'] = Config.apiKey;
     options.queryParameters['details'] = true;
     options.queryParameters['language'] = 'en-us';
-    options.queryParameters['Accept-Encoding'] = 'gzip,deflate';
+    options.headers['Accept-Encoding'] = 'gzip,deflate';
     // TODO
     options.queryParameters['metric'] = true;
     logger.d(
@@ -19,7 +18,7 @@ class ApiInterceptor extends InterceptorsWrapper {
   }
 
   @override
-  void onResponse(Response response, ResponseInterceptorHandler handler) {
+  void onResponse(Response<dynamic> response, ResponseInterceptorHandler handler) {
     logger.i('RESPONSE[${response.statusCode}] => DATA: ${response.data}');
     return handler.next(response);
   }

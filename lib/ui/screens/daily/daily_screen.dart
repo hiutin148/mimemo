@@ -11,13 +11,13 @@ class DailyPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('7-Day Forecast', style: TextStyle(color: Colors.white)),
-        backgroundColor: Color(0xFF4A90E2),
+        title: const Text('7-Day Forecast', style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color(0xFF4A90E2),
         elevation: 0,
         leading: Container(),
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -25,15 +25,15 @@ class DailyPage extends StatelessWidget {
           ),
         ),
         child: ListView.builder(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           itemCount: WeatherData.dailyForecast.length,
           itemBuilder: (context, index) {
             final day = WeatherData.dailyForecast[index];
             final dayName = WeatherData.getDayNames()[index];
 
             return Container(
-              margin: EdgeInsets.only(bottom: 12),
-              padding: EdgeInsets.all(16),
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
@@ -47,7 +47,7 @@ class DailyPage extends StatelessWidget {
                         flex: 2,
                         child: Text(
                           dayName,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
@@ -55,16 +55,16 @@ class DailyPage extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        WeatherData.getWeatherIcon(day['Day']['Icon']),
-                        style: TextStyle(fontSize: 32),
+                        WeatherData.getWeatherIcon(day['Day']['Icon'] as int),
+                        style: const TextStyle(fontSize: 32),
                       ),
-                      Gap( 20),
+                      const Gap( 20),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
                             '${day['Temperature']['Maximum']['Value']}°',
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 20,
                               fontWeight: FontWeight.w600,
@@ -81,12 +81,12 @@ class DailyPage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  Gap( 12),
+                  const Gap( 12),
                   Row(
                     children: [
                       Expanded(
                         child: Text(
-                          day['Day']['IconPhrase'],
+                          day['Day']['IconPhrase'].toString(),
                           style: TextStyle(
                             color: Colors.white.withValues(alpha: 0.8),
                             fontSize: 14,

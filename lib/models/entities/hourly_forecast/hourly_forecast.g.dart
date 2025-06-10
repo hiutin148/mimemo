@@ -20,35 +20,37 @@ HourlyForecast _$HourlyForecastFromJson(
   temperature:
       json['Temperature'] == null
           ? null
-          : UnitValue.fromJson(json['Temperature'] as Map<String, dynamic>),
+          : UnitValueDetail.fromJson(
+            json['Temperature'] as Map<String, dynamic>,
+          ),
   realFeelTemperature:
       json['RealFeelTemperature'] == null
           ? null
-          : UnitValueWithPhrase.fromJson(
+          : UnitValueDetail.fromJson(
             json['RealFeelTemperature'] as Map<String, dynamic>,
           ),
   realFeelTemperatureShade:
       json['RealFeelTemperatureShade'] == null
           ? null
-          : UnitValueWithPhrase.fromJson(
+          : UnitValueDetail.fromJson(
             json['RealFeelTemperatureShade'] as Map<String, dynamic>,
           ),
   wetBulbTemperature:
       json['WetBulbTemperature'] == null
           ? null
-          : UnitValue.fromJson(
+          : UnitValueDetail.fromJson(
             json['WetBulbTemperature'] as Map<String, dynamic>,
           ),
   wetBulbGlobeTemperature:
       json['WetBulbGlobeTemperature'] == null
           ? null
-          : UnitValue.fromJson(
+          : UnitValueDetail.fromJson(
             json['WetBulbGlobeTemperature'] as Map<String, dynamic>,
           ),
   dewPoint:
       json['DewPoint'] == null
           ? null
-          : UnitValue.fromJson(json['DewPoint'] as Map<String, dynamic>),
+          : UnitValueDetail.fromJson(json['DewPoint'] as Map<String, dynamic>),
   wind:
       json['Wind'] == null
           ? null
@@ -62,11 +64,13 @@ HourlyForecast _$HourlyForecastFromJson(
   visibility:
       json['Visibility'] == null
           ? null
-          : UnitValue.fromJson(json['Visibility'] as Map<String, dynamic>),
+          : UnitValueDetail.fromJson(
+            json['Visibility'] as Map<String, dynamic>,
+          ),
   ceiling:
       json['Ceiling'] == null
           ? null
-          : UnitValue.fromJson(json['Ceiling'] as Map<String, dynamic>),
+          : UnitValueDetail.fromJson(json['Ceiling'] as Map<String, dynamic>),
   uvIndex: (json['UVIndex'] as num?)?.toInt(),
   uvIndexText: json['UVIndexText'] as String?,
   precipitationProbability: (json['PrecipitationProbability'] as num?)?.toInt(),
@@ -77,30 +81,34 @@ HourlyForecast _$HourlyForecastFromJson(
   totalLiquid:
       json['TotalLiquid'] == null
           ? null
-          : UnitValue.fromJson(json['TotalLiquid'] as Map<String, dynamic>),
+          : UnitValueDetail.fromJson(
+            json['TotalLiquid'] as Map<String, dynamic>,
+          ),
   rain:
       json['Rain'] == null
           ? null
-          : UnitValue.fromJson(json['Rain'] as Map<String, dynamic>),
+          : UnitValueDetail.fromJson(json['Rain'] as Map<String, dynamic>),
   snow:
       json['Snow'] == null
           ? null
-          : UnitValue.fromJson(json['Snow'] as Map<String, dynamic>),
+          : UnitValueDetail.fromJson(json['Snow'] as Map<String, dynamic>),
   ice:
       json['Ice'] == null
           ? null
-          : UnitValue.fromJson(json['Ice'] as Map<String, dynamic>),
+          : UnitValueDetail.fromJson(json['Ice'] as Map<String, dynamic>),
   cloudCover: (json['CloudCover'] as num?)?.toInt(),
   evapotranspiration:
       json['Evapotranspiration'] == null
           ? null
-          : UnitValue.fromJson(
+          : UnitValueDetail.fromJson(
             json['Evapotranspiration'] as Map<String, dynamic>,
           ),
   solarIrradiance:
       json['SolarIrradiance'] == null
           ? null
-          : UnitValue.fromJson(json['SolarIrradiance'] as Map<String, dynamic>),
+          : UnitValueDetail.fromJson(
+            json['SolarIrradiance'] as Map<String, dynamic>,
+          ),
   accuLumenBrightnessIndex:
       (json['AccuLumenBrightnessIndex'] as num?)?.toDouble(),
   mobileLink: json['MobileLink'] as String?,
@@ -147,73 +155,3 @@ Map<String, dynamic> _$HourlyForecastToJson(HourlyForecast instance) =>
       'MobileLink': instance.mobileLink,
       'Link': instance.link,
     };
-
-UnitValue _$UnitValueFromJson(Map<String, dynamic> json) => UnitValue(
-  value: (json['value'] as num?)?.toDouble(),
-  unit: json['unit'] as String?,
-  unitType: (json['unitType'] as num?)?.toInt(),
-);
-
-Map<String, dynamic> _$UnitValueToJson(UnitValue instance) => <String, dynamic>{
-  'value': instance.value,
-  'unit': instance.unit,
-  'unitType': instance.unitType,
-};
-
-UnitValueWithPhrase _$UnitValueWithPhraseFromJson(Map<String, dynamic> json) =>
-    UnitValueWithPhrase(
-      value: (json['value'] as num?)?.toDouble(),
-      unit: json['unit'] as String?,
-      unitType: (json['unitType'] as num?)?.toInt(),
-      phrase: json['phrase'] as String?,
-    );
-
-Map<String, dynamic> _$UnitValueWithPhraseToJson(
-  UnitValueWithPhrase instance,
-) => <String, dynamic>{
-  'value': instance.value,
-  'unit': instance.unit,
-  'unitType': instance.unitType,
-  'phrase': instance.phrase,
-};
-
-Wind _$WindFromJson(Map<String, dynamic> json) => Wind(
-  speed:
-      json['speed'] == null
-          ? null
-          : UnitValue.fromJson(json['speed'] as Map<String, dynamic>),
-  direction:
-      json['direction'] == null
-          ? null
-          : WindDirection.fromJson(json['direction'] as Map<String, dynamic>),
-);
-
-Map<String, dynamic> _$WindToJson(Wind instance) => <String, dynamic>{
-  'speed': instance.speed,
-  'direction': instance.direction,
-};
-
-WindDirection _$WindDirectionFromJson(Map<String, dynamic> json) =>
-    WindDirection(
-      degrees: (json['degrees'] as num?)?.toInt(),
-      localized: json['localized'] as String?,
-      english: json['english'] as String?,
-    );
-
-Map<String, dynamic> _$WindDirectionToJson(WindDirection instance) =>
-    <String, dynamic>{
-      'degrees': instance.degrees,
-      'localized': instance.localized,
-      'english': instance.english,
-    };
-
-WindGust _$WindGustFromJson(Map<String, dynamic> json) => WindGust(
-  speed:
-      json['speed'] == null
-          ? null
-          : UnitValue.fromJson(json['speed'] as Map<String, dynamic>),
-);
-
-Map<String, dynamic> _$WindGustToJson(WindGust instance) => <String, dynamic>{
-  'speed': instance.speed,
-};

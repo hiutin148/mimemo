@@ -2,12 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class AppIcon extends StatelessWidget {
-  const AppIcon({
-    super.key,
-    required this.icon,
-    this.color,
-    this.size = 24,
-  });
+  const AppIcon({required this.icon, super.key, this.color, this.size = 24});
 
   final String icon;
   final Color? color;

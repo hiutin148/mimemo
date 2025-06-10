@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:mimemo/core/extension/context_extension.dart';
 import 'package:mimemo/core/extension/text_style_extension.dart';
@@ -21,7 +23,7 @@ abstract final class OverlayLoading {
     } catch (e) {
       rethrow;
     } finally {
-      OverlayLoading.hide();
+      unawaited(OverlayLoading.hide());
     }
   }
 
@@ -70,7 +72,7 @@ abstract final class OverlayLoading {
     _controller!.forward();
   }
 
-  static void hide() async {
+  static Future<void> hide() async {
     if (_overlayEntry == null || _controller == null) return;
 
     await _controller!.reverse();

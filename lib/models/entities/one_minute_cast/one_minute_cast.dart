@@ -4,6 +4,17 @@ part 'one_minute_cast.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class OneMinuteCast {
+
+  OneMinuteCast({
+    this.summary,
+    this.summaries,
+    this.intervals,
+    this.mobileLink,
+    this.link,
+  });
+
+  factory OneMinuteCast.fromJson(Map<String, dynamic> json) =>
+      _$OneMinuteCastFromJson(json);
   @JsonKey(name: 'Summary')
   final MinuteCastSummary? summary;
 
@@ -18,22 +29,24 @@ class OneMinuteCast {
 
   @JsonKey(name: 'Link')
   final String? link;
-
-  OneMinuteCast({
-    this.summary,
-    this.summaries,
-    this.intervals,
-    this.mobileLink,
-    this.link,
-  });
-
-  factory OneMinuteCast.fromJson(Map<String, dynamic> json) =>
-      _$OneMinuteCastFromJson(json);
   Map<String, dynamic> toJson() => _$OneMinuteCastToJson(this);
 }
 
 @JsonSerializable()
 class MinuteCastSummary {
+
+  MinuteCastSummary({
+    this.phrase,
+    this.phrase60,
+    this.widgetPhrase,
+    this.shortPhrase,
+    this.briefPhrase,
+    this.longPhrase,
+    this.iconCode,
+  });
+
+  factory MinuteCastSummary.fromJson(Map<String, dynamic> json) =>
+      _$MinuteCastSummaryFromJson(json);
   @JsonKey(name: 'Phrase')
   final String? phrase;
 
@@ -54,10 +67,18 @@ class MinuteCastSummary {
 
   @JsonKey(name: 'IconCode')
   final int? iconCode;
+  Map<String, dynamic> toJson() => _$MinuteCastSummaryToJson(this);
+}
 
-  MinuteCastSummary({
-    this.phrase,
-    this.phrase60,
+@JsonSerializable()
+class MinuteCastRangeSummary {
+
+  MinuteCastRangeSummary({
+    this.startMinute,
+    this.endMinute,
+    this.countMinute,
+    this.minuteText,
+    this.minutesText,
     this.widgetPhrase,
     this.shortPhrase,
     this.briefPhrase,
@@ -65,13 +86,8 @@ class MinuteCastSummary {
     this.iconCode,
   });
 
-  factory MinuteCastSummary.fromJson(Map<String, dynamic> json) =>
-      _$MinuteCastSummaryFromJson(json);
-  Map<String, dynamic> toJson() => _$MinuteCastSummaryToJson(this);
-}
-
-@JsonSerializable()
-class MinuteCastRangeSummary {
+  factory MinuteCastRangeSummary.fromJson(Map<String, dynamic> json) =>
+      _$MinuteCastRangeSummaryFromJson(json);
   @JsonKey(name: 'StartMinute')
   final int? startMinute;
 
@@ -101,27 +117,25 @@ class MinuteCastRangeSummary {
 
   @JsonKey(name: 'IconCode')
   final int? iconCode;
-
-  MinuteCastRangeSummary({
-    this.startMinute,
-    this.endMinute,
-    this.countMinute,
-    this.minuteText,
-    this.minutesText,
-    this.widgetPhrase,
-    this.shortPhrase,
-    this.briefPhrase,
-    this.longPhrase,
-    this.iconCode,
-  });
-
-  factory MinuteCastRangeSummary.fromJson(Map<String, dynamic> json) =>
-      _$MinuteCastRangeSummaryFromJson(json);
   Map<String, dynamic> toJson() => _$MinuteCastRangeSummaryToJson(this);
 }
 
 @JsonSerializable()
 class MinuteInterval {
+
+  MinuteInterval({
+    this.startDateTime,
+    this.startEpochDateTime,
+    this.minute,
+    this.dbz,
+    this.shortPhrase,
+    this.iconCode,
+    this.cloudCover,
+    this.lightningRate,
+  });
+
+  factory MinuteInterval.fromJson(Map<String, dynamic> json) =>
+      _$MinuteIntervalFromJson(json);
   @JsonKey(name: 'StartDateTime')
   final String? startDateTime;
 
@@ -145,19 +159,5 @@ class MinuteInterval {
 
   @JsonKey(name: 'LightningRate')
   final int? lightningRate;
-
-  MinuteInterval({
-    this.startDateTime,
-    this.startEpochDateTime,
-    this.minute,
-    this.dbz,
-    this.shortPhrase,
-    this.iconCode,
-    this.cloudCover,
-    this.lightningRate,
-  });
-
-  factory MinuteInterval.fromJson(Map<String, dynamic> json) =>
-      _$MinuteIntervalFromJson(json);
   Map<String, dynamic> toJson() => _$MinuteIntervalToJson(this);
 }

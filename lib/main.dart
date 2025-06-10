@@ -6,14 +6,13 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:mimemo/common/blocs/main/main_cubit.dart';
 import 'package:mimemo/core/const/app_theme.dart';
+import 'package:mimemo/generated/l10n.dart';
 import 'package:mimemo/locator.dart';
 import 'package:mimemo/repositories/app_setting_repository.dart';
 import 'package:mimemo/repositories/forecast_repository.dart';
 import 'package:mimemo/repositories/position_repository.dart';
 import 'package:mimemo/router/app_router.dart';
 import 'package:mimemo/services/geolocation_service.dart';
-
-import 'generated/l10n.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,7 +42,7 @@ class WeatherApp extends StatelessWidget {
       ],
       child: MaterialApp.router(
         title: 'Weather App',
-        localizationsDelegates: [
+        localizationsDelegates: const [
           S.delegate,
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,

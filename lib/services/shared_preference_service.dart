@@ -151,7 +151,7 @@ class SharedPreferencesService {
 
     try {
       return jsonDecode(jsonString) as Map<String, dynamic>;
-    } catch (e) {
+    } on Exception {
       // Log error or handle as needed
       return null;
     }
@@ -171,7 +171,7 @@ class SharedPreferencesService {
     try {
       final decoded = jsonDecode(jsonString) as List;
       return decoded.cast<Map<String, dynamic>>();
-    } catch (e) {
+    } on Exception {
       // Log error or handle as needed
       return null;
     }

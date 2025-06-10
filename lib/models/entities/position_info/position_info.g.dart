@@ -232,18 +232,6 @@ Map<String, dynamic> _$ElevationToJson(Elevation instance) => <String, dynamic>{
   'Imperial': instance.imperial,
 };
 
-UnitValue _$UnitValueFromJson(Map<String, dynamic> json) => UnitValue(
-  value: (json['Value'] as num?)?.toDouble(),
-  unit: json['Unit'] as String?,
-  unitType: (json['UnitType'] as num?)?.toInt(),
-);
-
-Map<String, dynamic> _$UnitValueToJson(UnitValue instance) => <String, dynamic>{
-  'Value': instance.value,
-  'Unit': instance.unit,
-  'UnitType': instance.unitType,
-};
-
 ParentCity _$ParentCityFromJson(Map<String, dynamic> json) => ParentCity(
   key: json['Key'] as String?,
   localizedName: json['LocalizedName'] as String?,

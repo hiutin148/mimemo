@@ -12,15 +12,17 @@ abstract final class AppColors {
   static const Color airHazardous = Color(0XFF7E0023);
 
   static MaterialColor createMaterialColor(Color color) {
-    List strengths = <double>[.05];
-    Map<int, Color> swatch = {};
-    final double r = color.r, g = color.g, b = color.b;
+    final strengths = <double>[.05];
+    final swatch = <int, Color>{};
+    final r = color.r;
+    final g = color.g;
+    final b = color.b;
 
-    for (int i = 1; i < 10; i++) {
+    for (var i = 1; i < 10; i++) {
       strengths.add(0.1 * i);
     }
-    for (var strength in strengths) {
-      final double ds = 0.5 - strength;
+    for (final strength in strengths) {
+      final ds = 0.5 - strength;
       swatch[(strength * 1000).round()] = Color.from(
         alpha: 1,
         red: r + ((ds < 0 ? r : (255 - r)) * ds).round(),

@@ -3,10 +3,10 @@ import 'package:mimemo/common/utils/logger.dart';
 
 /// Custom exception for location-related errors
 class LocationException implements Exception {
-  final String message;
-  final LocationErrorType type;
 
   const LocationException(this.message, this.type);
+  final String message;
+  final LocationErrorType type;
 
   @override
   String toString() => 'LocationException: $message';
@@ -35,21 +35,21 @@ class GeoLocationService {
     try {
       // Check if location services are enabled
       logger.d('GeoLocationService: GETTING CURRENT POSITION');
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        throw LocationException(
+        throw const LocationException(
           'Location services are disabled',
           LocationErrorType.serviceDisabled,
         );
       }
 
       // Check and request permission
-      LocationPermission permission = await Geolocator.checkPermission();
+      var permission = await Geolocator.checkPermission();
 
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          throw LocationException(
+          throw const LocationException(
             'Location permission denied',
             LocationErrorType.permissionDenied,
           );
@@ -57,7 +57,7 @@ class GeoLocationService {
       }
 
       if (permission == LocationPermission.deniedForever) {
-        throw LocationException(
+        throw const LocationException(
           'Location permissions permanently denied',
           LocationErrorType.permissionDeniedForever,
         );
@@ -71,7 +71,7 @@ class GeoLocationService {
     } catch (e) {
       if (e is LocationException) rethrow;
       throw LocationException(
-        'Failed to get location: ${e.toString()}',
+        'Failed to get location: $e',
         LocationErrorType.unknown,
       );
     }
@@ -79,11 +79,11 @@ class GeoLocationService {
 
   /// Open app settings for permissions
   Future<bool> openAppSettings() async {
-    return await Geolocator.openAppSettings();
+    return Geolocator.openAppSettings();
   }
 
   /// Open location settings
   Future<bool> openLocationSettings() async {
-    return await Geolocator.openLocationSettings();
+    return Geolocator.openLocationSettings();
   }
 }

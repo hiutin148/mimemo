@@ -1,8 +1,8 @@
-import 'package:collection/collection.dart';
-import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
+import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mimemo/common/blocs/main/main_cubit.dart';
 import 'package:mimemo/core/extension/string_extension.dart';
@@ -22,7 +22,7 @@ class RainConditionChart extends StatelessWidget {
               final rainData = _extractRainData(homeState, mainState);
 
               return Padding(
-                padding: const EdgeInsets.only(top: 28.0),
+                padding: const EdgeInsets.only(top: 28),
                 child: SizedBox(
                   width: 300,
                   height: 300,
@@ -62,14 +62,22 @@ class RainConditionChart extends StatelessWidget {
 
 // Data class to hold processed rain data
 class RainData {
+
+  const RainData({required this.values, required this.maxValue, required this.colors});
   final List<double> values;
   final double maxValue;
   final List<MinuteColor> colors;
-
-  const RainData({required this.values, required this.maxValue, required this.colors});
 }
 
 class RainConditionPainter extends CustomPainter {
+
+  RainConditionPainter({
+    required this.values,
+    required this.minValue,
+    required this.maxValue,
+    required this.colors,
+    required this.strokeWidth,
+  });
   final List<double> values;
   final double minValue;
   final double maxValue;
@@ -93,14 +101,6 @@ class RainConditionPainter extends CustomPainter {
 
   // Cache for trigonometric calculations
   final Map<int, _SegmentInfo> _segmentCache = {};
-
-  RainConditionPainter({
-    required this.values,
-    required this.minValue,
-    required this.maxValue,
-    required this.colors,
-    required this.strokeWidth,
-  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -138,7 +138,7 @@ class RainConditionPainter extends CustomPainter {
     );
 
     // Draw all segments
-    for (int i = 0; i < segmentCount; i++) {
+    for (var i = 0; i < segmentCount; i++) {
       final segmentInfo = segmentInfos[i];
 
       // Draw background segment
@@ -157,7 +157,7 @@ class RainConditionPainter extends CustomPainter {
       ) {
     final segments = <_SegmentInfo>[];
 
-    for (int i = 0; i < segmentCount; i++) {
+    for (var i = 0; i < segmentCount; i++) {
       // Check cache first
       if (_segmentCache.containsKey(i)) {
         segments.add(_segmentCache[i]!);
@@ -193,7 +193,7 @@ class RainConditionPainter extends CustomPainter {
     );
 
     // Check shader cache
-    ui.Shader? shader = _shaderCache[progress];
+    var shader = _shaderCache[progress];
     if (shader == null) {
       final gradientInfo = _getCachedGradientInfo(progress);
       shader = ui.Gradient.linear(
@@ -234,8 +234,8 @@ class RainConditionPainter extends CustomPainter {
     );
 
     for (final label in _labels) {
-      textPainter.text = TextSpan(text: label.text, style: textStyle);
-      textPainter.layout();
+      textPainter..text = TextSpan(text: label.text, style: textStyle)
+      ..layout();
 
       final labelOffset = Offset(
         center.dx + (radius + 20) * math.cos(label.angle) - textPainter.width / 2,
@@ -269,7 +269,7 @@ class RainConditionPainter extends CustomPainter {
     final gradientStops = <double>[];
 
     // Optimize the gradient calculation
-    for (int i = 0; i < colors.length; i++) {
+    for (var i = 0; i < colors.length; i++) {
       final currentColor = colors[i];
       final startDbz = currentColor.startDbz ?? 0.0;
       final endDbz = currentColor.endDbz ?? 0.0;
@@ -303,7 +303,7 @@ class RainConditionPainter extends CustomPainter {
     // Ensure we have at least 2 colors for gradient
     if (gradientColors.length == 1) {
       gradientColors.add(gradientColors.first);
-      gradientStops.add(1.0);
+      gradientStops.add(1);
     }
 
     return GradientInfo(gradientColors, gradientStops);
@@ -330,22 +330,22 @@ class RainConditionPainter extends CustomPainter {
 
 // Helper classes for better organization
 class _LabelInfo {
-  final String text;
-  final double angle;
 
   const _LabelInfo(this.text, this.angle);
+  final String text;
+  final double angle;
 }
 
 class _SegmentInfo {
-  final Offset startPoint;
-  final Offset endPoint;
 
   const _SegmentInfo(this.startPoint, this.endPoint);
+  final Offset startPoint;
+  final Offset endPoint;
 }
 
 class GradientInfo {
-  final List<Color> colors;
-  final List<double> stops;
 
   const GradientInfo(this.colors, this.stops);
+  final List<Color> colors;
+  final List<double> stops;
 }

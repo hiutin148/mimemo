@@ -1,15 +1,15 @@
 part of 'main_cubit.dart';
 
 class MainState extends Equatable {
-  final PositionInfo? positionInfo;
-  final List<MinuteColor> minuteColors;
-  final LoadStatus loadStatus;
 
   const MainState({
     this.positionInfo,
     this.loadStatus = LoadStatus.initial,
     this.minuteColors = const [],
   });
+  final PositionInfo? positionInfo;
+  final List<MinuteColor> minuteColors;
+  final LoadStatus loadStatus;
 
   @override
   List<Object?> get props => [positionInfo, loadStatus, minuteColors];

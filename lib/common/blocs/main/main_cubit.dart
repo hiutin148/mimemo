@@ -1,6 +1,8 @@
+import 'dart:async';
+
 import 'package:equatable/equatable.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mimemo/common/utils/logger.dart';
+import 'package:mimemo/core/base/bases.dart';
 import 'package:mimemo/models/entities/minute_color/minute_color.dart';
 import 'package:mimemo/models/entities/position_info/position_info.dart';
 import 'package:mimemo/models/enums/load_status.dart';
@@ -11,11 +13,7 @@ import 'package:mimemo/services/geolocation_service.dart';
 
 part 'main_state.dart';
 
-class MainCubit extends Cubit<MainState> {
-  final PositionRepository _positionRepository;
-  final GeoLocationService _geoLocationService;
-  final ForecastRepository _forecastRepository;
-  final AppSettingRepository _appSettingRepository;
+class MainCubit extends BaseCubit<MainState> {
 
   MainCubit({
     required PositionRepository positionRepository,
@@ -27,6 +25,10 @@ class MainCubit extends Cubit<MainState> {
        _forecastRepository = forecastRepository,
        _appSettingRepository = appSettingRepository,
        super(const MainState());
+  final PositionRepository _positionRepository;
+  final GeoLocationService _geoLocationService;
+  final ForecastRepository _forecastRepository;
+  final AppSettingRepository _appSettingRepository;
 
   Future<void> init() async {
     if (state.loadStatus == LoadStatus.loading) return;
@@ -37,7 +39,7 @@ class MainCubit extends Cubit<MainState> {
       final (positionInfo, minuteColors) =
           await (_getPositionInfo(), _forecastRepository.getMinuteColors()).wait;
 
-      _appSettingRepository.setSavedLocationKey(positionInfo.key ?? '');
+      unawaited(_appSettingRepository.setSavedLocationKey(positionInfo.key ?? ''));
 
       emit(
         state.copyWith(
@@ -72,7 +74,7 @@ class MainCubit extends Cubit<MainState> {
   Future<PositionInfo> _getPositionInfo() async {
     final savedLocationKey = await _appSettingRepository.getSavedLocationKey();
 
-    return savedLocationKey?.isNotEmpty == true
+    return savedLocationKey?.isNotEmpty ?? false
         ? _positionRepository.getPositionByLocationKey(savedLocationKey!)
         : _getPositionInfoByLatLong();
   }

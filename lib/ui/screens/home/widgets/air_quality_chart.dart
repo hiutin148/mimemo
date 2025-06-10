@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mimemo/common/blocs/main/main_cubit.dart';
 import 'package:mimemo/models/enums/aqi.dart';
@@ -24,7 +24,7 @@ class AirQualityChart extends StatelessWidget {
                   height: 300,
                   child: CustomPaint(
                     painter: AirQualityPainter(value: overallPlumeLabsIndex, strokeWidth: 6),
-                    child: SizedBox(),
+                    child: const SizedBox(),
                   ),
                 ),
               );
@@ -37,22 +37,22 @@ class AirQualityChart extends StatelessWidget {
 }
 
 class AirQualityPainter extends CustomPainter {
+
+  AirQualityPainter({required this.value, required this.strokeWidth});
   final double value;
   final double strokeWidth;
 
   // Cache for expensive calculations
-  static const _endAngle = 9 * math.pi / 4;
+  static const double _endAngle = 9 * math.pi / 4;
   static const double _startAngle = 3 * math.pi / 4;
   static const int _maxSegments = 45;
   static const double _maxValue = 250;
-
-  AirQualityPainter({required this.value, required this.strokeWidth});
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = (size.width - strokeWidth) / 2;
-    final segmentCount = _maxSegments;
+    const segmentCount = _maxSegments;
 
     _drawSegments(canvas, center, radius, segmentCount);
     _drawLabels(canvas, center, radius);
@@ -60,16 +60,16 @@ class AirQualityPainter extends CustomPainter {
 
   void _drawSegments(Canvas canvas, Offset center, double radius, int segmentCount) {
     final innerRadius = radius - strokeWidth * 4;
-    final totalAngleSpan = _endAngle - _startAngle;
-    final stepValue = _maxValue / _maxSegments;
-    int valueIndex = (value / stepValue).round();
+    const totalAngleSpan = _endAngle - _startAngle;
+    const stepValue = _maxValue / _maxSegments;
+    final valueIndex = (value / stepValue).round();
     final backgroundPaint =
         Paint()
           ..color = Colors.white24
           ..strokeWidth = strokeWidth
           ..strokeCap = StrokeCap.round;
 
-    for (int i = 0; i < segmentCount; i++) {
+    for (var i = 0; i < segmentCount; i++) {
       final segmentAngle = _startAngle + (i * totalAngleSpan / (segmentCount - 1));
 
       final cosAngle = math.cos(segmentAngle);
@@ -99,8 +99,8 @@ class AirQualityPainter extends CustomPainter {
     const textStyle = TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w500);
 
     // First label ("0")
-    textPainter.text = TextSpan(text: '0', style: textStyle);
-    textPainter.layout();
+    textPainter..text = const TextSpan(text: '0', style: textStyle)
+    ..layout();
 
     final startLabelHeight = textPainter.height;
 
@@ -109,11 +109,11 @@ class AirQualityPainter extends CustomPainter {
       center.dy + radius * math.sin(3 * math.pi / 4) - startLabelHeight / 2,
     );
 
-    textPainter.paint(canvas, labelOffset);
+    textPainter..paint(canvas, labelOffset)
 
     // Second label ("250+")
-    textPainter.text = TextSpan(text: '250+', style: textStyle);
-    textPainter.layout();
+    ..text = const TextSpan(text: '250+', style: textStyle)
+    ..layout();
 
     final endLabelWidth = textPainter.width;
     final endLabelHeight = textPainter.height;
@@ -133,8 +133,8 @@ class AirQualityPainter extends CustomPainter {
 }
 
 class GradientInfo {
-  final List<Color> colors;
-  final List<double> stops;
 
   const GradientInfo(this.colors, this.stops);
+  final List<Color> colors;
+  final List<double> stops;
 }

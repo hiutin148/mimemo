@@ -4,6 +4,20 @@ part 'minute_color.g.dart';
 
 @JsonSerializable()
 class MinuteColor {
+
+  MinuteColor({
+    this.type,
+    this.threshold,
+    this.startDbz,
+    this.endDbz,
+    this.red,
+    this.green,
+    this.blue,
+    this.hex,
+  });
+
+  factory MinuteColor.fromJson(Map<String, dynamic> json) =>
+      _$MinuteColorFromJson(json);
   @JsonKey(name: 'Type')
   final String? type;
 
@@ -27,20 +41,6 @@ class MinuteColor {
 
   @JsonKey(name: 'Hex')
   final String? hex;
-
-  MinuteColor({
-    this.type,
-    this.threshold,
-    this.startDbz,
-    this.endDbz,
-    this.red,
-    this.green,
-    this.blue,
-    this.hex,
-  });
-
-  factory MinuteColor.fromJson(Map<String, dynamic> json) =>
-      _$MinuteColorFromJson(json);
 
   Map<String, dynamic> toJson() => _$MinuteColorToJson(this);
 }

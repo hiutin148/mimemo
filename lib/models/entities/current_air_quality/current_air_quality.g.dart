@@ -64,7 +64,7 @@ Pollutant _$PollutantFromJson(Map<String, dynamic> json) => Pollutant(
   concentration:
       json['concentration'] == null
           ? null
-          : Concentration.fromJson(
+          : UnitValueDetail.fromJson(
             json['concentration'] as Map<String, dynamic>,
           ),
   source: json['source'] as String?,
@@ -77,17 +77,3 @@ Map<String, dynamic> _$PollutantToJson(Pollutant instance) => <String, dynamic>{
   'concentration': instance.concentration,
   'source': instance.source,
 };
-
-Concentration _$ConcentrationFromJson(Map<String, dynamic> json) =>
-    Concentration(
-      value: (json['value'] as num?)?.toDouble(),
-      unit: json['unit'] as String?,
-      unitType: (json['unitType'] as num?)?.toInt(),
-    );
-
-Map<String, dynamic> _$ConcentrationToJson(Concentration instance) =>
-    <String, dynamic>{
-      'value': instance.value,
-      'unit': instance.unit,
-      'unitType': instance.unitType,
-    };

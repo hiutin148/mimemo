@@ -29,14 +29,14 @@ class _CurrentConditionGaugeChartState extends State<CurrentConditionGaugeChart>
   static const String _dangerousLabel = 'DANGEROUS';
 
   // UI Constants
-  static const double _chartHeight = 332.0;
-  static const double _centerContentSize = 264.0;
-  static const double _iconSize = 56.0;
-  static const double _buttonWidth = 100.0;
-  static const double _aqiBarWidth = 16.0;
-  static const double _aqiBarHeight = 10.0;
-  static const double _indicatorDotWidth = 28.0;
-  static const double _indicatorDotHeight = 3.0;
+  static const double _chartHeight = 332;
+  static const double _centerContentSize = 264;
+  static const double _iconSize = 56;
+  static const double _buttonWidth = 100;
+  static const double _aqiBarWidth = 16;
+  static const double _aqiBarHeight = 10;
+  static const double _indicatorDotWidth = 28;
+  static const double _indicatorDotHeight = 3;
 
   int _currentTab = 0;
   late PageController _pageController;
@@ -66,7 +66,7 @@ class _CurrentConditionGaugeChartState extends State<CurrentConditionGaugeChart>
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HomeCubit, HomeState>(
-      builder: (context, state) => _buildContent(context, state),
+      builder: _buildContent,
     );
   }
 

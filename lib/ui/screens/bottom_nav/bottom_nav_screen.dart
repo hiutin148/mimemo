@@ -3,11 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:mimemo/ui/screens/bottom_nav/bottom_nav_cubit.dart';
-
-import '../daily/daily_screen.dart';
-import '../home/home_screen.dart';
-import '../hourly/hourly_screen.dart';
-import '../radar/radar_screen.dart';
+import 'package:mimemo/ui/screens/daily/daily_screen.dart';
+import 'package:mimemo/ui/screens/home/home_screen.dart';
+import 'package:mimemo/ui/screens/hourly/hourly_screen.dart';
+import 'package:mimemo/ui/screens/radar/radar_screen.dart';
 
 @RoutePage()
 class BottomNavScreen extends StatelessWidget {
@@ -15,7 +14,7 @@ class BottomNavScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(create: (context) => BottomNavCubit(), child: BottomNavView());
+    return BlocProvider(create: (context) => BottomNavCubit(), child: const BottomNavView());
   }
 }
 
@@ -35,17 +34,20 @@ class _BottomNavViewState extends State<BottomNavView> {
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> screens = [
-      HomeScreen(),
-      RadarPage(),
-      HourlyPage(),
-      DailyPage(),
+    final screens = <Widget>[
+      const HomeScreen(),
+      const HourlyPage(),
+      const DailyPage(),
+      const RadarPage(),
       MorePage(),
     ];
     return BlocBuilder<BottomNavCubit, int>(
       builder: (context, state) {
         return Scaffold(
-          body: screens[state],
+          body: PageView(
+            controller: context.read<BottomNavCubit>().pageController,
+            children: screens,
+          ),
           bottomNavigationBar: Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -53,7 +55,7 @@ class _BottomNavViewState extends State<BottomNavView> {
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 10,
-                  offset: Offset(0, -2),
+                  offset: const Offset(0, -2),
                 ),
               ],
             ),
@@ -61,15 +63,15 @@ class _BottomNavViewState extends State<BottomNavView> {
               currentIndex: state,
               onTap: (index) => context.read<BottomNavCubit>().switchTab(index),
               type: BottomNavigationBarType.fixed,
-              selectedItemColor: Color(0xFF4A90E2),
+              selectedItemColor: const Color(0xFF4A90E2),
               unselectedItemColor: Colors.grey,
               backgroundColor: Colors.white,
               elevation: 0,
-              items: [
+              items: const [
                 BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Current'),
-                BottomNavigationBarItem(icon: Icon(Icons.radar), label: 'Radar'),
                 BottomNavigationBarItem(icon: Icon(Icons.schedule), label: 'Hourly'),
                 BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Daily'),
+                BottomNavigationBarItem(icon: Icon(Icons.radar), label: 'Radar'),
                 BottomNavigationBarItem(icon: Icon(Icons.more_horiz), label: 'More'),
               ],
             ),
@@ -236,7 +238,7 @@ class WeatherData {
   ];
 
   static String getWeatherIcon(int iconNumber) {
-    Map<int, String> icons = {
+    final icons = <int, String>{
       1: '☀️',
       3: '⛅',
       7: '☁️',
@@ -257,6 +259,8 @@ class WeatherData {
 
 // More Screen
 class MorePage extends StatelessWidget {
+
+  MorePage({super.key});
   final List<Map<String, dynamic>> menuItems = [
     {
       'title': 'Severe Weather',
@@ -303,19 +307,17 @@ class MorePage extends StatelessWidget {
     {'title': 'Settings', 'subtitle': 'App preferences', 'icon': Icons.settings, 'hasAlert': false},
   ];
 
-  MorePage({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('More', style: TextStyle(color: Colors.white)),
-        backgroundColor: Color(0xFF4A90E2),
+        title: const Text('More', style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color(0xFF4A90E2),
         elevation: 0,
         leading: Container(),
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -323,12 +325,12 @@ class MorePage extends StatelessWidget {
           ),
         ),
         child: ListView.builder(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           itemCount: menuItems.length,
           itemBuilder: (context, index) {
             final item = menuItems[index];
             return Container(
-              margin: EdgeInsets.only(bottom: 12),
+              margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
@@ -336,31 +338,31 @@ class MorePage extends StatelessWidget {
               ),
               child: ListTile(
                 leading: Container(
-                  padding: EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(item['icon'], color: Colors.white, size: 24),
+                  child: Icon(item['icon'] as IconData, color: Colors.white, size: 24),
                 ),
                 title: Text(
-                  item['title'],
-                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+                  item['title'].toString(),
+                  style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
                 ),
                 subtitle: Text(
-                  item['subtitle'],
+                  item['subtitle'].toString(),
                   style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 14),
                 ),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (item['hasAlert'])
+                    if (item['hasAlert'] as bool)
                       Container(
                         width: 8,
                         height: 8,
-                        decoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                        decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
                       ),
-                    Gap(8),
+                    const Gap(8),
                     Icon(
                       Icons.arrow_forward_ios,
                       color: Colors.white.withValues(alpha: 0.7),
@@ -373,8 +375,8 @@ class MorePage extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Opening ${item['title']}...'),
-                      backgroundColor: Color(0xFF4A90E2),
-                      duration: Duration(seconds: 1),
+                      backgroundColor: const Color(0xFF4A90E2),
+                      duration: const Duration(seconds: 1),
                     ),
                   );
                 },

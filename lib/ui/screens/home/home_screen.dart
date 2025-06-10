@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gap/gap.dart';
 import 'package:mimemo/common/blocs/main/main_cubit.dart';
 import 'package:mimemo/common/utils/utils.dart';
-import 'package:mimemo/core/const/app_colors.dart';
-import 'package:mimemo/core/const/date_format_pattern.dart';
-import 'package:mimemo/core/extension/datetime_extension.dart';
+import 'package:mimemo/core/const/consts.dart';
+import 'package:mimemo/core/extension/extensions.dart';
 import 'package:mimemo/locator.dart';
+import 'package:mimemo/models/entities/position_info/position_info.dart';
 import 'package:mimemo/repositories/current_condition_repository.dart';
 import 'package:mimemo/repositories/forecast_repository.dart';
+import 'package:mimemo/ui/screens/bottom_nav/bottom_nav_screen.dart';
 import 'package:mimemo/ui/screens/home/home_cubit.dart';
 import 'package:mimemo/ui/screens/home/widgets/current_condition_gauge_chart.dart';
-import 'package:mimemo/models/entities/position_info/position_info.dart';
-import 'package:mimemo/ui/screens/bottom_nav/bottom_nav_screen.dart';
-import 'package:mimemo/ui/widgets/app_icon.dart';
+import 'package:mimemo/ui/screens/home/widgets/home_daily_forecast.dart';
+import 'package:mimemo/ui/widgets/widgets.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -27,7 +26,7 @@ class HomeScreen extends StatelessWidget {
             mainCubit: context.read<MainCubit>(),
             currentConditionRepository: locator<CurrentConditionRepository>(),
           ),
-      child: HomeView(),
+      child: const HomeView(),
     );
   }
 }
@@ -39,7 +38,7 @@ class HomeView extends StatefulWidget {
   State<HomeView> createState() => _HomeViewState();
 }
 
-class _HomeViewState extends State<HomeView> with AutomaticKeepAliveClientMixin<HomeView> {
+class _HomeViewState extends State<HomeView> with AutomaticKeepAliveClientMixin {
   late final HomeCubit _cubit;
 
   @override
@@ -58,28 +57,31 @@ class _HomeViewState extends State<HomeView> with AutomaticKeepAliveClientMixin<
         final position = positionInfo?.localizedName ?? '';
         final city =
             positionInfo?.parentCity?.localizedName != null
-                ? (', ${positionInfo?.parentCity?.localizedName!}')
+                ? ', ${positionInfo?.parentCity?.localizedName!}'
                 : '';
         return Scaffold(
           appBar: _buildAppBar(position, city),
           drawer: Container(),
           body: Container(
-            decoration: BoxDecoration(color: AppColors.primary),
+            decoration: const BoxDecoration(color: AppColors.primary),
             child: SafeArea(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CurrentConditionGaugeChart(),
-                      Gap(24),
-                      _buildHourlyPreview(),
-                      Gap(24),
-                      _buildWeatherDetails(),
-                      Gap(24),
-                      _buildDailyPreview(),
-                    ],
+              child: RefreshIndicator(
+                onRefresh: () async {},
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const CurrentConditionGaugeChart(),
+                        const Gap(24),
+                        _buildHourlyPreview(),
+                        const Gap(24),
+                        _buildWeatherDetails(),
+                        const Gap(24),
+                        const HomeDailyForecast(),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -94,16 +96,16 @@ class _HomeViewState extends State<HomeView> with AutomaticKeepAliveClientMixin<
   AppBar _buildAppBar(String position, String city) {
     return AppBar(
       backgroundColor: AppColors.primary,
-      iconTheme: IconThemeData(color: Colors.white),
+      iconTheme: const IconThemeData(color: Colors.white),
       centerTitle: true,
       title: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.location_on, color: Colors.white, size: 20),
-          Gap(4),
+          const Icon(Icons.location_on, color: Colors.white, size: 20),
+          const Gap(4),
           Text(
             '$position$city',
-            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500),
+            style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500),
           ),
         ],
       ),
@@ -124,7 +126,7 @@ class _HomeViewState extends State<HomeView> with AutomaticKeepAliveClientMixin<
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
+                const Text(
                   'Hourly Forecast',
                   style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
                 ),
@@ -137,7 +139,7 @@ class _HomeViewState extends State<HomeView> with AutomaticKeepAliveClientMixin<
                 ),
               ],
             ),
-            Gap(16),
+            const Gap(16),
             SizedBox(
               height: 120,
               child: ListView.builder(
@@ -152,8 +154,8 @@ class _HomeViewState extends State<HomeView> with AutomaticKeepAliveClientMixin<
                   final unit = forecast.temperature?.unit ?? '';
                   return Container(
                     width: 80,
-                    margin: EdgeInsets.only(right: 12),
-                    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+                    margin: const EdgeInsets.only(right: 12),
+                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
                     decoration: BoxDecoration(
                       color: Colors.white24,
                       borderRadius: BorderRadius.circular(8),
@@ -163,7 +165,7 @@ class _HomeViewState extends State<HomeView> with AutomaticKeepAliveClientMixin<
                       children: [
                         Text(
                           displayTime,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -177,7 +179,7 @@ class _HomeViewState extends State<HomeView> with AutomaticKeepAliveClientMixin<
                         ),
                         Text(
                           '$tem °$unit',
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -199,7 +201,7 @@ class _HomeViewState extends State<HomeView> with AutomaticKeepAliveClientMixin<
     final current = WeatherData.currentConditions;
 
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(16),
@@ -207,11 +209,11 @@ class _HomeViewState extends State<HomeView> with AutomaticKeepAliveClientMixin<
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Weather Details',
             style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
           ),
-          Gap(16),
+          const Gap(16),
           Row(
             children: [
               Expanded(
@@ -230,7 +232,7 @@ class _HomeViewState extends State<HomeView> with AutomaticKeepAliveClientMixin<
               ),
             ],
           ),
-          Gap(16),
+          const Gap(16),
           Row(
             children: [
               Expanded(
@@ -249,7 +251,7 @@ class _HomeViewState extends State<HomeView> with AutomaticKeepAliveClientMixin<
               ),
             ],
           ),
-          Gap(16),
+          const Gap(16),
           Row(
             children: [
               Expanded(
@@ -273,7 +275,7 @@ class _HomeViewState extends State<HomeView> with AutomaticKeepAliveClientMixin<
     return Row(
       children: [
         Icon(icon, color: Colors.white.withValues(alpha: 0.7), size: 20),
-        Gap(8),
+        const Gap(8),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -284,94 +286,9 @@ class _HomeViewState extends State<HomeView> with AutomaticKeepAliveClientMixin<
               ),
               Text(
                 value,
-                style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
               ),
             ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDailyPreview() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              '7-Day Forecast',
-              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
-            ),
-            Text(
-              'View All',
-              style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 14),
-            ),
-          ],
-        ),
-        Gap(16),
-        Container(
-          padding: EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Column(
-            children:
-                WeatherData.dailyForecast.take(3).map((day) {
-                  final index = WeatherData.dailyForecast.indexOf(day);
-                  final dayName = WeatherData.getDayNames()[index];
-                  return Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            dayName,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          WeatherData.getWeatherIcon(day['Day']['Icon']),
-                          style: TextStyle(fontSize: 24),
-                        ),
-                        Gap(16),
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            day['Day']['IconPhrase'],
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.8),
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          '${day['Temperature']['Minimum']['Value']}°',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.7),
-                            fontSize: 16,
-                          ),
-                        ),
-                        Gap(16),
-                        Text(
-                          '${day['Temperature']['Maximum']['Value']}°',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
           ),
         ),
       ],

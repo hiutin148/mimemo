@@ -10,11 +10,11 @@ enum Aqi {
   purple(color: AppColors.airVeryUnhealthy, min: 201, max: 300),
   maroon(color: AppColors.airHazardous, min: 301, max: double.infinity);
 
+  const Aqi({required this.color, required this.min, required this.max});
+
   final Color color;
   final double min;
   final double max;
-
-  const Aqi({required this.color, required this.min, required this.max});
 }
 
 extension AqiExtension on Aqi {
@@ -26,7 +26,7 @@ extension AqiExtension on Aqi {
 
     // Find the current AQI category
     Aqi? currentAqi;
-    for (Aqi aqi in Aqi.values) {
+    for (final aqi in Aqi.values) {
       if (aqiValue >= aqi.min && aqiValue <= aqi.max) {
         currentAqi = aqi;
         break;
@@ -36,7 +36,7 @@ extension AqiExtension on Aqi {
     if (currentAqi == null) return Aqi.maroon.color;
 
     // Find current AQI index
-    int currentIndex = Aqi.values.indexOf(currentAqi);
+    final currentIndex = Aqi.values.indexOf(currentAqi);
 
     // If we're at the last category or at the exact minimum, return the category color
     if (currentIndex == Aqi.values.length - 1 || aqiValue == currentAqi.min) {
@@ -44,16 +44,15 @@ extension AqiExtension on Aqi {
     }
 
     // Get the next AQI category for interpolation
-    Aqi nextAqi = Aqi.values[currentIndex + 1];
+    final nextAqi = Aqi.values[currentIndex + 1];
 
     // Calculate interpolation factor
-    double rangeSize = currentAqi.max - currentAqi.min + 1;
-    double positionInRange = aqiValue - currentAqi.min;
-    double interpolationFactor = positionInRange / rangeSize;
+    final rangeSize = currentAqi.max - currentAqi.min + 1;
+    final positionInRange = aqiValue - currentAqi.min;
+    final interpolationFactor = positionInRange / rangeSize;
 
     // Interpolate between current and next AQI colors
-    return Color.lerp(currentAqi.color, nextAqi.color, interpolationFactor)
-        ?? currentAqi.color;
+    return Color.lerp(currentAqi.color, nextAqi.color, interpolationFactor) ?? currentAqi.color;
   }
 
   /// Alternative implementation with smoother transitions
@@ -63,22 +62,21 @@ extension AqiExtension on Aqi {
     if (aqiValue >= Aqi.maroon.min) return Aqi.maroon.color;
 
     // Find the two AQI categories to interpolate between
-    for (int i = 0; i < Aqi.values.length - 1; i++) {
-      Aqi currentAqi = Aqi.values[i];
-      Aqi nextAqi = Aqi.values[i + 1];
+    for (var i = 0; i < Aqi.values.length - 1; i++) {
+      final currentAqi = Aqi.values[i];
+      final nextAqi = Aqi.values[i + 1];
 
       if (aqiValue >= currentAqi.min && aqiValue < nextAqi.min) {
         // Calculate interpolation factor based on position between range centers
-        double currentCenter = (currentAqi.min + currentAqi.max) / 2;
-        double nextCenter = (nextAqi.min + nextAqi.max) / 2;
+        final currentCenter = (currentAqi.min + currentAqi.max) / 2;
+        final nextCenter = (nextAqi.min + nextAqi.max) / 2;
 
-        double totalDistance = nextCenter - currentCenter;
-        double currentDistance = aqiValue - currentCenter;
+        final totalDistance = nextCenter - currentCenter;
+        final currentDistance = aqiValue - currentCenter;
 
-        double interpolationFactor = (currentDistance / totalDistance).clamp(0.0, 1.0);
+        final interpolationFactor = (currentDistance / totalDistance).clamp(0.0, 1.0);
 
-        return Color.lerp(currentAqi.color, nextAqi.color, interpolationFactor)
-            ?? currentAqi.color;
+        return Color.lerp(currentAqi.color, nextAqi.color, interpolationFactor) ?? currentAqi.color;
       }
     }
 
@@ -87,7 +85,7 @@ extension AqiExtension on Aqi {
 
   /// Get the AQI category for a given value
   static Aqi getAQICategory(double aqiValue) {
-    for (Aqi aqi in Aqi.values) {
+    for (final aqi in Aqi.values) {
       if (aqiValue >= aqi.min && aqiValue <= aqi.max) {
         return aqi;
       }
@@ -106,7 +104,7 @@ extension AqiExtension on Aqi {
       Aqi.maroon: 'Hazardous',
     };
 
-    Aqi category = getAQICategory(aqiValue);
+    final category = getAQICategory(aqiValue);
     return categoryNames[category] ?? 'Unknown';
   }
 }
