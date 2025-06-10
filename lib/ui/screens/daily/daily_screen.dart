@@ -1,109 +1,136 @@
-// Daily Screen
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:mimemo/ui/screens/bottom_nav/bottom_nav_screen.dart';
+import 'package:mimemo/common/blocs/main/main_cubit.dart';
+import 'package:mimemo/common/utils/utils.dart';
+import 'package:mimemo/core/const/consts.dart';
+import 'package:mimemo/core/extension/extensions.dart';
+import 'package:mimemo/locator.dart';
+import 'package:mimemo/repositories/forecast_repository.dart';
+import 'package:mimemo/ui/screens/daily/daily_cubit.dart';
+import 'package:mimemo/ui/widgets/app_icon.dart';
 
+class DailyScreen extends StatelessWidget {
+  const DailyScreen({super.key});
 
-class DailyPage extends StatelessWidget {
-  const DailyPage({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create:
+          (context) => DailyCubit(
+            forecastRepository: locator<ForecastRepository>(),
+            mainCubit: context.read<MainCubit>(),
+          )..init(),
+      child: const DailyView(),
+    );
+  }
+}
+
+class DailyView extends StatelessWidget {
+  const DailyView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('7-Day Forecast', style: TextStyle(color: Colors.white)),
-        backgroundColor: const Color(0xFF4A90E2),
-        elevation: 0,
-        leading: Container(),
-      ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF4A90E2), Color(0xFF1E3A8A)],
-          ),
-        ),
-        child: ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: WeatherData.dailyForecast.length,
-          itemBuilder: (context, index) {
-            final day = WeatherData.dailyForecast[index];
-            final dayName = WeatherData.getDayNames()[index];
-
-            return Container(
-              margin: const EdgeInsets.only(bottom: 12),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 2,
-                        child: Text(
-                          dayName,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      Text(
-                        WeatherData.getWeatherIcon(day['Day']['Icon'] as int),
-                        style: const TextStyle(fontSize: 32),
-                      ),
-                      const Gap( 20),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+      body: BlocBuilder<DailyCubit, DailyState>(
+        builder: (context, state) {
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              final listMaxTemperature =
+                  state.dailyForecast?.dailyForecasts?.fold<double>(0, (max, forecast) {
+                    final temp = forecast.temperature?.maximum?.value ?? 0;
+                    return temp > max ? temp : max;
+                  }) ??
+                  0;
+              final listMinDegree =
+                  state.dailyForecast?.dailyForecasts?.fold<double>(double.infinity, (
+                    min,
+                    forecast,
+                  ) {
+                    // Start with infinity
+                    final temp = forecast.temperature?.minimum?.value ?? double.infinity;
+                    return temp < min ? temp : min; // Changed > to
+                  }) ??
+                  0;
+              return ListView.builder(
+                itemCount: state.dailyForecast?.dailyForecasts?.length ?? 0,
+                scrollDirection: Axis.horizontal,
+                itemBuilder: (context, index) {
+                  final dailyForecasts = state.dailyForecast?.dailyForecasts ?? [];
+                  final forecastDay = dailyForecasts[index];
+                  final dayMaxTemperature = forecastDay.temperature?.maximum?.value ?? 0;
+                  final dayMinTemperature = forecastDay.temperature?.minimum?.value ?? 0;
+                  return DecoratedBox(
+                    decoration: const BoxDecoration(
+                      border: Border(right: BorderSide(color: Colors.white24)),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
+                          Text(forecastDay.date?.toDate?.dayOfWeek ?? ''),
                           Text(
-                            '${day['Temperature']['Maximum']['Value']}°',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
+                            forecastDay.date?.reformatDateString(
+                                  newFormat: DateFormatPattern.day,
+                                ) ??
+                                '',
+                          ),
+                          AppIcon(icon: Utils.getIconAsset(forecastDay.day?.icon ?? 0)),
+                          const Gap(8),
+                          Expanded(
+                            child: LayoutBuilder(
+                              builder: (context, constraints) {
+                                final aDegreeSpace =
+                                    constraints.maxHeight /
+                                    (listMaxTemperature - listMinDegree + 4);
+                                final topSpace =
+                                    aDegreeSpace * (listMaxTemperature - dayMaxTemperature);
+                                final barHeight =
+                                    (dayMaxTemperature - dayMinTemperature) * aDegreeSpace;
+                                return Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Gap(topSpace),
+                                    Text(dayMaxTemperature.toString()),
+                                    const Gap(2),
+                                    Container(
+                                      width: 20,
+                                      decoration: BoxDecoration(
+                                        gradient: const LinearGradient(
+                                          colors: [AppColors.primary, Colors.white54],
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                        ),
+                                        borderRadius: BorderRadius.circular(10),
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: Colors.white12,
+                                            blurRadius: 2,
+                                            offset: Offset(1, 1),
+                                          ),
+                                        ],
+                                      ),
+                                      height: barHeight,
+                                    ),
+                                    const Gap(2),
+                                    Text(dayMinTemperature.toString()),
+                                  ],
+                                );
+                              },
                             ),
                           ),
-                          Text(
-                            '${day['Temperature']['Minimum']['Value']}°',
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.7),
-                              fontSize: 16,
-                            ),
-                          ),
+                          const Gap(8),
+                          Text(forecastDay.day?.relativeHumidity?.average?.toString() ?? ''),
                         ],
                       ),
-                    ],
-                  ),
-                  const Gap( 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          day['Day']['IconPhrase'].toString(),
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.8),
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                      Text(
-                        '${day['Day']['PrecipitationProbability']}% chance of rain',
-                        style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
+                    ),
+                  );
+                },
+              );
+            },
+          );
+        },
       ),
     );
   }

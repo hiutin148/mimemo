@@ -2,6 +2,9 @@ import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:mimemo/common/blocs/main/main_cubit.dart';
+import 'package:mimemo/core/const/consts.dart';
+import 'package:mimemo/models/entities/position_info/position_info.dart';
 import 'package:mimemo/ui/screens/bottom_nav/bottom_nav_cubit.dart';
 import 'package:mimemo/ui/screens/daily/daily_screen.dart';
 import 'package:mimemo/ui/screens/home/home_screen.dart';
@@ -26,7 +29,6 @@ class BottomNavView extends StatefulWidget {
 }
 
 class _BottomNavViewState extends State<BottomNavView> {
-
   @override
   void initState() {
     super.initState();
@@ -37,47 +39,80 @@ class _BottomNavViewState extends State<BottomNavView> {
     final screens = <Widget>[
       const HomeScreen(),
       const HourlyPage(),
-      const DailyPage(),
+      const DailyScreen(),
       const RadarPage(),
       MorePage(),
     ];
     return BlocBuilder<BottomNavCubit, int>(
       builder: (context, state) {
-        return Scaffold(
-          body: PageView(
-            controller: context.read<BottomNavCubit>().pageController,
-            children: screens,
-          ),
-          bottomNavigationBar: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, -2),
+        return BlocSelector<MainCubit, MainState, PositionInfo?>(
+          builder: (context, positionInfo) {
+            final position = positionInfo?.localizedName ?? '';
+            final city =
+                positionInfo?.parentCity?.localizedName != null
+                    ? ', ${positionInfo?.parentCity?.localizedName!}'
+                    : '';
+
+            return Scaffold(
+              appBar: _buildAppBar(position, city),
+              drawer: Container(),
+              body: PageView(
+                physics: const NeverScrollableScrollPhysics(),
+                controller: context.read<BottomNavCubit>().pageController,
+                children: screens,
+              ),
+              bottomNavigationBar: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, -2),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: BottomNavigationBar(
-              currentIndex: state,
-              onTap: (index) => context.read<BottomNavCubit>().switchTab(index),
-              type: BottomNavigationBarType.fixed,
-              selectedItemColor: const Color(0xFF4A90E2),
-              unselectedItemColor: Colors.grey,
-              backgroundColor: Colors.white,
-              elevation: 0,
-              items: const [
-                BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Current'),
-                BottomNavigationBarItem(icon: Icon(Icons.schedule), label: 'Hourly'),
-                BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Daily'),
-                BottomNavigationBarItem(icon: Icon(Icons.radar), label: 'Radar'),
-                BottomNavigationBarItem(icon: Icon(Icons.more_horiz), label: 'More'),
-              ],
-            ),
-          ),
+                child: BottomNavigationBar(
+                  currentIndex: state,
+                  onTap: (index) => context.read<BottomNavCubit>().switchTab(index),
+                  type: BottomNavigationBarType.fixed,
+                  selectedItemColor: const Color(0xFF4A90E2),
+                  unselectedItemColor: Colors.grey,
+                  backgroundColor: Colors.white,
+                  elevation: 0,
+                  items: const [
+                    BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Current'),
+                    BottomNavigationBarItem(icon: Icon(Icons.schedule), label: 'Hourly'),
+                    BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Daily'),
+                    BottomNavigationBarItem(icon: Icon(Icons.radar), label: 'Radar'),
+                    BottomNavigationBarItem(icon: Icon(Icons.more_horiz), label: 'More'),
+                  ],
+                ),
+              ),
+            );
+          },
+          selector: (state) => state.positionInfo,
         );
       },
+    );
+  }
+
+  AppBar _buildAppBar(String position, String city) {
+    return AppBar(
+      backgroundColor: AppColors.primary,
+      iconTheme: const IconThemeData(color: Colors.white),
+      centerTitle: true,
+      title: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.location_on, color: Colors.white, size: 20),
+          const Gap(4),
+          Text(
+            '$position$city',
+            style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -259,8 +294,8 @@ class WeatherData {
 
 // More Screen
 class MorePage extends StatelessWidget {
-
   MorePage({super.key});
+
   final List<Map<String, dynamic>> menuItems = [
     {
       'title': 'Severe Weather',
@@ -347,7 +382,11 @@ class MorePage extends StatelessWidget {
                 ),
                 title: Text(
                   item['title'].toString(),
-                  style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
                 subtitle: Text(
                   item['subtitle'].toString(),

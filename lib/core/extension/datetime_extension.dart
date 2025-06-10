@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'package:mimemo/core/const/consts.dart';
 
 extension DatetimeExtension on DateTime {
   String toFormatedString(String format) {
@@ -6,6 +7,6 @@ extension DatetimeExtension on DateTime {
   }
 
   String get dayOfWeek {
-    return DateFormat('EE').format(this);
+    return DateFormat(DateFormatPattern.shortDayOfWeek).format(this);
   }
 }

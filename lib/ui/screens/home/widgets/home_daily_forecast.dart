@@ -5,6 +5,7 @@ import 'package:mimemo/core/const/consts.dart';
 import 'package:mimemo/core/extension/extensions.dart';
 import 'package:mimemo/models/entities/daily_forecast/daily_forecast.dart';
 import 'package:mimemo/ui/screens/bottom_nav/bottom_nav_cubit.dart';
+import 'package:mimemo/ui/screens/bottom_nav/bottom_nav_tab.dart';
 import 'package:mimemo/ui/screens/home/home_cubit.dart';
 import 'package:mimemo/ui/widgets/widgets.dart';
 
@@ -16,7 +17,7 @@ class HomeDailyForecast extends StatelessWidget {
   static const _iconSize = 16.0;
 
   void _onViewAllTapped(BuildContext context) {
-    context.read<BottomNavCubit>().switchTab(1);
+    context.read<BottomNavCubit>().switchTab(BottomNavTab.daily.index);
   }
 
   void _onForecastItemTapped(BuildContext context, dynamic forecastDay, int index) {

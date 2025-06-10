@@ -3,6 +3,13 @@ import 'package:flutter/material.dart';
 abstract final class AppColors {
   static const Color primary = Color(0XFF10061C);
 
+  // Basic colors
+  static const Color purple = Color(0XFF6a4c93);
+  static const Color red = Color(0XFFff595e);
+  static const Color yellow = Color(0XFFffca3a);
+  static const Color green = Color(0XFF8ac926);
+  static const Color blue = Color(0XFF1982c4);
+
   // AQI Basics for Ozone and Particle Pollution Colors
   static const Color airGood = Color(0XFF00E400);
   static const Color airModerate = Color(0XFFFFFF00);
