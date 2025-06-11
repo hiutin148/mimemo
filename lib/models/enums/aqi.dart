@@ -21,8 +21,8 @@ extension AqiExtension on Aqi {
   /// Calculates the interpolated color for a given AQI value
   static Color getAQIColor(double aqiValue) {
     // Handle edge cases
-    if (aqiValue < 0) return Aqi.green.color;
-    if (aqiValue > 300) return Aqi.maroon.color;
+    if (aqiValue <= Aqi.green.min) return Aqi.green.color;
+    if (aqiValue >= Aqi.maroon.min) return Aqi.maroon.color;
 
     // Find the current AQI category
     Aqi? currentAqi;
@@ -55,34 +55,6 @@ extension AqiExtension on Aqi {
     return Color.lerp(currentAqi.color, nextAqi.color, interpolationFactor) ?? currentAqi.color;
   }
 
-  /// Alternative implementation with smoother transitions
-  static Color getAQIColorSmooth(double aqiValue) {
-    // Handle edge cases
-    if (aqiValue <= Aqi.green.min) return Aqi.green.color;
-    if (aqiValue >= Aqi.maroon.min) return Aqi.maroon.color;
-
-    // Find the two AQI categories to interpolate between
-    for (var i = 0; i < Aqi.values.length - 1; i++) {
-      final currentAqi = Aqi.values[i];
-      final nextAqi = Aqi.values[i + 1];
-
-      if (aqiValue >= currentAqi.min && aqiValue < nextAqi.min) {
-        // Calculate interpolation factor based on position between range centers
-        final currentCenter = (currentAqi.min + currentAqi.max) / 2;
-        final nextCenter = (nextAqi.min + nextAqi.max) / 2;
-
-        final totalDistance = nextCenter - currentCenter;
-        final currentDistance = aqiValue - currentCenter;
-
-        final interpolationFactor = (currentDistance / totalDistance).clamp(0.0, 1.0);
-
-        return Color.lerp(currentAqi.color, nextAqi.color, interpolationFactor) ?? currentAqi.color;
-      }
-    }
-
-    return Aqi.maroon.color;
-  }
-
   /// Get the AQI category for a given value
   static Aqi getAQICategory(double aqiValue) {
     for (final aqi in Aqi.values) {
@@ -91,20 +63,5 @@ extension AqiExtension on Aqi {
       }
     }
     return Aqi.maroon; // Default to hazardous for values above 300
-  }
-
-  /// Get AQI category name for display purposes
-  static String getAQICategoryName(double aqiValue) {
-    const categoryNames = {
-      Aqi.green: 'Good',
-      Aqi.yellow: 'Moderate',
-      Aqi.orange: 'Unhealthy for Sensitive Groups',
-      Aqi.red: 'Unhealthy',
-      Aqi.purple: 'Very Unhealthy',
-      Aqi.maroon: 'Hazardous',
-    };
-
-    final category = getAQICategory(aqiValue);
-    return categoryNames[category] ?? 'Unknown';
   }
 }

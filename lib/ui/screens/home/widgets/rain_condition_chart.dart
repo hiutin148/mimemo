@@ -31,7 +31,11 @@ class RainConditionChart extends StatelessWidget {
                       values: rainData.values,
                       minValue: 0,
                       maxValue: rainData.maxValue,
-                      colors: rainData.colors,
+                      colors:
+                          rainData.colors
+                              .where((element) => element.type?.toLowerCase() == 'rain')
+                              .whereType<MinuteColor>()
+                              .toList(),
                       strokeWidth: 6,
                     ),
                     child: Container(),
@@ -48,13 +52,13 @@ class RainConditionChart extends StatelessWidget {
   RainData _extractRainData(HomeState homeState, MainState mainState) {
     final values =
         homeState.oneMinuteCast?.intervals?.map((e) => e.dbz ?? 0.0).whereType<double>().toList() ??
-            <double>[];
+        <double>[];
 
     final maxValue =
         mainState.minuteColors
             .lastWhereOrNull((element) => element.type?.toLowerCase() == 'rain')
             ?.endDbz ??
-            95.0;
+        95.0;
 
     return RainData(values: values, maxValue: maxValue, colors: mainState.minuteColors);
   }
@@ -62,15 +66,14 @@ class RainConditionChart extends StatelessWidget {
 
 // Data class to hold processed rain data
 class RainData {
-
   const RainData({required this.values, required this.maxValue, required this.colors});
+
   final List<double> values;
   final double maxValue;
   final List<MinuteColor> colors;
 }
 
 class RainConditionPainter extends CustomPainter {
-
   RainConditionPainter({
     required this.values,
     required this.minValue,
@@ -78,6 +81,7 @@ class RainConditionPainter extends CustomPainter {
     required this.colors,
     required this.strokeWidth,
   });
+
   final List<double> values;
   final double minValue;
   final double maxValue;
@@ -90,9 +94,7 @@ class RainConditionPainter extends CustomPainter {
   static const int _maxSegments = 60;
 
   // Pre-calculated label positions
-  static const List<_LabelInfo> _labels = [
-    _LabelInfo('Now', 3 * math.pi / 2),
-  ];
+  static const List<_LabelInfo> _labels = [_LabelInfo('Now', 3 * math.pi / 2)];
 
   // Cache for paints and gradients
   Paint? _backgroundPaint;
@@ -118,10 +120,11 @@ class RainConditionPainter extends CustomPainter {
   }
 
   void _initializePaints() {
-    _backgroundPaint ??= Paint()
-      ..color = Colors.white24
-      ..strokeWidth = strokeWidth
-      ..strokeCap = StrokeCap.round;
+    _backgroundPaint ??=
+        Paint()
+          ..color = Colors.white24
+          ..strokeWidth = strokeWidth
+          ..strokeCap = StrokeCap.round;
   }
 
   void _drawSegments(Canvas canvas, Offset center, double radius, int segmentCount) {
@@ -134,7 +137,11 @@ class RainConditionPainter extends CustomPainter {
 
     // Pre-calculate all segment positions
     final segmentInfos = _calculateSegmentPositions(
-        center, innerRadius, radius, segmentCount, segmentStep
+      center,
+      innerRadius,
+      radius,
+      segmentCount,
+      segmentStep,
     );
 
     // Draw all segments
@@ -153,8 +160,12 @@ class RainConditionPainter extends CustomPainter {
   }
 
   List<_SegmentInfo> _calculateSegmentPositions(
-      Offset center, double innerRadius, double radius, int segmentCount, double segmentStep
-      ) {
+    Offset center,
+    double innerRadius,
+    double radius,
+    int segmentCount,
+    double segmentStep,
+  ) {
     final segments = <_SegmentInfo>[];
 
     for (var i = 0; i < segmentCount; i++) {
@@ -173,10 +184,7 @@ class RainConditionPainter extends CustomPainter {
         center.dy + innerRadius * sinAngle,
       );
 
-      final endPoint = Offset(
-          center.dx + radius * cosAngle,
-          center.dy + radius * sinAngle
-      );
+      final endPoint = Offset(center.dx + radius * cosAngle, center.dy + radius * sinAngle);
 
       final segmentInfo = _SegmentInfo(startPoint, endPoint);
       _segmentCache[i] = segmentInfo;
@@ -192,23 +200,19 @@ class RainConditionPainter extends CustomPainter {
       segmentInfo.startPoint.dy + (segmentInfo.endPoint.dy - segmentInfo.startPoint.dy) * progress,
     );
 
-    // Check shader cache
-    var shader = _shaderCache[progress];
-    if (shader == null) {
-      final gradientInfo = _getCachedGradientInfo(progress);
-      shader = ui.Gradient.linear(
-        segmentInfo.startPoint,
-        segmentInfo.endPoint,
-        gradientInfo.colors,
-        gradientInfo.stops,
-      );
-      _shaderCache[progress] = shader;
-    }
+    final gradientInfo = _getCachedGradientInfo(progress);
+    final shader = ui.Gradient.linear(
+      segmentInfo.startPoint,
+      segmentInfo.endPoint,
+      gradientInfo.colors,
+      gradientInfo.stops,
+    );
 
-    final progressPaint = Paint()
-      ..shader = shader
-      ..strokeWidth = strokeWidth
-      ..strokeCap = StrokeCap.round;
+    final progressPaint =
+        Paint()
+          ..shader = shader
+          ..strokeWidth = strokeWidth
+          ..strokeCap = StrokeCap.round;
 
     canvas.drawLine(segmentInfo.startPoint, progressEndPoint, progressPaint);
   }
@@ -227,15 +231,12 @@ class RainConditionPainter extends CustomPainter {
   void _drawLabels(Canvas canvas, Offset center, double radius) {
     // Use a single TextPainter and reuse it
     final textPainter = TextPainter(textDirection: TextDirection.ltr);
-    const textStyle = TextStyle(
-        color: Colors.white70,
-        fontSize: 14,
-        fontWeight: FontWeight.w500
-    );
+    const textStyle = TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w500);
 
     for (final label in _labels) {
-      textPainter..text = TextSpan(text: label.text, style: textStyle)
-      ..layout();
+      textPainter
+        ..text = TextSpan(text: label.text, style: textStyle)
+        ..layout();
 
       final labelOffset = Offset(
         center.dx + (radius + 20) * math.cos(label.angle) - textPainter.width / 2,
@@ -311,7 +312,8 @@ class RainConditionPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant RainConditionPainter oldDelegate) {
-    final shouldRepaint = values != oldDelegate.values ||
+    final shouldRepaint =
+        values != oldDelegate.values ||
         maxValue != oldDelegate.maxValue ||
         colors != oldDelegate.colors ||
         strokeWidth != oldDelegate.strokeWidth;
@@ -330,22 +332,22 @@ class RainConditionPainter extends CustomPainter {
 
 // Helper classes for better organization
 class _LabelInfo {
-
   const _LabelInfo(this.text, this.angle);
+
   final String text;
   final double angle;
 }
 
 class _SegmentInfo {
-
   const _SegmentInfo(this.startPoint, this.endPoint);
+
   final Offset startPoint;
   final Offset endPoint;
 }
 
 class GradientInfo {
-
   const GradientInfo(this.colors, this.stops);
+
   final List<Color> colors;
   final List<double> stops;
 }

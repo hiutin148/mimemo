@@ -20,7 +20,14 @@ class DailyCubit extends BaseCubit<DailyState> {
       final dailyForecast = await forecastRepository.get10DaysForecast(
         mainCubit.state.positionInfo?.key ?? '',
       );
-      emit(state.copyWith(dailyForecast: dailyForecast, loadStatus: LoadStatus.success));
+      final selectedDay = dailyForecast.dailyForecasts?.firstOrNull;
+      emit(
+        state.copyWith(
+          dailyForecast: dailyForecast,
+          loadStatus: LoadStatus.success,
+          selectedDay: selectedDay,
+        ),
+      );
     } on Exception catch (e) {
       emit(state.copyWith(loadStatus: LoadStatus.failure));
       logger.e(e);
