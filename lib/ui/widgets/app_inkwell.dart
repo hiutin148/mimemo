@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class AppInkwell extends StatelessWidget {
-  const AppInkwell({
+class AppInkWell extends StatelessWidget {
+  const AppInkWell({
     required this.child,
     super.key,
     this.onTap,

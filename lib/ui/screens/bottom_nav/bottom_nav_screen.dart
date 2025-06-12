@@ -4,9 +4,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:mimemo/common/blocs/main/main_cubit.dart';
 import 'package:mimemo/core/const/consts.dart';
+import 'package:mimemo/locator.dart';
 import 'package:mimemo/models/entities/position_info/position_info.dart';
+import 'package:mimemo/repositories/current_condition_repository.dart';
+import 'package:mimemo/repositories/forecast_repository.dart';
 import 'package:mimemo/ui/screens/bottom_nav/bottom_nav_cubit.dart';
+import 'package:mimemo/ui/screens/daily/daily_cubit.dart';
 import 'package:mimemo/ui/screens/daily/daily_screen.dart';
+import 'package:mimemo/ui/screens/home/home_cubit.dart';
 import 'package:mimemo/ui/screens/home/home_screen.dart';
 import 'package:mimemo/ui/screens/hourly/hourly_screen.dart';
 import 'package:mimemo/ui/screens/radar/radar_screen.dart';
@@ -17,7 +22,27 @@ class BottomNavScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(create: (context) => BottomNavCubit(), child: const BottomNavView());
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => BottomNavCubit()),
+        BlocProvider(
+          create:
+              (context) => HomeCubit(
+                forecastRepository: locator<ForecastRepository>(),
+                mainCubit: context.read<MainCubit>(),
+                currentConditionRepository: locator<CurrentConditionRepository>(),
+              )..init(),
+        ),
+        BlocProvider(
+          create:
+              (context) => DailyCubit(
+                forecastRepository: locator<ForecastRepository>(),
+                mainCubit: context.read<MainCubit>(),
+              )..init(),
+        ),
+      ],
+      child: const BottomNavView(),
+    );
   }
 }
 

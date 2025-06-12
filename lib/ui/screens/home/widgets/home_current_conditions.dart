@@ -46,7 +46,7 @@ class HomeCurrentConditions extends StatelessWidget {
                   Expanded(
                     child: _buildDetailItem(
                       'Wind Speed',
-                      '${currentConditions?.wind?.speed?.metric?.value ?? ''} ${currentConditions?.wind?.speed?.metric?.unit ?? ''}',
+                      '${currentConditions?.wind?.speed?.value ?? ''} ${currentConditions?.wind?.speed?.unit ?? ''}',
                       Icons.air,
                     ),
                   ),

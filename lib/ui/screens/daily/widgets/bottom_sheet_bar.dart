@@ -1,16 +1,53 @@
 import 'package:flutter/material.dart';
 
+class BottomSheetBarController {
+  BottomSheetBarController();
+
+  late final DraggableScrollableController draggableScrollableController;
+  bool isExpanded = false;
+  double maxSize = 1;
+  double minSize = 0.2;
+
+  void expand() {
+    draggableScrollableController.animateTo(
+      maxSize,
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeIn,
+    );
+    isExpanded = true;
+  }
+
+  void collapse() {
+    draggableScrollableController.animateTo(
+      minSize,
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeIn,
+    );
+    isExpanded = false;
+  }
+
+  void dispose() {
+    draggableScrollableController.dispose();
+  }
+}
+
 class BottomSheetBar extends StatefulWidget {
   const BottomSheetBar({
     required this.body,
     required this.header,
     required this.expandedSliver,
     super.key,
+    this.bodyBottomPadding = 48,
+    this.borderRadius = 16,
+    this.controller,
   });
 
   final Widget body;
   final Widget header;
   final Widget expandedSliver;
+  final double bodyBottomPadding;
+  final BottomSheetBarController? controller;
+  final double borderRadius;
 
   @override
   State<BottomSheetBar> createState() => _BottomSheetBarState();
@@ -19,6 +56,21 @@ class BottomSheetBar extends StatefulWidget {
 class _BottomSheetBarState extends State<BottomSheetBar> {
   double _headerHeight = 60;
   bool _isHeaderMeasured = false;
+  late final BottomSheetBarController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = widget.controller ?? BottomSheetBarController();
+  }
+
+  @override
+  void didUpdateWidget(covariant BottomSheetBar oldWidget) {
+    if (oldWidget.controller != widget.controller && widget.controller != null) {
+      controller = widget.controller!;
+    }
+    super.didUpdateWidget(oldWidget);
+  }
 
   void _onHeaderMeasured(Size size) {
     if (!_isHeaderMeasured || _headerHeight != size.height) {
@@ -34,13 +86,13 @@ class _BottomSheetBarState extends State<BottomSheetBar> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final minChildSize = _headerHeight / constraints.maxHeight;
-
+        controller.minSize = minChildSize;
         return Stack(
           alignment: Alignment.bottomCenter,
           children: [
             Positioned.fill(
               child: Padding(
-                padding: EdgeInsets.only(bottom: _headerHeight + 24),
+                padding: EdgeInsets.only(bottom: _headerHeight + widget.bodyBottomPadding),
                 child: widget.body,
               ),
             ),
@@ -49,6 +101,8 @@ class _BottomSheetBarState extends State<BottomSheetBar> {
               header: widget.header,
               minChildSize: minChildSize,
               expandedSliver: widget.expandedSliver,
+              controller: controller,
+              borderRadius: widget.borderRadius,
             ),
           ],
         );
@@ -63,6 +117,8 @@ class BottomSheetBarSheet extends StatefulWidget {
     required this.header,
     required this.expandedSliver,
     required this.minChildSize,
+    required this.controller,
+    required this.borderRadius,
     super.key,
   });
 
@@ -70,69 +126,58 @@ class BottomSheetBarSheet extends StatefulWidget {
   final Widget header;
   final Widget expandedSliver;
   final double minChildSize;
+  final BottomSheetBarController controller;
+  final double borderRadius;
 
   @override
   State<BottomSheetBarSheet> createState() => _BottomSheetBarSheetState();
 }
 
 class _BottomSheetBarSheetState extends State<BottomSheetBarSheet> {
-  final DraggableScrollableController _draggableScrollableController =
-      DraggableScrollableController();
-  bool _expanded = false;
-
   @override
   void initState() {
     super.initState();
-    _draggableScrollableController.addListener(_controllerListener);
+    widget.controller.draggableScrollableController = DraggableScrollableController();
+    widget.controller.draggableScrollableController.addListener(_controllerListener);
+  }
+
+  void _controllerListener() {
+    if (widget.controller.isExpanded &&
+        widget.controller.draggableScrollableController.size == widget.controller.minSize) {
+      widget.controller.isExpanded = false;
+    }
+
+    if (!widget.controller.isExpanded &&
+        widget.controller.draggableScrollableController.size == widget.controller.maxSize) {
+      widget.controller.isExpanded = true;
+    }
   }
 
   @override
   void dispose() {
-    _draggableScrollableController
-      ..removeListener(_controllerListener)
-      ..dispose();
+    widget.controller.dispose();
     super.dispose();
   }
 
-  void _controllerListener() {
-    if (_draggableScrollableController.size == 1 && !_expanded) {
-      setState(() {
-        _expanded = true;
-      });
-    } else if (_expanded) {
-      setState(() {
-        _expanded = false;
-      });
-    }
-  }
-
   void _onHeaderTap() {
-    if (_expanded) {
-      _draggableScrollableController.animateTo(
-        widget.minChildSize,
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.easeIn,
-      );
+    if (widget.controller.isExpanded) {
+      widget.controller.collapse();
     } else {
-      _draggableScrollableController.animateTo(
-        1,
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.easeIn,
-      );
+      widget.controller.expand();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
-      controller: _draggableScrollableController,
+      controller: widget.controller.draggableScrollableController,
       initialChildSize: widget.minChildSize,
       minChildSize: widget.minChildSize,
       snap: true,
       builder: (context, scrollController) {
         return Material(
           color: Colors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(widget.borderRadius)),
           child: CustomScrollView(
             controller: scrollController,
             slivers: [

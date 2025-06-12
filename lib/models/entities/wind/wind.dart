@@ -12,7 +12,7 @@ class Wind {
   final WindDirection? direction;
 
   @JsonKey(name: 'Speed')
-  final UnitValue? speed;
+  final UnitValueDetail? speed;
 
   Map<String, dynamic> toJson() => _$WindToJson(this);
 }

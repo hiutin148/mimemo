@@ -70,7 +70,7 @@ class HomeDailyForecast extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
           ),
-          AppInkwell(
+          AppInkWell(
             onTap: () => _onViewAllTapped(context),
             child: Text(
               'View All',
@@ -103,7 +103,7 @@ class HomeDailyForecast extends StatelessWidget {
     final humidity = forecastDay.day?.relativeHumidity?.average;
     final iconCode = forecastDay.day?.icon ?? 0;
 
-    return AppInkwell(
+    return AppInkWell(
       onTap: () => _onForecastItemTapped(context, forecastDay, index),
       decoration:
           index == 0

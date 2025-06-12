@@ -14,6 +14,8 @@ abstract class ForecastRepository {
   Future<DailyForecast> get10DaysForecast(String locationKey);
 
   Future<DailyForecast> get15DaysForecast(String locationKey);
+
+  Future<DailyForecast> get45DaysForecast(String locationKey);
 }
 
 class ForecastRepositoryImpl extends ForecastRepository {
@@ -46,5 +48,10 @@ class ForecastRepositoryImpl extends ForecastRepository {
   @override
   Future<DailyForecast> get15DaysForecast(String locationKey) {
     return apiClient.get15DaysForecast(locationKey);
+  }
+
+  @override
+  Future<DailyForecast> get45DaysForecast(String locationKey) {
+    return apiClient.get45DaysForecast(locationKey);
   }
 }

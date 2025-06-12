@@ -17,7 +17,7 @@ class DailyCubit extends BaseCubit<DailyState> {
   Future<void> init() async {
     try {
       emit(state.copyWith(loadStatus: LoadStatus.loading));
-      final dailyForecast = await forecastRepository.get10DaysForecast(
+      final dailyForecast = await forecastRepository.get45DaysForecast(
         mainCubit.state.positionInfo?.key ?? '',
       );
       final selectedDay = dailyForecast.dailyForecasts?.firstOrNull;
@@ -32,5 +32,9 @@ class DailyCubit extends BaseCubit<DailyState> {
       emit(state.copyWith(loadStatus: LoadStatus.failure));
       logger.e(e);
     }
+  }
+
+  void changeSelectedDay(ForecastDay? day) {
+    emit(state.copyWith(selectedDay: day));
   }
 }

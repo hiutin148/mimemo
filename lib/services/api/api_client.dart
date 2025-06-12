@@ -42,6 +42,8 @@ abstract class ApiClient {
   @GET('/forecasts/v1/daily/15day/{locationKey}')
   Future<DailyForecast> get15DaysForecast(@Path('locationKey') String locationKey);
 
+  @GET('/forecasts/v1/daily/45day/{locationKey}')
+  Future<DailyForecast> get45DaysForecast(@Path('locationKey') String locationKey);
 
   // Current condition
   @GET('/currentconditions/v1/{locationKey}')
