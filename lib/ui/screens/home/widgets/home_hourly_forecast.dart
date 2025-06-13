@@ -25,7 +25,7 @@ class HomeHourlyForecast extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
+                const Text(
                   'Hourly Forecast',
                   style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
                 ),
@@ -40,7 +40,7 @@ class HomeHourlyForecast extends StatelessWidget {
                 ),
               ],
             ),
-            Gap(16),
+            const Gap(16),
             SizedBox(
               height: 120,
               child: ListView.builder(
@@ -55,8 +55,8 @@ class HomeHourlyForecast extends StatelessWidget {
                   final unit = forecast.temperature?.unit ?? '';
                   return Container(
                     width: 80,
-                    margin: EdgeInsets.only(right: 12),
-                    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+                    margin: const EdgeInsets.only(right: 12),
+                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
                     decoration: BoxDecoration(
                       color: Colors.white24,
                       borderRadius: BorderRadius.circular(8),
@@ -66,7 +66,7 @@ class HomeHourlyForecast extends StatelessWidget {
                       children: [
                         Text(
                           displayTime,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -80,7 +80,7 @@ class HomeHourlyForecast extends StatelessWidget {
                         ),
                         Text(
                           '$tem °$unit',
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 16,
                             fontWeight: FontWeight.w600,

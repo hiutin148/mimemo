@@ -2,6 +2,8 @@ import 'package:equatable/equatable.dart';
 import 'package:mimemo/common/blocs/main/main_cubit.dart';
 import 'package:mimemo/common/utils/utils.dart';
 import 'package:mimemo/core/base/base_cubit.dart';
+import 'package:mimemo/core/extension/extensions.dart';
+import 'package:mimemo/models/entities/climo_summary/climo_summary.dart';
 import 'package:mimemo/models/entities/daily_forecast/daily_forecast.dart';
 import 'package:mimemo/models/enums/load_status.dart';
 import 'package:mimemo/repositories/forecast_repository.dart';
@@ -17,21 +19,43 @@ class DailyCubit extends BaseCubit<DailyState> {
   Future<void> init() async {
     try {
       emit(state.copyWith(loadStatus: LoadStatus.loading));
-      final dailyForecast = await forecastRepository.get45DaysForecast(
-        mainCubit.state.positionInfo?.key ?? '',
-      );
+      final locationKey = mainCubit.state.positionInfo?.key ?? '';
+      final dailyForecast = await forecastRepository.get45DaysForecast(locationKey);
       final selectedDay = dailyForecast.dailyForecasts?.firstOrNull;
+      final currentYear = selectedDay?.date?.toDate?.year;
+      final currentMonth = selectedDay?.date?.toDate?.month;
+      final currentDay = selectedDay?.date?.toDate?.day;
+      ClimoSummary? climoSummary;
+      if (currentYear != null && currentMonth != null && currentDay != null) {
+        final lastYear = currentYear - 1;
+        climoSummary = await getClimoSummary(
+          locationKey,
+          lastYear.toString(),
+          currentMonth.toString(),
+          currentDay.toString(),
+        );
+      }
       emit(
         state.copyWith(
           dailyForecast: dailyForecast,
           loadStatus: LoadStatus.success,
           selectedDay: selectedDay,
+          selectedDayClimo: climoSummary,
         ),
       );
     } on Exception catch (e) {
       emit(state.copyWith(loadStatus: LoadStatus.failure));
       logger.e(e);
     }
+  }
+
+  Future<ClimoSummary> getClimoSummary(String locationKey, String year, String month, String day) {
+    return forecastRepository.getClimoSummary(
+      locationKey: locationKey,
+      year: year,
+      month: month,
+      day: day,
+    );
   }
 
   void changeSelectedDay(ForecastDay? day) {

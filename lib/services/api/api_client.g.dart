@@ -254,6 +254,38 @@ class _ApiClient implements ApiClient {
   }
 
   @override
+  Future<ClimoSummary> getClimoSummary({
+    required String locationKey,
+    required String year,
+    required String month,
+    required String day,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<ClimoSummary>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/climo/v1/summary/${year}/${month}/${day}/${locationKey}',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ClimoSummary _value;
+    try {
+      _value = ClimoSummary.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
   Future<List<CurrentConditions>> getCurrentConditions(
     String locationKey,
   ) async {

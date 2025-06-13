@@ -5,7 +5,7 @@ part 'unit_value_range.g.dart';
 
 @JsonSerializable()
 class UnitValueRange {
-  UnitValueRange({this.minimum, this.maximum});
+  UnitValueRange({this.minimum, this.maximum, this.average});
 
   factory UnitValueRange.fromJson(Map<String, dynamic> json) => _$UnitValueRangeFromJson(json);
   @JsonKey(name: 'Minimum')
@@ -13,6 +13,9 @@ class UnitValueRange {
 
   @JsonKey(name: 'Maximum')
   final UnitValue? maximum;
+
+  @JsonKey(name: 'Average')
+  final UnitValue? average;
 
   Map<String, dynamic> toJson() => _$UnitValueRangeToJson(this);
 }

@@ -11,6 +11,12 @@ class AppTheme {
       titleTextStyle: TextStyle(fontSize: 16, color: Colors.white),
       iconTheme: IconThemeData(color: Colors.white),
     ),
+    tabBarTheme:  TabBarTheme(
+      dividerColor: Colors.white24,
+      indicatorColor: Colors.white,
+      labelColor: Colors.white,
+      overlayColor: WidgetStatePropertyAll(Colors.white.withValues(alpha: 0.2)),
+    ),
     fontFamily: 'Roboto',
     textTheme: const TextTheme(
       // Display

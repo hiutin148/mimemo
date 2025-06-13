@@ -13,7 +13,7 @@ extension StringExtension on String {
 
   DateTime? get toDate {
     try {
-      return DateTime.tryParse(this);
+      return DateTime.tryParse(this)?.toLocal();
     } on Exception {
       return null;
     }

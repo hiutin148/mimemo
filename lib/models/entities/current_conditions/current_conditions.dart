@@ -2,7 +2,6 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:mimemo/models/entities/temperature/unit_value.dart';
 import 'package:mimemo/models/entities/unit_value_range/unit_value_range.dart';
 import 'package:mimemo/models/entities/wind/wind.dart';
-import 'package:mimemo/models/entities/wind_gust/wind_gust.dart';
 
 part 'current_conditions.g.dart';
 
@@ -91,7 +90,7 @@ class CurrentConditions {
   final Wind? wind;
 
   @JsonKey(name: 'WindGust')
-  final WindGust? windGust;
+  final Wind? windGust;
 
   @JsonKey(name: 'UVIndex')
   final int? uvIndex;

@@ -16,7 +16,15 @@ UnitValueRange _$UnitValueRangeFromJson(Map<String, dynamic> json) =>
           json['Maximum'] == null
               ? null
               : UnitValue.fromJson(json['Maximum'] as Map<String, dynamic>),
+      average:
+          json['Average'] == null
+              ? null
+              : UnitValue.fromJson(json['Average'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$UnitValueRangeToJson(UnitValueRange instance) =>
-    <String, dynamic>{'Minimum': instance.minimum, 'Maximum': instance.maximum};
+    <String, dynamic>{
+      'Minimum': instance.minimum,
+      'Maximum': instance.maximum,
+      'Average': instance.average,
+    };

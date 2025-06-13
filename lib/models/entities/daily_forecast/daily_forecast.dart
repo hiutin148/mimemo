@@ -3,7 +3,6 @@ import 'package:mimemo/models/entities/temperature/unit_value.dart';
 import 'package:mimemo/models/entities/unit_value_detail_range/unit_value_detail_range.dart';
 import 'package:mimemo/models/entities/unit_value_range/unit_value_range.dart';
 import 'package:mimemo/models/entities/wind/wind.dart';
-import 'package:mimemo/models/entities/wind_gust/wind_gust.dart';
 
 part 'daily_forecast.g.dart';
 
@@ -289,7 +288,7 @@ class DayNight {
   final Wind? wind;
 
   @JsonKey(name: 'WindGust')
-  final WindGust? windGust;
+  final Wind? windGust;
 
   @JsonKey(name: 'TotalLiquid')
   final UnitValue? totalLiquid;

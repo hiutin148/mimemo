@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:mimemo/core/const/config.dart';
+import 'package:mimemo/models/entities/climo_summary/climo_summary.dart';
 import 'package:mimemo/models/entities/current_air_quality/current_air_quality.dart';
 import 'package:mimemo/models/entities/current_conditions/current_conditions.dart';
 import 'package:mimemo/models/entities/daily_forecast/daily_forecast.dart';
@@ -44,6 +45,14 @@ abstract class ApiClient {
 
   @GET('/forecasts/v1/daily/45day/{locationKey}')
   Future<DailyForecast> get45DaysForecast(@Path('locationKey') String locationKey);
+
+  @GET('/climo/v1/summary/{year}/{month}/{day}/{locationKey}')
+  Future<ClimoSummary> getClimoSummary({
+    @Path('locationKey') required String locationKey,
+    @Path('year') required String year,
+    @Path('month') required String month,
+    @Path('day') required String day,
+  });
 
   // Current condition
   @GET('/currentconditions/v1/{locationKey}')

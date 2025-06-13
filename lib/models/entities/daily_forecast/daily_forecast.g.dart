@@ -205,7 +205,7 @@ DayNight _$DayNightFromJson(Map<String, dynamic> json) => DayNight(
   windGust:
       json['WindGust'] == null
           ? null
-          : WindGust.fromJson(json['WindGust'] as Map<String, dynamic>),
+          : Wind.fromJson(json['WindGust'] as Map<String, dynamic>),
   totalLiquid:
       json['TotalLiquid'] == null
           ? null

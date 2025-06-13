@@ -44,7 +44,7 @@ CurrentConditions _$CurrentConditionsFromJson(Map<String, dynamic> json) =>
       windGust:
           json['WindGust'] == null
               ? null
-              : WindGust.fromJson(json['WindGust'] as Map<String, dynamic>),
+              : Wind.fromJson(json['WindGust'] as Map<String, dynamic>),
       uvIndex: (json['UVIndex'] as num?)?.toInt(),
       uvIndexText: json['UVIndexText'] as String?,
       visibility:
