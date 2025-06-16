@@ -58,7 +58,15 @@ class DailyCubit extends BaseCubit<DailyState> {
     );
   }
 
-  void changeSelectedDay(ForecastDay? day) {
+  Future<void> changeSelectedDay(ForecastDay? day) async {
     emit(state.copyWith(selectedDay: day));
+    final date = day?.date?.toDate ?? DateTime.now();
+    final climo = await getClimoSummary(
+      mainCubit.state.positionInfo?.key ?? '',
+      (date.year - 1).toString(),
+      date.month.toString(),
+      date.day.toString(),
+    );
+    emit(state.copyWith(selectedDayClimo: climo));
   }
 }

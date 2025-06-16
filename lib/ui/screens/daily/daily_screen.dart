@@ -5,7 +5,8 @@ import 'package:mimemo/core/extension/extensions.dart';
 import 'package:mimemo/models/entities/daily_forecast/daily_forecast.dart';
 import 'package:mimemo/ui/screens/daily/daily_cubit.dart';
 import 'package:mimemo/ui/screens/daily/widgets/bottom_sheet_bar.dart';
-import 'package:mimemo/ui/screens/daily/widgets/fifteen_daily_forecast_item.dart';
+import 'package:mimemo/ui/screens/daily/widgets/daily_forecast_calendar.dart';
+import 'package:mimemo/ui/screens/daily/widgets/daily_forecast_list.dart';
 import 'package:mimemo/ui/screens/daily/widgets/selected_day_detail.dart';
 
 class DailyScreen extends StatefulWidget {
@@ -16,11 +17,19 @@ class DailyScreen extends StatefulWidget {
 }
 
 class _DailyViewState extends State<DailyScreen> with SingleTickerProviderStateMixin {
-  final BottomSheetBarController bottomSheetBarController = BottomSheetBarController();
+  final BottomSheetBarController _bottomSheetBarController = BottomSheetBarController();
+
+  int _currentTab = 0;
 
   void _onForecastItemPressed(ForecastDay? day) {
     context.read<DailyCubit>().changeSelectedDay(day);
-    bottomSheetBarController.expand();
+    _bottomSheetBarController.expand();
+  }
+
+  void _onTabBarTap(int index) {
+    setState(() {
+      _currentTab = index;
+    });
   }
 
   @override
@@ -31,26 +40,55 @@ class _DailyViewState extends State<DailyScreen> with SingleTickerProviderStateM
         body: LayoutBuilder(
           builder: (context, constraints) {
             return BottomSheetBar(
-              controller: bottomSheetBarController,
+              controller: _bottomSheetBarController,
               header: _buildBottomSheetHeader(context),
-              body: Column(
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(
-                        width: constraints.maxWidth,
-                        height: kToolbarHeight,
-                        child: const TabBar(tabs: [Tab(text: '15 days'), Tab(text: '45 days')]),
-                      ),
-                    ],
-                  ),
-                  Expanded(child: _buildForecastList()),
-                ],
-              ),
-              expandedSliver: _buildExpandedSliver(),
+              bodyBottomPadding: _currentTab == 0 ? 48 : 0,
+              body: _buildBottomSheetBarBody(),
+              expandedSliver: const SelectedDayDetail(),
             );
           },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomSheetBarBody() {
+    return Stack(
+      children: [
+        Column(
+          children: [
+            Expanded(
+              child:
+              _currentTab == 0
+                  ? DailyForecastList(onItemTap: _onForecastItemPressed)
+                  : DailyForecastCalendar(onItemTap: _onForecastItemPressed),
+            ),
+          ],
+        ),
+        Positioned(right: 16, top: 16, child: _buildSwitchTabButton()),
+      ],
+    );
+  }
+
+  Widget _buildSwitchTabButton() {
+    return IntrinsicWidth(
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.white),
+          borderRadius: BorderRadius.circular(100),
+        ),
+        child: TabBar(
+          indicator: BoxDecoration(borderRadius: BorderRadius.circular(100), color: Colors.white),
+          padding: EdgeInsets.zero,
+          dividerHeight: 0,
+          indicatorSize: TabBarIndicatorSize.tab,
+          labelPadding: const EdgeInsets.symmetric(horizontal: 16),
+          labelColor: Colors.black,
+          unselectedLabelColor: Colors.white,
+          labelStyle: context.textTheme.labelLarge,
+          overlayColor: const WidgetStatePropertyAll(Colors.transparent),
+          tabs: const [Tab(text: '15 days', height: 20), Tab(text: '45 days', height: 20)],
+          onTap: _onTabBarTap,
         ),
       ),
     );
@@ -90,58 +128,6 @@ class _DailyViewState extends State<DailyScreen> with SingleTickerProviderStateM
         );
       },
       selector: (state) => state.selectedDay,
-    );
-  }
-
-  Widget _buildForecastList() {
-    return BlocSelector<DailyCubit, DailyState, DailyForecast?>(
-      builder: (context, dailyForecast) {
-        final forecasts =
-            dailyForecast?.dailyForecasts?.getRange(0, 14).whereType<ForecastDay>().toList();
-
-        if (forecasts == null || forecasts.isEmpty) {
-          return const Center(child: Text('No forecast data available'));
-        }
-
-        final (max, min) = _calculateTemperatureRange(forecasts);
-
-        return ListView.builder(
-          itemCount: forecasts.length,
-          scrollDirection: Axis.horizontal,
-          itemBuilder: (context, index) {
-            return FifteenDailyForecastItem(
-              forecast: forecasts[index],
-              maxTem: max,
-              minTem: min,
-              key: ValueKey(forecasts[index].date),
-              onDayPressed: _onForecastItemPressed,
-            );
-          },
-        );
-      },
-      selector: (state) => state.dailyForecast,
-    );
-  }
-
-  Widget _buildExpandedSliver() {
-    return const SelectedDayDetail();
-  }
-
-  (double, double) _calculateTemperatureRange(List<ForecastDay> forecasts) {
-    var maxTemp = double.negativeInfinity;
-    var minTemp = double.infinity;
-
-    for (final forecast in forecasts) {
-      final max = forecast.temperature?.maximum?.value ?? 0.0;
-      final min = forecast.temperature?.minimum?.value ?? 0.0;
-
-      if (max > maxTemp) maxTemp = max;
-      if (min < minTemp) minTemp = min;
-    }
-
-    return (
-      maxTemp == double.negativeInfinity ? 0.0 : maxTemp,
-      minTemp == double.infinity ? 0.0 : minTemp,
     );
   }
 }
