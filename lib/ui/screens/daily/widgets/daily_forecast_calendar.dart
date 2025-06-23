@@ -20,7 +20,7 @@ class DailyForecastCalendar extends StatefulWidget {
 class _DailyForecastCalendarState extends State<DailyForecastCalendar> {
   late Map<DateTime, List<ForecastDay>> forecastsByMonth;
   late List<DateTime> sortedMonths;
-  final GlobalKey<State<StatefulWidget>> _globalKey = GlobalKey();
+  List<GlobalKey<State<StatefulWidget>>> _globalKeys = [];
   final GlobalKey<State<StatefulWidget>> _listViewKey = GlobalKey();
   final _scrollController = ScrollController();
   late ValueNotifier<String> _displayMonth;
@@ -43,24 +43,30 @@ class _DailyForecastCalendarState extends State<DailyForecastCalendar> {
       }
     }
     sortedMonths = forecastsByMonth.keys.toList()..sort((a, b) => a.compareTo(b));
+    _globalKeys = sortedMonths.map((e) => GlobalKey()).whereType<GlobalKey>().toList();
     _displayMonth = ValueNotifier(sortedMonths[0].toFormatedString(DateFormatPattern.monthFull));
+
     _scrollController.addListener(() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final listBox = _listViewKey.currentContext?.findRenderObject();
-        final targetBox = _globalKey.currentContext?.findRenderObject();
+        if (listBox is! RenderBox) return;
+        String? newDisplayMonth;
+        for (var i = 0; i < _globalKeys.length; i++) {
+          final targetBox = _globalKeys[i].currentContext?.findRenderObject();
+          if (targetBox is RenderBox) {
+            final relativeOffset = targetBox.localToGlobal(Offset.zero, ancestor: listBox);
+            final bottomY = relativeOffset.dy + targetBox.size.height;
 
-        if (listBox is RenderBox && targetBox is RenderBox) {
-          final relativeOffset = targetBox.localToGlobal(Offset.zero, ancestor: listBox);
-          final topY = relativeOffset.dy + 40;
-
-          final month0 = sortedMonths[0].toFormatedString(DateFormatPattern.monthFull);
-          final month1 = sortedMonths[1].toFormatedString(DateFormatPattern.monthFull);
-
-          final shouldBeMonth = topY <= 0 ? month1 : month0;
-
-          if (_displayMonth.value != shouldBeMonth) {
-            _displayMonth.value = shouldBeMonth;
+            if (bottomY <= 0) {
+              newDisplayMonth = sortedMonths[i].toFormatedString(DateFormatPattern.monthFull);
+            } else {
+              break;
+            }
           }
+        }
+        newDisplayMonth ??= sortedMonths.first.toFormatedString(DateFormatPattern.monthFull);
+        if (_displayMonth.value != newDisplayMonth) {
+          _displayMonth.value = newDisplayMonth;
         }
       });
     });
@@ -109,6 +115,7 @@ class _DailyForecastCalendarState extends State<DailyForecastCalendar> {
             Expanded(
               child: ListView.builder(
                 key: _listViewKey,
+                padding: const EdgeInsets.only(bottom: 12),
                 controller: _scrollController,
                 itemCount: sortedMonths.length,
                 itemBuilder: (context, index) {
@@ -147,7 +154,7 @@ class _DailyForecastCalendarState extends State<DailyForecastCalendar> {
       children: [
         if (index > 0)
           Container(
-            key: _globalKey,
+            key: _globalKeys[index],
             width: MediaQuery.sizeOf(context).width,
             decoration: const BoxDecoration(border: Border(top: BorderSide(color: Colors.white24))),
             padding: const EdgeInsets.all(8),

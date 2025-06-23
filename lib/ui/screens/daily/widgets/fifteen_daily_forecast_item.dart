@@ -112,7 +112,7 @@ class FifteenDailyForecastItem extends StatelessWidget {
         final textFont = context.textTheme.bodyMedium?.fontSize ?? 0;
         final degreeSpace =
             (constraints.maxHeight - textHeight * textFont * 2 - 16) / temperatureRangeSpan;
-        final topSpace = degreeSpace * (maxTem - dayMaxTemp);
+        final topSpace = degreeSpace * (maxTem - dayMaxTemp).clamp(0, maxTem);
         final barHeight = (dayMaxTemp - dayMinTemp) * degreeSpace;
 
         return Column(

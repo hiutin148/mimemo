@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mimemo/core/extension/extensions.dart';
 import 'package:mimemo/models/entities/daily_forecast/daily_forecast.dart';
 import 'package:mimemo/models/enums/load_status.dart';
 import 'package:mimemo/ui/screens/daily/daily_cubit.dart';
@@ -45,18 +46,32 @@ class DailyForecastList extends StatelessWidget {
 
           final (max, min) = _calculateTemperatureRange(forecasts);
 
-          return ListView.builder(
-            itemCount: forecasts.length,
-            scrollDirection: Axis.horizontal,
-            itemBuilder: (context, index) {
-              return FifteenDailyForecastItem(
-                forecast: forecasts[index],
-                maxTem: max,
-                minTem: min,
-                key: ValueKey(forecasts[index].date),
-                onDayPressed: onItemTap,
-              );
-            },
+          return Column(
+            children: [
+              Container(
+                width: MediaQuery.sizeOf(context).width,
+                decoration: const BoxDecoration(
+                  border: Border(top: BorderSide(color: Colors.white24)),
+                ),
+                padding: const EdgeInsets.all(16),
+                child: Text('value', style: context.textTheme.titleMedium),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: forecasts.length,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) {
+                    return FifteenDailyForecastItem(
+                      forecast: forecasts[index],
+                      maxTem: max,
+                      minTem: min,
+                      key: ValueKey(forecasts[index].date),
+                      onDayPressed: onItemTap,
+                    );
+                  },
+                ),
+              ),
+            ],
           );
         }
       },
