@@ -1,11 +1,12 @@
 import 'package:geolocator/geolocator.dart';
+import 'package:mimemo/common/utils/logger.dart';
 
 /// Custom exception for location-related errors
 class LocationException implements Exception {
-  final String message;
-  final LocationErrorType type;
 
   const LocationException(this.message, this.type);
+  final String message;
+  final LocationErrorType type;
 
   @override
   String toString() => 'LocationException: $message';
@@ -21,10 +22,7 @@ enum LocationErrorType {
 }
 
 /// Simplified location service for getting current position
-class LocationService {
-  static final LocationService _instance = LocationService._internal();
-  factory LocationService() => _instance;
-  LocationService._internal();
+class GeoLocationService {
 
   /// Default location settings
   static const LocationSettings _defaultSettings = LocationSettings(
@@ -36,21 +34,22 @@ class LocationService {
   Future<Position> getCurrentPosition() async {
     try {
       // Check if location services are enabled
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      logger.d('GeoLocationService: GETTING CURRENT POSITION');
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        throw LocationException(
+        throw const LocationException(
           'Location services are disabled',
           LocationErrorType.serviceDisabled,
         );
       }
 
       // Check and request permission
-      LocationPermission permission = await Geolocator.checkPermission();
+      var permission = await Geolocator.checkPermission();
 
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          throw LocationException(
+          throw const LocationException(
             'Location permission denied',
             LocationErrorType.permissionDenied,
           );
@@ -58,7 +57,7 @@ class LocationService {
       }
 
       if (permission == LocationPermission.deniedForever) {
-        throw LocationException(
+        throw const LocationException(
           'Location permissions permanently denied',
           LocationErrorType.permissionDeniedForever,
         );
@@ -72,7 +71,7 @@ class LocationService {
     } catch (e) {
       if (e is LocationException) rethrow;
       throw LocationException(
-        'Failed to get location: ${e.toString()}',
+        'Failed to get location: $e',
         LocationErrorType.unknown,
       );
     }
@@ -80,11 +79,11 @@ class LocationService {
 
   /// Open app settings for permissions
   Future<bool> openAppSettings() async {
-    return await Geolocator.openAppSettings();
+    return Geolocator.openAppSettings();
   }
 
   /// Open location settings
   Future<bool> openLocationSettings() async {
-    return await Geolocator.openLocationSettings();
+    return Geolocator.openLocationSettings();
   }
 }

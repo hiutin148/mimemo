@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
-import '../bottom_nav/bottom_nav_screen.dart';
+import 'package:mimemo/ui/screens/bottom_nav/bottom_nav_screen.dart';
 
 class HourlyPage extends StatelessWidget {
   const HourlyPage({super.key});
@@ -11,13 +11,13 @@ class HourlyPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Hourly Forecast', style: TextStyle(color: Colors.white)),
-        backgroundColor: Color(0xFF4A90E2),
+        title: const Text('Hourly Forecast', style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color(0xFF4A90E2),
         elevation: 0,
         leading: Container(),
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -25,11 +25,11 @@ class HourlyPage extends StatelessWidget {
           ),
         ),
         child: ListView.builder(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           itemCount: WeatherData.hourlyForecast.length,
           itemBuilder: (context, index) {
             final hour = WeatherData.hourlyForecast[index];
-            final dateTime = DateTime.parse(hour['DateTime']);
+            final dateTime = DateTime.parse(hour['DateTime'].toString());
             final time = dateTime.hour;
             final displayTime =
                 time == 12
@@ -41,8 +41,8 @@ class HourlyPage extends StatelessWidget {
                     : '$time AM';
 
             return Container(
-              margin: EdgeInsets.only(bottom: 12),
-              padding: EdgeInsets.all(16),
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
@@ -52,22 +52,22 @@ class HourlyPage extends StatelessWidget {
                 children: [
                   Text(
                     displayTime,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  Gap( 20),
+                  const Gap(20),
                   Text(
-                    WeatherData.getWeatherIcon(hour['WeatherIcon']),
-                    style: TextStyle(fontSize: 28),
+                    WeatherData.getWeatherIcon(hour['WeatherIcon'] as int),
+                    style: const TextStyle(fontSize: 28),
                   ),
-                  Gap( 20),
+                  const Gap(20),
                   Expanded(
                     child: Text(
-                      hour['IconPhrase'],
-                      style: TextStyle(color: Colors.white, fontSize: 16),
+                      hour['IconPhrase'].toString(),
+                      style: const TextStyle(color: Colors.white, fontSize: 16),
                     ),
                   ),
                   Column(
@@ -75,7 +75,7 @@ class HourlyPage extends StatelessWidget {
                     children: [
                       Text(
                         '${hour['Temperature']['Value']}°F',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.w600,

@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:mimemo/common/blocs/main/main_cubit.dart';
+import 'package:mimemo/common/utils/overlay_loading.dart';
 import 'package:mimemo/core/extension/context_extension.dart';
 import 'package:mimemo/core/extension/text_style_extension.dart';
 import 'package:mimemo/generated/l10n.dart';
@@ -9,6 +13,7 @@ import 'package:mimemo/locator.dart';
 import 'package:mimemo/repositories/app_setting_repository.dart';
 import 'package:mimemo/router/app_router.gr.dart';
 import 'package:mimemo/ui/screens/onboarding/onboarding_cubit.dart';
+import 'package:mimemo/ui/widgets/app_button.dart';
 
 @RoutePage()
 class OnboardingScreen extends StatefulWidget {
@@ -28,17 +33,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       child: Scaffold(
         body: PageView(
           controller: _pageController,
-          onPageChanged: (int page) {
-            setState(() {
-              // _currentPage = page;
-            });
-          },
           children: [
-            WelcomeScreen(onNext: () => _nextPage()),
-            FeaturesScreen(onNext: () => _nextPage(), onSkip: () => _skipToPermissions()),
-            LocationPermissionScreen(onNext: () => _nextPage(), onSkip: () => _nextPage()),
-            NotificationPermissionScreen(onNext: () => _nextPage(), onSkip: () => _nextPage()),
-            GetStartedScreen(),
+            WelcomeScreen(onNext: _nextPage),
+            FeaturesScreen(onNext: _nextPage, onSkip: _skipToPermissions),
+            LocationPermissionScreen(onNext: _nextPage, onSkip: _nextPage),
+            NotificationPermissionScreen(onNext: _nextPage, onSkip: _nextPage),
+            const GetStartedScreen(),
           ],
         ),
       ),
@@ -46,27 +46,27 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _nextPage() {
-    _pageController.nextPage(duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+    _pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
   }
 
   void _skipToPermissions() {
     _pageController.animateToPage(
       2,
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
   }
 }
 
 class WelcomeScreen extends StatelessWidget {
-  final VoidCallback onNext;
 
-  const WelcomeScreen({super.key, required this.onNext});
+  const WelcomeScreen({required this.onNext, super.key});
+  final VoidCallback onNext;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -75,11 +75,10 @@ class WelcomeScreen extends StatelessWidget {
       ),
       child: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             children: [
-              Gap(60),
-
+              const Gap(60),
               // AccuWeather Logo
               Container(
                 width: 120,
@@ -91,7 +90,7 @@ class WelcomeScreen extends StatelessWidget {
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 20,
-                      offset: Offset(0, 10),
+                      offset: const Offset(0, 10),
                     ),
                   ],
                 ),
@@ -104,14 +103,14 @@ class WelcomeScreen extends StatelessWidget {
                 ),
               ),
 
-              Spacer(),
+              const Spacer(),
               Text(
                 S.of(context).welcomeTonaccuweather,
                 style: context.textTheme.headlineMedium?.w500.white,
                 textAlign: TextAlign.center,
               ),
 
-              Gap(16),
+              const Gap(16),
 
               Text(
                 S.of(context).getTheWorldsMostAccuratenweatherForecasts,
@@ -122,25 +121,19 @@ class WelcomeScreen extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              Gap(16),
+              const Gap(16),
 
               // Get Started Button
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
+                child: AppButton(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
                   onPressed: onNext,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Color(0xFF1E90FF),
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-                    elevation: 0,
-                  ),
                   child: Text(S.of(context).getStarted, style: context.textTheme.bodyLarge?.w700),
                 ),
               ),
 
-              Gap(40),
+              const Gap(40),
             ],
           ),
         ),
@@ -150,10 +143,10 @@ class WelcomeScreen extends StatelessWidget {
 }
 
 class FeaturesScreen extends StatelessWidget {
+
+  const FeaturesScreen({required this.onNext, required this.onSkip, super.key});
   final VoidCallback onNext;
   final VoidCallback onSkip;
-
-  const FeaturesScreen({super.key, required this.onNext, required this.onSkip});
 
   @override
   Widget build(BuildContext context) {
@@ -167,10 +160,10 @@ class FeaturesScreen extends StatelessWidget {
       ),
       child: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             children: [
-              Spacer(),
+              const Spacer(),
               // Features list
               Expanded(
                 child: Column(
@@ -180,34 +173,34 @@ class FeaturesScreen extends StatelessWidget {
                       Icons.location_on,
                       S.of(context).hyperlocalForecasts,
                       S.of(context).getPreciseWeatherForYourExactLocation,
-                      Color(0xFF00CED1),
+                      const Color(0xFF00CED1),
                     ),
-                    Gap(32),
+                    const Gap(32),
                     _buildFeatureItem(
                       context,
 
                       Icons.access_time,
                       S.of(context).hourlyDailyForecasts,
                       S.of(context).planAheadWithDetailed15dayForecasts,
-                      Color(0xFFFFD700),
+                      const Color(0xFFFFD700),
                     ),
-                    Gap(32),
+                    const Gap(32),
                     _buildFeatureItem(
                       context,
 
                       Icons.warning,
                       S.of(context).severeWeatherAlerts,
                       S.of(context).staySafeWithRealtimeWeatherWarnings,
-                      Color(0xFFFF6347),
+                      const Color(0xFFFF6347),
                     ),
-                    Gap(32),
+                    const Gap(32),
                     _buildFeatureItem(
                       context,
 
                       Icons.radar,
                       S.of(context).interactiveRadar,
                       S.of(context).trackStormsWithOurAdvancedRadarMaps,
-                      Color(0xFF32CD32),
+                      const Color(0xFF32CD32),
                     ),
                   ],
                 ),
@@ -216,20 +209,15 @@ class FeaturesScreen extends StatelessWidget {
               // Continue Button
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
+                child: AppButton(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+
                   onPressed: onNext,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Color(0xFF2F1B69),
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-                    elevation: 0,
-                  ),
                   child: Text(S.of(context).continueT, style: context.textTheme.bodyLarge?.w700),
                 ),
               ),
 
-              Gap(40),
+              const Gap(40),
             ],
           ),
         ),
@@ -255,13 +243,13 @@ class FeaturesScreen extends StatelessWidget {
           ),
           child: Icon(icon, color: iconColor, size: 24),
         ),
-        Gap(16),
+        const Gap(16),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(title, style: context.textTheme.titleMedium?.white),
-              Gap(4),
+              const Gap(4),
               Text(description, style: context.textTheme.titleSmall?.white),
             ],
           ),
@@ -272,13 +260,13 @@ class FeaturesScreen extends StatelessWidget {
 }
 
 class LocationPermissionScreen extends StatelessWidget {
+
+  const LocationPermissionScreen({required this.onNext, required this.onSkip, super.key});
   final VoidCallback onNext;
   final VoidCallback onSkip;
 
-  const LocationPermissionScreen({super.key, required this.onNext, required this.onSkip});
-
-  void _requestPermission() {
-    // LocationService().initialize();
+  Future<void> _requestPermission(BuildContext context) async {
+    await OverlayLoading.runWithLoading(context, () => context.read<MainCubit>().init());
     onNext.call();
   }
 
@@ -294,10 +282,10 @@ class LocationPermissionScreen extends StatelessWidget {
       ),
       child: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             children: [
-              Gap(60),
+              const Gap(60),
 
               // Location icon illustration
               Container(
@@ -307,18 +295,18 @@ class LocationPermissionScreen extends StatelessWidget {
                   color: Colors.white.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
-                child: Center(child: Icon(Icons.location_on, size: 80, color: Colors.white)),
+                child: const Center(child: Icon(Icons.location_on, size: 80, color: Colors.white)),
               ),
 
-              Gap(60),
+              const Gap(60),
 
               Text(
                 S.of(context).enableLocationAccess,
-                style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
+                style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
 
-              Gap(20),
+              const Gap(20),
 
               Text(
                 S.of(context).allowAccuweatherToAccessYourLocationToProvideHyperlocalWeather,
@@ -330,11 +318,11 @@ class LocationPermissionScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
 
-              Gap(40),
+              const Gap(40),
 
               // Benefits
               Container(
-                padding: EdgeInsets.all(20),
+                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16),
@@ -342,27 +330,23 @@ class LocationPermissionScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     _buildBenefitItem(context, '🎯', S.of(context).preciseLocalForecasts),
-                    Gap(12),
+                    const Gap(12),
                     _buildBenefitItem(context, '⚡', S.of(context).realtimeWeatherAlerts),
-                    Gap(12),
+                    const Gap(12),
                     _buildBenefitItem(context, '🗺️', S.of(context).interactiveRadarMaps),
                   ],
                 ),
               ),
 
-              Spacer(),
+              const Spacer(),
 
               // Allow Location Button
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _requestPermission,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-                    elevation: 0,
-                  ),
+                child: AppButton(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+
+                  onPressed: () => _requestPermission(context),
                   child: Text(
                     S.of(context).allowLocationAccess,
                     style: context.textTheme.bodyLarge?.w700,
@@ -370,7 +354,7 @@ class LocationPermissionScreen extends StatelessWidget {
                 ),
               ),
 
-              Gap(40),
+              const Gap(40),
             ],
           ),
         ),
@@ -382,7 +366,7 @@ class LocationPermissionScreen extends StatelessWidget {
     return Row(
       children: [
         Text(emoji, style: context.textTheme.titleLarge),
-        Gap(12),
+        const Gap(12),
         Text(text, style: context.textTheme.titleMedium?.white),
       ],
     );
@@ -390,15 +374,15 @@ class LocationPermissionScreen extends StatelessWidget {
 }
 
 class NotificationPermissionScreen extends StatelessWidget {
+
+  const NotificationPermissionScreen({required this.onNext, required this.onSkip, super.key});
   final VoidCallback onNext;
   final VoidCallback onSkip;
-
-  const NotificationPermissionScreen({super.key, required this.onNext, required this.onSkip});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -407,10 +391,10 @@ class NotificationPermissionScreen extends StatelessWidget {
       ),
       child: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             children: [
-              Gap(60),
+              const Gap(60),
 
               // Notification bell illustration
               Container(
@@ -423,15 +407,15 @@ class NotificationPermissionScreen extends StatelessWidget {
                 child: Center(
                   child: Stack(
                     children: [
-                      Icon(Icons.notifications, size: 80, color: Colors.white),
+                      const Icon(Icons.notifications, size: 80, color: Colors.white),
                       Positioned(
                         top: 15,
                         right: 15,
                         child: Container(
                           width: 20,
                           height: 20,
-                          decoration: BoxDecoration(shape: BoxShape.circle),
-                          child: Center(
+                          decoration: const BoxDecoration(shape: BoxShape.circle),
+                          child: const Center(
                             child: Text(
                               '!',
                               style: TextStyle(
@@ -448,7 +432,7 @@ class NotificationPermissionScreen extends StatelessWidget {
                 ),
               ),
 
-              Gap(60),
+              const Gap(60),
 
               Text(
                 S.of(context).stayAlertPrepared,
@@ -456,7 +440,7 @@ class NotificationPermissionScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
 
-              Gap(20),
+              const Gap(20),
 
               Text(
                 S.of(context).onboarding_notificationMessage,
@@ -464,11 +448,11 @@ class NotificationPermissionScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
 
-              Gap(40),
+              const Gap(40),
 
               // Notification types
               Container(
-                padding: EdgeInsets.all(20),
+                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16),
@@ -476,28 +460,23 @@ class NotificationPermissionScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     _buildNotificationItem(context, '⚠️', S.of(context).severeWeatherAlerts),
-                    Gap(12),
+                    const Gap(12),
                     _buildNotificationItem(context, '🌅', S.of(context).dailyWeatherSummary),
-                    Gap(12),
+                    const Gap(12),
                     _buildNotificationItem(context, '🌧️', S.of(context).rainSnowNotifications),
                   ],
                 ),
               ),
 
-              Spacer(),
+              const Spacer(),
 
               // Enable Notifications Button
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
+                child: AppButton(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+
                   onPressed: onNext,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Color(0xFFDC143C),
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-                    elevation: 0,
-                  ),
                   child: Text(
                     S.of(context).enableNotifications,
                     style: context.textTheme.bodyLarge?.w700,
@@ -505,7 +484,7 @@ class NotificationPermissionScreen extends StatelessWidget {
                 ),
               ),
 
-              Gap(40),
+              const Gap(40),
             ],
           ),
         ),
@@ -517,7 +496,7 @@ class NotificationPermissionScreen extends StatelessWidget {
     return Row(
       children: [
         Text(emoji, style: context.textTheme.titleLarge),
-        Gap(12),
+        const Gap(12),
         Text(text, style: context.textTheme.titleMedium?.white),
       ],
     );
@@ -530,7 +509,7 @@ class GetStartedScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -539,10 +518,10 @@ class GetStartedScreen extends StatelessWidget {
       ),
       child: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             children: [
-              Gap(80),
+              const Gap(80),
 
               // Success checkmark
               Container(
@@ -552,42 +531,42 @@ class GetStartedScreen extends StatelessWidget {
                   color: Colors.white.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
-                child: Center(child: Icon(Icons.check, size: 80, color: Colors.white)),
+                child: const Center(child: Icon(Icons.check, size: 80, color: Colors.white)),
               ),
-              Gap(60),
+              const Gap(60),
               Text(
                 S.of(context).youreAllSet,
                 style: context.textTheme.headlineLarge?.white.w700,
                 textAlign: TextAlign.center,
               ),
-              Gap(20),
+              const Gap(20),
               Text(
                 S.of(context).welcome,
                 style: context.textTheme.titleMedium?.white,
                 textAlign: TextAlign.center,
               ),
-              Spacer(),
+              const Spacer(),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
+                child: AppButton(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  onPressed: () async {
                     context.read<OnboardingCubit>().setIsFirstOpen();
-                    context.replaceRoute(BottomNavRoute());
+                    await OverlayLoading.runWithLoading(
+                      context,
+                      () => context.read<MainCubit>().init(),
+                    );
+                    if (context.mounted) {
+                      unawaited(context.replaceRoute(const BottomNavRoute()));
+                    }
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Color(0xFF006400),
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-                    elevation: 0,
-                  ),
                   child: Text(
                     S.of(context).startUsingApp,
                     style: context.textTheme.bodyLarge?.w700,
                   ),
                 ),
               ),
-              Gap(40),
+              const Gap(40),
             ],
           ),
         ),
@@ -604,14 +583,14 @@ class CloudPainter extends CustomPainter {
           ..color = Colors.white
           ..style = PaintingStyle.fill;
 
-    final path = Path();
+    final path = Path()
 
     // Cloud shape
-    path.addOval(Rect.fromCircle(center: Offset(20, 30), radius: 15));
-    path.addOval(Rect.fromCircle(center: Offset(35, 25), radius: 20));
-    path.addOval(Rect.fromCircle(center: Offset(55, 25), radius: 18));
-    path.addOval(Rect.fromCircle(center: Offset(75, 30), radius: 15));
-    path.addOval(Rect.fromCircle(center: Offset(45, 40), radius: 25));
+    ..addOval(Rect.fromCircle(center: const Offset(20, 30), radius: 15))
+    ..addOval(Rect.fromCircle(center: const Offset(35, 25), radius: 20))
+    ..addOval(Rect.fromCircle(center: const Offset(55, 25), radius: 18))
+    ..addOval(Rect.fromCircle(center: const Offset(75, 30), radius: 15))
+    ..addOval(Rect.fromCircle(center: const Offset(45, 40), radius: 25));
 
     canvas.drawPath(path, paint);
   }

@@ -4,6 +4,8 @@ import 'package:flutter/widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class MyBannerAdWidget extends StatefulWidget {
+
+  MyBannerAdWidget({super.key, this.adSize = AdSize.banner});
   /// The requested size of the banner. Defaults to [AdSize.banner].
   final AdSize adSize;
 
@@ -15,8 +17,6 @@ class MyBannerAdWidget extends StatefulWidget {
       ? 'ca-app-pub-2482231919542936/1127477279'
   // ... or this one on iOS.
       : 'ca-app-pub-2482231919542936/2614210534';
-
-  MyBannerAdWidget({super.key, this.adSize = AdSize.banner});
 
   @override
   State<MyBannerAdWidget> createState() => _MyBannerAdWidgetState();
@@ -55,31 +55,31 @@ class _MyBannerAdWidgetState extends State<MyBannerAdWidget> {
 
   /// Loads a banner ad.
   void _loadAd() {
-    final bannerAd = BannerAd(
-      size: widget.adSize,
-      adUnitId: widget.adUnitId,
-      request: const AdRequest(),
-      listener: BannerAdListener(
-        // Called when an ad is successfully received.
-        onAdLoaded: (ad) {
-          if (!mounted) {
-            ad.dispose();
-            return;
-          }
-          setState(() {
-            _bannerAd = ad as BannerAd;
-          });
-        },
-        // Called when an ad request failed.
-        onAdFailedToLoad: (ad, error) {
-          debugPrint('BannerAd failed to load: $error');
-          ad.dispose();
-        },
-      ),
-    );
-
-    // Start loading.
-    bannerAd.load();
+    // final bannerAd = BannerAd(
+    //   size: widget.adSize,
+    //   adUnitId: widget.adUnitId,
+    //   request: const AdRequest(),
+    //   listener: BannerAdListener(
+    //     // Called when an ad is successfully received.
+    //     onAdLoaded: (ad) {
+    //       if (!mounted) {
+    //         ad.dispose();
+    //         return;
+    //       }
+    //       setState(() {
+    //         _bannerAd = ad as BannerAd;
+    //       });
+    //     },
+    //     // Called when an ad request failed.
+    //     onAdFailedToLoad: (ad, error) {
+    //       debugPrint('BannerAd failed to load: $error');
+    //       ad.dispose();
+    //     },
+    //   ),
+    // )
+    //
+    // // Start loading.
+    // ..load();
   }
 
 }

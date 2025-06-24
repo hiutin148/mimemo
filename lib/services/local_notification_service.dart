@@ -1,18 +1,19 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 /// Singleton service class for handling local notifications
 /// Provides optimized performance and follows Flutter best practices
 class NotificationService {
-  static NotificationService? _instance;
-  static NotificationService get instance => _instance ??= NotificationService._();
 
   NotificationService._();
+  static NotificationService? _instance;
+  static final NotificationService instance = _instance ??= NotificationService._();
 
   final FlutterLocalNotificationsPlugin _notifications = FlutterLocalNotificationsPlugin();
 
@@ -30,14 +31,14 @@ class NotificationService {
   Future<bool> initialize({
     String? defaultIcon,
     String? defaultSound,
-    Function(NotificationResponse)? onNotificationTap,
-    Function(NotificationResponse)? onBackgroundNotificationTap,
+    void Function(NotificationResponse)? onNotificationTap,
+    void Function(NotificationResponse)? onBackgroundNotificationTap,
   }) async {
     if (_isInitialized) return true;
 
     // Prevent multiple initialization attempts
     if (_initCompleter != null) {
-      return await _initCompleter!.future;
+      return _initCompleter!.future;
     }
 
     _initCompleter = Completer<bool>();
@@ -73,7 +74,7 @@ class NotificationService {
         onDidReceiveBackgroundNotificationResponse: onBackgroundNotificationTap,
       );
 
-      if (initialized == true) {
+      if (initialized ?? false) {
         _isInitialized = true;
         _initCompleter!.complete(true);
         return true;
@@ -81,7 +82,7 @@ class NotificationService {
         _initCompleter!.complete(false);
         return false;
       }
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('NotificationService: Initialization failed - $e');
       _initCompleter!.complete(false);
       return false;
@@ -121,7 +122,7 @@ class NotificationService {
       _permissionsGranted = true;
       _lastPermissionCheck = DateTime.now();
       return true;
-    } catch (e) {
+    } on Exception catch(e) {
       debugPrint('NotificationService: Permission request failed - $e');
       return false;
     }
@@ -200,7 +201,7 @@ class NotificationService {
     }
 
     try {
-      final tz.TZDateTime tzScheduledDate = tz.TZDateTime.from(scheduledDate, tz.local);
+      final tzScheduledDate = tz.TZDateTime.from(scheduledDate, tz.local);
 
       final androidDetails = AndroidNotificationDetails(
         channelId ?? 'scheduled_channel',
@@ -294,7 +295,7 @@ class NotificationService {
 
     try {
       await _notifications.cancel(id);
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('NotificationService: Failed to cancel notification $id - $e');
     }
   }
@@ -305,7 +306,7 @@ class NotificationService {
 
     try {
       await _notifications.cancelAll();
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('NotificationService: Failed to cancel all notifications - $e');
     }
   }
@@ -316,7 +317,7 @@ class NotificationService {
 
     try {
       return await _notifications.pendingNotificationRequests();
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('NotificationService: Failed to get pending notifications - $e');
       return [];
     }
@@ -328,7 +329,7 @@ class NotificationService {
 
     try {
       return await _notifications.getActiveNotifications();
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('NotificationService: Failed to get active notifications - $e');
       return [];
     }
@@ -362,7 +363,7 @@ class NotificationService {
       await _notifications
           .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
           ?.createNotificationChannel(androidChannel);
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('NotificationService: Failed to create notification channel - $e');
     }
   }
@@ -375,7 +376,7 @@ class NotificationService {
       await _notifications
           .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
           ?.deleteNotificationChannel(channelId);
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('NotificationService: Failed to delete notification channel - $e');
     }
   }
@@ -391,7 +392,7 @@ class NotificationService {
             ?.areNotificationsEnabled() ?? false;
       }
       return _permissionsGranted ?? false;
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('NotificationService: Failed to check notification status - $e');
       return false;
     }
