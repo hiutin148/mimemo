@@ -1,15 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mimemo/core/const/consts.dart';
 import 'package:mimemo/core/extension/extensions.dart';
 import 'package:mimemo/models/entities/daily_forecast/daily_forecast.dart';
 import 'package:mimemo/models/enums/load_status.dart';
 import 'package:mimemo/ui/screens/daily/daily_cubit.dart';
 import 'package:mimemo/ui/screens/daily/widgets/fifteen_daily_forecast_item.dart';
 
-class DailyForecastList extends StatelessWidget {
+class DailyForecastList extends StatefulWidget {
   const DailyForecastList({required this.onItemTap, super.key});
 
   final void Function(ForecastDay? day) onItemTap;
+
+  @override
+  State<DailyForecastList> createState() => _DailyForecastListState();
+}
+
+class _DailyForecastListState extends State<DailyForecastList> {
+  final GlobalKey<State<StatefulWidget>> _firstNextMonthKey = GlobalKey();
+  final ScrollController _scrollController = ScrollController();
+  late final ValueNotifier<String> _month;
+  final DateTime now = DateTime.now();
+
+  late final String _currentMonth;
+
+  late final String _nextMonth;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_checkIfJuly1IsNearLeft);
+    _currentMonth = now.toFormatedString(DateFormatPattern.monthFull);
+    final nextMonthDate = DateTime(now.year, now.month + 1);
+    _nextMonth = nextMonthDate.toFormatedString(DateFormatPattern.monthFull);
+    _month = ValueNotifier(_currentMonth);
+  }
 
   (double, double) _calculateTemperatureRange(List<ForecastDay> forecasts) {
     var maxTemp = double.negativeInfinity;
@@ -27,6 +52,24 @@ class DailyForecastList extends StatelessWidget {
       maxTemp == double.negativeInfinity ? 0.0 : maxTemp,
       minTemp == double.infinity ? 0.0 : minTemp,
     );
+  }
+
+  void _checkIfJuly1IsNearLeft() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final context = _firstNextMonthKey.currentContext;
+      if (context != null) {
+        final box = context.findRenderObject()! as RenderBox;
+        final position = box.localToGlobal(Offset.zero);
+
+        const threshold = 20.0;
+
+        if (position.dx < threshold && _month.value != _nextMonth) {
+          _month.value = _nextMonth;
+        } else if (position.dx >= threshold && _month.value != _currentMonth) {
+          _month.value = _currentMonth;
+        }
+      }
+    });
   }
 
   @override
@@ -54,19 +97,27 @@ class DailyForecastList extends StatelessWidget {
                   border: Border(top: BorderSide(color: Colors.white24)),
                 ),
                 padding: const EdgeInsets.all(16),
-                child: Text('value', style: context.textTheme.titleMedium),
+                child: ValueListenableBuilder<String>(
+                  builder: (context, value, child) {
+                    return Text(value, style: context.textTheme.titleMedium);
+                  },
+                  valueListenable: _month,
+                ),
               ),
               Expanded(
                 child: ListView.builder(
+                  controller: _scrollController,
                   itemCount: forecasts.length,
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (context, index) {
+                    final date = forecasts[index].date?.toDate;
+                    final isFirstNextMonth = date?.month != DateTime.now().month && date?.day == 1;
                     return FifteenDailyForecastItem(
+                      key: isFirstNextMonth ? _firstNextMonthKey : null,
                       forecast: forecasts[index],
                       maxTem: max,
                       minTem: min,
-                      key: ValueKey(forecasts[index].date),
-                      onDayPressed: onItemTap,
+                      onDayPressed: widget.onItemTap,
                     );
                   },
                 ),

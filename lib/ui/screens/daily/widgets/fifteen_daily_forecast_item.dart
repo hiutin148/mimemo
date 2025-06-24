@@ -8,7 +8,7 @@ import 'package:mimemo/models/enums/temperature_color.dart';
 import 'package:mimemo/ui/screens/daily/daily_cubit.dart';
 import 'package:mimemo/ui/widgets/widgets.dart';
 
-class FifteenDailyForecastItem extends StatelessWidget {
+class FifteenDailyForecastItem extends StatefulWidget {
   const FifteenDailyForecastItem({
     required this.forecast,
     required this.minTem,
@@ -23,41 +23,66 @@ class FifteenDailyForecastItem extends StatelessWidget {
   final void Function(ForecastDay? day) onDayPressed;
 
   @override
+  State<FifteenDailyForecastItem> createState() => _FifteenDailyForecastItemState();
+}
+
+class _FifteenDailyForecastItemState extends State<FifteenDailyForecastItem>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    duration: const Duration(milliseconds: 200),
+    vsync: this,
+  )..forward();
+  late final CurvedAnimation _animation = CurvedAnimation(
+    parent: _controller,
+    curve: Curves.easeIn,
+  );
+
+  @override
+  void dispose() {
+    _animation.dispose();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final dayMaxTemp = (forecast.temperature?.maximum?.value ?? 0.0).roundToDouble();
-    final dayMinTemp = (forecast.temperature?.minimum?.value ?? 0.0).roundToDouble();
+    final dayMaxTemp = (widget.forecast.temperature?.maximum?.value ?? 0.0).roundToDouble();
+    final dayMinTemp = (widget.forecast.temperature?.minimum?.value ?? 0.0).roundToDouble();
 
     final (colors, stops) = TemperatureColorExtension.getGradientColorsFromEnum(
       dayMinTemp,
       dayMaxTemp,
     );
 
-    return GestureDetector(
-      onTap: () => onDayPressed(forecast),
-      behavior: HitTestBehavior.translucent,
+    return FadeTransition(
+      opacity: _animation,
+      child: GestureDetector(
+        onTap: () => widget.onDayPressed(widget.forecast),
+        behavior: HitTestBehavior.translucent,
 
-      child: DecoratedBox(
-        decoration: const BoxDecoration(border: Border(right: BorderSide(color: Colors.white24))),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildDateInfo(context, forecast),
-              const Gap(16),
-              _buildWeatherIcon(),
-              const Gap(16),
-              Expanded(
-                child: _buildTemperatureBar(
-                  colors: colors,
-                  stops: stops,
-                  dayMaxTemp: dayMaxTemp,
-                  dayMinTemp: dayMinTemp,
+        child: DecoratedBox(
+          decoration: const BoxDecoration(border: Border(right: BorderSide(color: Colors.white24))),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildDateInfo(context, widget.forecast),
+                const Gap(16),
+                _buildWeatherIcon(),
+                const Gap(16),
+                Expanded(
+                  child: _buildTemperatureBar(
+                    colors: colors,
+                    stops: stops,
+                    dayMaxTemp: dayMaxTemp,
+                    dayMinTemp: dayMinTemp,
+                  ),
                 ),
-              ),
-              const Gap(8),
-              _buildHumidityInfo(context),
-            ],
+                const Gap(8),
+                _buildHumidityInfo(context),
+              ],
+            ),
           ),
         ),
       ),
@@ -68,7 +93,10 @@ class FifteenDailyForecastItem extends StatelessWidget {
     return Column(
       spacing: 8,
       children: [
-        Text(forecast.date?.toDate?.dayOfWeek ?? '', style: context.textTheme.bodySmall?.w600),
+        Text(
+          widget.forecast.date?.toDate?.dayOfWeek ?? '',
+          style: context.textTheme.bodySmall?.w600,
+        ),
         BlocSelector<DailyCubit, DailyState, ForecastDay?>(
           builder: (context, selectedDay) {
             final isSelected = selectedDay?.date == day.date;
@@ -79,7 +107,7 @@ class FifteenDailyForecastItem extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: Text(
-                forecast.date?.reformatDateString(newFormat: DateFormatPattern.day) ?? '',
+                widget.forecast.date?.reformatDateString(newFormat: DateFormatPattern.day) ?? '',
                 style: context.textTheme.bodySmall?.w600.copyWith(
                   color: isSelected ? AppColors.primary : Colors.white,
                 ),
@@ -95,7 +123,7 @@ class FifteenDailyForecastItem extends StatelessWidget {
   Widget _buildWeatherIcon() {
     return AppInkWell(
       onTap: () {},
-      child: AppIcon(icon: Utils.getIconAsset(forecast.day?.icon ?? 0)),
+      child: AppIcon(icon: Utils.getIconAsset(widget.forecast.day?.icon ?? 0)),
     );
   }
 
@@ -107,12 +135,12 @@ class FifteenDailyForecastItem extends StatelessWidget {
   }) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final temperatureRangeSpan = maxTem - minTem;
+        final temperatureRangeSpan = widget.maxTem - widget.minTem;
         final textHeight = context.textTheme.bodyMedium?.height ?? 0;
         final textFont = context.textTheme.bodyMedium?.fontSize ?? 0;
         final degreeSpace =
             (constraints.maxHeight - textHeight * textFont * 2 - 16) / temperatureRangeSpan;
-        final topSpace = degreeSpace * (maxTem - dayMaxTemp).clamp(0, maxTem);
+        final topSpace = degreeSpace * (widget.maxTem - dayMaxTemp).clamp(0, widget.maxTem);
         final barHeight = (dayMaxTemp - dayMinTemp) * degreeSpace;
 
         return Column(
@@ -152,7 +180,7 @@ class FifteenDailyForecastItem extends StatelessWidget {
   }
 
   Widget _buildHumidityInfo(BuildContext context) {
-    final humidity = forecast.day?.relativeHumidity?.average;
+    final humidity = widget.forecast.day?.relativeHumidity?.average;
     return Container(
       padding: const EdgeInsets.only(top: 8),
       decoration: const BoxDecoration(border: Border(top: BorderSide(color: Colors.white24))),
