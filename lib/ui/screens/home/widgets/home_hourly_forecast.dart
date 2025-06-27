@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:mimemo/common/utils/utils.dart';
-import 'package:mimemo/core/const/date_format_pattern.dart';
+import 'package:mimemo/core/const/consts.dart';
 import 'package:mimemo/core/extension/datetime_extension.dart';
 import 'package:mimemo/ui/screens/home/home_cubit.dart';
 import 'package:mimemo/ui/widgets/app_icon.dart';
@@ -50,7 +50,7 @@ class HomeHourlyForecast extends StatelessWidget {
                   final forecast = next12HoursForecast[index];
                   final dateTime = DateTime.tryParse(forecast.dateTime ?? '')?.toLocal();
                   final displayTime =
-                  dateTime != null ? dateTime.toFormatedString(DateFormatPattern.hour12) : '';
+                      dateTime != null ? dateTime.toFormatedString(DateFormatPattern.hour12) : '';
                   final tem = forecast.temperature?.value?.toString() ?? '';
                   final unit = forecast.temperature?.unit ?? '';
                   return Container(
@@ -58,7 +58,7 @@ class HomeHourlyForecast extends StatelessWidget {
                     margin: const EdgeInsets.only(right: 12),
                     padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
                     decoration: BoxDecoration(
-                      color: Colors.white24,
+                      color: AppColors.cardBackground,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Column(

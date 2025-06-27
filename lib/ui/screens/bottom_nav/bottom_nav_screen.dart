@@ -13,6 +13,7 @@ import 'package:mimemo/ui/screens/daily/daily_cubit.dart';
 import 'package:mimemo/ui/screens/daily/daily_screen.dart';
 import 'package:mimemo/ui/screens/home/home_cubit.dart';
 import 'package:mimemo/ui/screens/home/home_screen.dart';
+import 'package:mimemo/ui/screens/hourly/hourly_cubit.dart';
 import 'package:mimemo/ui/screens/hourly/hourly_screen.dart';
 import 'package:mimemo/ui/screens/radar/radar_screen.dart';
 
@@ -40,6 +41,13 @@ class BottomNavScreen extends StatelessWidget {
                 mainCubit: context.read<MainCubit>(),
               )..init(),
         ),
+        BlocProvider(
+          create:
+              (context) => HourlyCubit(
+                forecastRepository: locator<ForecastRepository>(),
+                mainCubit: context.read<MainCubit>(),
+              )..init(),
+        ),
       ],
       child: const BottomNavView(),
     );
@@ -63,7 +71,7 @@ class _BottomNavViewState extends State<BottomNavView> {
   Widget build(BuildContext context) {
     final screens = <Widget>[
       const HomeScreen(),
-      const HourlyPage(),
+      const HourlyScreen(),
       const DailyScreen(),
       const RadarPage(),
       MorePage(),
@@ -127,6 +135,10 @@ class _BottomNavViewState extends State<BottomNavView> {
       backgroundColor: AppColors.primary,
       iconTheme: const IconThemeData(color: Colors.white),
       centerTitle: true,
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(0.5),
+        child: Container(color: Colors.white54, height: 0.5),
+      ),
       title: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -221,6 +233,76 @@ class WeatherData {
       'IconPhrase': 'Rain',
       'Temperature': {'Value': 69, 'Unit': 'F'},
       'PrecipitationProbability': 80,
+    },
+    {
+      'DateTime': '2024-01-15T19:00:00',
+      'WeatherIcon': 12,
+      'IconPhrase': 'Showers',
+      'Temperature': {'Value': 67, 'Unit': 'F'},
+      'PrecipitationProbability': 55,
+    },
+    {
+      'DateTime': '2024-01-15T19:00:00',
+      'WeatherIcon': 12,
+      'IconPhrase': 'Showers',
+      'Temperature': {'Value': 67, 'Unit': 'F'},
+      'PrecipitationProbability': 55,
+    },
+    {
+      'DateTime': '2024-01-15T19:00:00',
+      'WeatherIcon': 12,
+      'IconPhrase': 'Showers',
+      'Temperature': {'Value': 67, 'Unit': 'F'},
+      'PrecipitationProbability': 55,
+    },
+    {
+      'DateTime': '2024-01-15T19:00:00',
+      'WeatherIcon': 12,
+      'IconPhrase': 'Showers',
+      'Temperature': {'Value': 67, 'Unit': 'F'},
+      'PrecipitationProbability': 55,
+    },
+    {
+      'DateTime': '2024-01-15T19:00:00',
+      'WeatherIcon': 12,
+      'IconPhrase': 'Showers',
+      'Temperature': {'Value': 67, 'Unit': 'F'},
+      'PrecipitationProbability': 55,
+    },
+    {
+      'DateTime': '2024-01-15T19:00:00',
+      'WeatherIcon': 12,
+      'IconPhrase': 'Showers',
+      'Temperature': {'Value': 67, 'Unit': 'F'},
+      'PrecipitationProbability': 55,
+    },
+    {
+      'DateTime': '2024-01-15T19:00:00',
+      'WeatherIcon': 12,
+      'IconPhrase': 'Showers',
+      'Temperature': {'Value': 67, 'Unit': 'F'},
+      'PrecipitationProbability': 55,
+    },
+    {
+      'DateTime': '2024-01-15T19:00:00',
+      'WeatherIcon': 12,
+      'IconPhrase': 'Showers',
+      'Temperature': {'Value': 67, 'Unit': 'F'},
+      'PrecipitationProbability': 55,
+    },
+    {
+      'DateTime': '2024-01-15T19:00:00',
+      'WeatherIcon': 12,
+      'IconPhrase': 'Showers',
+      'Temperature': {'Value': 67, 'Unit': 'F'},
+      'PrecipitationProbability': 55,
+    },
+    {
+      'DateTime': '2024-01-15T19:00:00',
+      'WeatherIcon': 12,
+      'IconPhrase': 'Showers',
+      'Temperature': {'Value': 67, 'Unit': 'F'},
+      'PrecipitationProbability': 55,
     },
     {
       'DateTime': '2024-01-15T19:00:00',

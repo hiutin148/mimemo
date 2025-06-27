@@ -110,9 +110,9 @@ class _SwitchTabBarState extends State<SwitchTabBar> with SingleTickerProviderSt
           Row(
             children:
                 widget.tabs.asMap().entries.map((entry) {
-                  int index = entry.key;
-                  String tab = entry.value;
-                  bool isSelected = index == _selectedIndex;
+                  final index = entry.key;
+                  final tab = entry.value;
+                  final isSelected = index == _selectedIndex;
 
                   return Expanded(
                     child: GestureDetector(

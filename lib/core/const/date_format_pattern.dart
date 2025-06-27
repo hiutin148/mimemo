@@ -4,7 +4,9 @@ abstract final class DateFormatPattern {
   static const String monthFull = 'MMMM';
   static const String dateShort = 'dd/MM';
   static const String hour12 = 'h a';
+  static const String hou24 = 'H';
   static const String shortDayOfWeek = 'EE';
+  static const String dayOfWeek = 'EEEE';
   static const String weekDayAndDate = 'EEEE, dd MMMM';
   static const String day = 'dd';
 }

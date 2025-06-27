@@ -50,7 +50,7 @@ class HomeDailyForecast extends StatelessWidget {
   Widget _buildForecastContainer(BuildContext context, List<ForecastDay> forecasts) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.2),
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(_borderRadius),
       ),
       child: Column(children: [_buildHeader(context), _buildForecastList(context, forecasts)]),
