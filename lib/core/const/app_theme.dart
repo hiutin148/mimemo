@@ -11,7 +11,7 @@ class AppTheme {
       titleTextStyle: TextStyle(fontSize: 16, color: Colors.white),
       iconTheme: IconThemeData(color: Colors.white),
     ),
-    tabBarTheme:  TabBarTheme(
+    tabBarTheme: TabBarThemeData(
       dividerColor: Colors.white24,
       indicatorColor: Colors.white,
       labelColor: Colors.white,

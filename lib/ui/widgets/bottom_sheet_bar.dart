@@ -35,16 +35,21 @@ class BottomSheetBar extends StatefulWidget {
   const BottomSheetBar({
     required this.body,
     required this.header,
-    required this.expandedSliver,
     super.key,
     this.bodyBottomPadding = 48,
     this.borderRadius = 16,
     this.controller,
-  });
+    this.expandedSliver,
+    this.expandedWidget,
+  }) : assert(
+         (expandedSliver != null) ^ (expandedWidget != null),
+         'Either expandedSliver or expandedWidget must be provided, but not both',
+       );
 
   final Widget body;
   final Widget header;
-  final Widget expandedSliver;
+  final Widget? expandedSliver; // Keep for backward compatibility
+  final Widget? expandedWidget; // New option for normal widgets
   final double bodyBottomPadding;
   final BottomSheetBarController? controller;
   final double borderRadius;
@@ -66,7 +71,8 @@ class _BottomSheetBarState extends State<BottomSheetBar> {
 
   @override
   void didUpdateWidget(covariant BottomSheetBar oldWidget) {
-    if (oldWidget.controller != widget.controller && widget.controller != null) {
+    if (oldWidget.controller != widget.controller &&
+        widget.controller != null) {
       controller = widget.controller!;
     }
     super.didUpdateWidget(oldWidget);
@@ -92,7 +98,9 @@ class _BottomSheetBarState extends State<BottomSheetBar> {
           children: [
             Positioned.fill(
               child: Padding(
-                padding: EdgeInsets.only(bottom: _headerHeight + widget.bodyBottomPadding),
+                padding: EdgeInsets.only(
+                  bottom: _headerHeight + widget.bodyBottomPadding,
+                ),
                 child: widget.body,
               ),
             ),
@@ -101,6 +109,7 @@ class _BottomSheetBarState extends State<BottomSheetBar> {
               header: widget.header,
               minChildSize: minChildSize,
               expandedSliver: widget.expandedSliver,
+              expandedWidget: widget.expandedWidget,
               controller: controller,
               borderRadius: widget.borderRadius,
             ),
@@ -115,16 +124,18 @@ class BottomSheetBarSheet extends StatefulWidget {
   const BottomSheetBarSheet({
     required this.onHeaderChange,
     required this.header,
-    required this.expandedSliver,
     required this.minChildSize,
     required this.controller,
     required this.borderRadius,
     super.key,
+    this.expandedSliver,
+    this.expandedWidget,
   });
 
   final void Function(Size size) onHeaderChange;
   final Widget header;
-  final Widget expandedSliver;
+  final Widget? expandedSliver;
+  final Widget? expandedWidget;
   final double minChildSize;
   final BottomSheetBarController controller;
   final double borderRadius;
@@ -137,18 +148,23 @@ class _BottomSheetBarSheetState extends State<BottomSheetBarSheet> {
   @override
   void initState() {
     super.initState();
-    widget.controller.draggableScrollableController = DraggableScrollableController();
-    widget.controller.draggableScrollableController.addListener(_controllerListener);
+    widget.controller.draggableScrollableController =
+        DraggableScrollableController();
+    widget.controller.draggableScrollableController.addListener(
+      _controllerListener,
+    );
   }
 
   void _controllerListener() {
     if (widget.controller.isExpanded &&
-        widget.controller.draggableScrollableController.size == widget.controller.minSize) {
+        widget.controller.draggableScrollableController.size ==
+            widget.controller.minSize) {
       widget.controller.isExpanded = false;
     }
 
     if (!widget.controller.isExpanded &&
-        widget.controller.draggableScrollableController.size == widget.controller.maxSize) {
+        widget.controller.draggableScrollableController.size ==
+            widget.controller.maxSize) {
       widget.controller.isExpanded = true;
     }
   }
@@ -169,31 +185,45 @@ class _BottomSheetBarSheetState extends State<BottomSheetBarSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
-      controller: widget.controller.draggableScrollableController,
-      initialChildSize: widget.minChildSize,
-      minChildSize: widget.minChildSize,
-      snap: true,
-      builder: (context, scrollController) {
-        return Material(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(widget.borderRadius)),
-          child: CustomScrollView(
-            controller: scrollController,
-            slivers: [
-              SliverToBoxAdapter(
-                child: MeasureSize(
-                  onChange: widget.onHeaderChange,
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.translucent,
-                    onTap: _onHeaderTap,
-                    child: widget.header,
-                  ),
-                ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return DraggableScrollableSheet(
+          controller: widget.controller.draggableScrollableController,
+          initialChildSize: widget.minChildSize,
+          minChildSize: widget.minChildSize,
+          snap: true,
+          builder: (context, scrollController) {
+            return Material(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(widget.borderRadius),
               ),
-              widget.expandedSliver,
-            ],
-          ),
+              child: CustomScrollView(
+                controller: scrollController,
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: MeasureSize(
+                      onChange: widget.onHeaderChange,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        onTap: _onHeaderTap,
+                        child: widget.header,
+                      ),
+                    ),
+                  ),
+                  // Use either the provided sliver or wrap the widget in a sliver
+                  widget.expandedSliver ??
+                      SliverToBoxAdapter(
+                        child: SizedBox(
+                          height: constraints.maxHeight,
+                          child:
+                              widget.expandedWidget ?? const SizedBox.shrink(),
+                        ),
+                      ),
+                ],
+              ),
+            );
+          },
         );
       },
     );

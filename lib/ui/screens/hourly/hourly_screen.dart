@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mimemo/core/const/consts.dart';
 import 'package:mimemo/models/enums/load_status.dart';
-
 import 'package:mimemo/ui/screens/hourly/hourly_cubit.dart';
 import 'package:mimemo/ui/screens/hourly/widgets/hourly_list.dart';
+import 'package:mimemo/ui/screens/hourly/widgets/selected_hour_detail.dart';
+import 'package:mimemo/ui/widgets/widgets.dart';
 
 class HourlyScreen extends StatefulWidget {
   const HourlyScreen({super.key});
@@ -13,65 +14,53 @@ class HourlyScreen extends StatefulWidget {
   State<HourlyScreen> createState() => _HourlyScreenState();
 }
 
-class _HourlyScreenState extends State<HourlyScreen> with AutomaticKeepAliveClientMixin {
+class _HourlyScreenState extends State<HourlyScreen>
+    with AutomaticKeepAliveClientMixin {
+  final BottomSheetBarController _bottomSheetBarController =
+      BottomSheetBarController();
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
     return BlocSelector<HourlyCubit, HourlyState, LoadStatus>(
-      builder: (context, loadStatus) {
-        if (loadStatus == LoadStatus.loading) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (loadStatus == LoadStatus.failure) {
-          return const SizedBox();
-        } else {
-          return Scaffold(
-            backgroundColor: AppColors.primary,
-            body: RefreshIndicator(
-              onRefresh: () => context.read<HourlyCubit>().refresh(),
-              child: CustomScrollView(
-                physics: const ClampingScrollPhysics(),
-                slivers: [
-                  _buildAppBar(),
-                  // _buildForecastChart(),
-                  const SliverToBoxAdapter(child: HourlyList()),
-                ],
-              ),
-            ),
-          );
-        }
-      },
       selector: (state) => state.loadStatus,
-    );
-  }
-
-  Widget _buildAppBar() {
-    return BlocSelector<HourlyCubit, HourlyState, String>(
-      selector: (state) => state.currentDay,
-      builder: (context, currentDay) {
-        return SliverAppBar(
-          title: Text(currentDay),
+      builder: (context, loadStatus) {
+        return Scaffold(
           backgroundColor: AppColors.primary,
-          pinned: true,
-          surfaceTintColor: AppColors.primary,
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(0.5),
-            child: Container(color: Colors.white54, height: 0.5),
-          ),
+          body: _buildBody(context, loadStatus),
         );
       },
     );
   }
 
-  // Widget _buildForecastChart() {
-  //   return SliverToBoxAdapter(
-  //     child: BlocBuilder<HourlyCubit, HourlyState>(
-  //       builder: (context, state) {
-  //         final forecasts = state.hourlyForecasts;
-  //         return SizedBox(height: 400, child: HourlyChart(forecasts: forecasts));
-  //       },
-  //     ),
-  //   );
-  // }
+  Widget _buildBody(BuildContext context, LoadStatus loadStatus) {
+    return switch (loadStatus) {
+      LoadStatus.loading => const Center(child: CircularProgressIndicator()),
+      LoadStatus.failure => _buildErrorState(context),
+      _ => _buildSuccessState(context),
+    };
+  }
+
+  Widget _buildErrorState(BuildContext context) {
+    return LoadErrorWidget(
+      onRetry: () => context.read<HourlyCubit>().refresh(),
+    );
+  }
+
+  Widget _buildSuccessState(BuildContext context) {
+    return RefreshIndicator(
+      onRefresh: () => context.read<HourlyCubit>().refresh(),
+      child: BottomSheetBar(
+        controller: _bottomSheetBarController,
+        header: const SizedBox(),
+        body: HourlyList(
+          onItemTap: _bottomSheetBarController.expand,
+        ),
+        expandedWidget: const SelectedHourDetail(),
+        bodyBottomPadding: 0,
+      ),
+    );
+  }
 
   @override
   bool get wantKeepAlive => true;

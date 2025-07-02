@@ -94,6 +94,7 @@ class _SelectedDayDetailState extends State<SelectedDayDetail> with SingleTicker
       tabAlignment: TabAlignment.center,
       overlayColor: WidgetStatePropertyAll(AppColors.primary.withValues(alpha: 0.2)),
       controller: _tabController,
+      dividerHeight: 0.5,
       tabs: const [
         Tab(child: SizedBox(width: 60, child: Center(child: Text('Day')))),
         Tab(child: SizedBox(width: 60, child: Center(child: Text('Night')))),
@@ -194,8 +195,8 @@ class _SelectedDayDetailState extends State<SelectedDayDetail> with SingleTicker
   }
 
   (String, String, String, String) _calculateSunTimes(ForecastDay selectedDay) {
-    final sunSet = selectedDay.sun?.set?.toDate;
-    final sunRise = selectedDay.sun?.rise?.toDate;
+    final sunSet = selectedDay.sun?.set?.toDefaultDate;
+    final sunRise = selectedDay.sun?.rise?.toDefaultDate;
     final sunSetTime = sunSet?.toFormatedString(DateFormatPattern.time) ?? '';
     final sunRiseTime = sunRise?.toFormatedString(DateFormatPattern.time) ?? '';
     final sunTime = (sunSet != null && sunRise != null) ? sunSet.difference(sunRise) : null;
@@ -205,8 +206,8 @@ class _SelectedDayDetailState extends State<SelectedDayDetail> with SingleTicker
   }
 
   (String, String, String, String) _calculateMoonTimes(ForecastDay selectedDay) {
-    final moonSet = selectedDay.moon?.set?.toDate;
-    final moonRise = selectedDay.moon?.rise?.toDate;
+    final moonSet = selectedDay.moon?.set?.toDefaultDate;
+    final moonRise = selectedDay.moon?.rise?.toDefaultDate;
     final moonSetTime = moonSet?.toFormatedString(DateFormatPattern.time) ?? '';
     final moonRiseTime = moonRise?.toFormatedString(DateFormatPattern.time) ?? '';
     final moonTime = (moonSet != null && moonRise != null) ? moonSet.difference(moonRise) : null;

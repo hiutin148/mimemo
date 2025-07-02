@@ -22,9 +22,9 @@ class DailyCubit extends BaseCubit<DailyState> {
       final locationKey = mainCubit.state.positionInfo?.key ?? '';
       final dailyForecast = await forecastRepository.get45DaysForecast(locationKey);
       final selectedDay = dailyForecast.dailyForecasts?.firstOrNull;
-      final currentYear = selectedDay?.date?.toDate?.year;
-      final currentMonth = selectedDay?.date?.toDate?.month;
-      final currentDay = selectedDay?.date?.toDate?.day;
+      final currentYear = selectedDay?.date?.toDefaultDate?.year;
+      final currentMonth = selectedDay?.date?.toDefaultDate?.month;
+      final currentDay = selectedDay?.date?.toDefaultDate?.day;
       ClimoSummary? climoSummary;
       if (currentYear != null && currentMonth != null && currentDay != null) {
         final lastYear = currentYear - 1;
@@ -60,7 +60,7 @@ class DailyCubit extends BaseCubit<DailyState> {
 
   Future<void> changeSelectedDay(ForecastDay? day) async {
     emit(state.copyWith(selectedDay: day));
-    final date = day?.date?.toDate ?? DateTime.now();
+    final date = day?.date?.toDefaultDate ?? DateTime.now();
     final climo = await getClimoSummary(
       mainCubit.state.positionInfo?.key ?? '',
       (date.year - 1).toString(),

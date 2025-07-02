@@ -185,7 +185,7 @@ class HomeDailyForecast extends StatelessWidget {
 
   String? _getDayLabel(ForecastDay forecastDay, int index) {
     if (index == 0) return 'Today';
-    return forecastDay.date?.toDate?.dayOfWeek;
+    return forecastDay.date?.toDefaultDate?.dayOfWeek;
   }
 
   String? _getFormattedDate(ForecastDay forecastDay) {
