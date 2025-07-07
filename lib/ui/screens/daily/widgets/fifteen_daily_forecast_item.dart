@@ -94,7 +94,7 @@ class _FifteenDailyForecastItemState extends State<FifteenDailyForecastItem>
       spacing: 8,
       children: [
         Text(
-          widget.forecast.date?.toDate?.dayOfWeek ?? '',
+          widget.forecast.date?.toDefaultDate?.dayOfWeek ?? '',
           style: context.textTheme.bodySmall?.w600,
         ),
         BlocSelector<DailyCubit, DailyState, ForecastDay?>(

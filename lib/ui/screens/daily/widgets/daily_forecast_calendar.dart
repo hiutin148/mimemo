@@ -36,7 +36,7 @@ class _DailyForecastCalendarState extends State<DailyForecastCalendar> {
 
     forecastsByMonth = <DateTime, List<ForecastDay>>{};
     for (final forecast in dailyForecasts) {
-      final date = forecast.date?.toDate;
+      final date = forecast.date?.toDefaultDate;
       if (date != null) {
         final monthKey = DateTime(date.year, date.month);
         forecastsByMonth.putIfAbsent(monthKey, () => []).add(forecast);
@@ -144,7 +144,7 @@ class _DailyForecastCalendarState extends State<DailyForecastCalendar> {
     List<ForecastDay> forecasts,
   ) {
     final firstForecast = forecasts.firstOrNull;
-    var firstWeekdayOffset = firstForecast?.date?.toDate?.weekday ?? 0;
+    var firstWeekdayOffset = firstForecast?.date?.toDefaultDate?.weekday ?? 0;
     if (firstWeekdayOffset == 7) {
       firstWeekdayOffset = 0;
     }

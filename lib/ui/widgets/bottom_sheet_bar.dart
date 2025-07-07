@@ -1,8 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class BottomSheetBarController {
   BottomSheetBarController();
 
+  late ScrollController scrollController;
   late final DraggableScrollableController draggableScrollableController;
   bool isExpanded = false;
   double maxSize = 1;
@@ -35,19 +38,28 @@ class BottomSheetBar extends StatefulWidget {
   const BottomSheetBar({
     required this.body,
     required this.header,
-    required this.expandedSliver,
     super.key,
     this.bodyBottomPadding = 48,
     this.borderRadius = 16,
     this.controller,
-  });
+    this.expandedSliver,
+    this.expandedWidget,
+    this.expandedBuilder,
+  }) : assert(
+         (expandedSliver != null) ^
+             (expandedWidget != null) ^
+             (expandedBuilder != null),
+         'Exactly one of expandedSliver, expandedWidget, or expandedBuilder must be provided',
+       );
 
   final Widget body;
   final Widget header;
-  final Widget expandedSliver;
+  final Widget? expandedSliver; // Keep for backward compatibility
+  final Widget? expandedWidget; // New option for normal widgets
   final double bodyBottomPadding;
   final BottomSheetBarController? controller;
   final double borderRadius;
+  final ScrollableWidgetBuilder? expandedBuilder;
 
   @override
   State<BottomSheetBar> createState() => _BottomSheetBarState();
@@ -66,7 +78,8 @@ class _BottomSheetBarState extends State<BottomSheetBar> {
 
   @override
   void didUpdateWidget(covariant BottomSheetBar oldWidget) {
-    if (oldWidget.controller != widget.controller && widget.controller != null) {
+    if (oldWidget.controller != widget.controller &&
+        widget.controller != null) {
       controller = widget.controller!;
     }
     super.didUpdateWidget(oldWidget);
@@ -85,14 +98,22 @@ class _BottomSheetBarState extends State<BottomSheetBar> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final minChildSize = _headerHeight / constraints.maxHeight;
-        controller.minSize = minChildSize;
+        double minChildSize = 0;
+        if (controller.minSize > 0) {
+          minChildSize = _headerHeight / constraints.maxHeight;
+          controller.minSize = minChildSize;
+        }
+
         return Stack(
           alignment: Alignment.bottomCenter,
           children: [
             Positioned.fill(
               child: Padding(
-                padding: EdgeInsets.only(bottom: _headerHeight + widget.bodyBottomPadding),
+                padding: EdgeInsets.only(
+                  bottom: minChildSize != 0
+                      ? _headerHeight + widget.bodyBottomPadding
+                      : 0,
+                ),
                 child: widget.body,
               ),
             ),
@@ -101,8 +122,11 @@ class _BottomSheetBarState extends State<BottomSheetBar> {
               header: widget.header,
               minChildSize: minChildSize,
               expandedSliver: widget.expandedSliver,
+              expandedWidget: widget.expandedWidget,
               controller: controller,
               borderRadius: widget.borderRadius,
+              expandedBuilder: widget.expandedBuilder,
+              headerHeight: _headerHeight,
             ),
           ],
         );
@@ -115,19 +139,25 @@ class BottomSheetBarSheet extends StatefulWidget {
   const BottomSheetBarSheet({
     required this.onHeaderChange,
     required this.header,
-    required this.expandedSliver,
     required this.minChildSize,
     required this.controller,
     required this.borderRadius,
+    required this.headerHeight,
     super.key,
+    this.expandedSliver,
+    this.expandedWidget,
+    this.expandedBuilder,
   });
 
   final void Function(Size size) onHeaderChange;
   final Widget header;
-  final Widget expandedSliver;
+  final Widget? expandedSliver;
+  final Widget? expandedWidget;
   final double minChildSize;
   final BottomSheetBarController controller;
   final double borderRadius;
+  final ScrollableWidgetBuilder? expandedBuilder;
+  final double headerHeight;
 
   @override
   State<BottomSheetBarSheet> createState() => _BottomSheetBarSheetState();
@@ -137,18 +167,23 @@ class _BottomSheetBarSheetState extends State<BottomSheetBarSheet> {
   @override
   void initState() {
     super.initState();
-    widget.controller.draggableScrollableController = DraggableScrollableController();
-    widget.controller.draggableScrollableController.addListener(_controllerListener);
+    widget.controller.draggableScrollableController =
+        DraggableScrollableController();
+    widget.controller.draggableScrollableController.addListener(
+      _controllerListener,
+    );
   }
 
   void _controllerListener() {
     if (widget.controller.isExpanded &&
-        widget.controller.draggableScrollableController.size == widget.controller.minSize) {
+        widget.controller.draggableScrollableController.size ==
+            widget.controller.minSize) {
       widget.controller.isExpanded = false;
     }
 
     if (!widget.controller.isExpanded &&
-        widget.controller.draggableScrollableController.size == widget.controller.maxSize) {
+        widget.controller.draggableScrollableController.size ==
+            widget.controller.maxSize) {
       widget.controller.isExpanded = true;
     }
   }
@@ -169,31 +204,56 @@ class _BottomSheetBarSheetState extends State<BottomSheetBarSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
-      controller: widget.controller.draggableScrollableController,
-      initialChildSize: widget.minChildSize,
-      minChildSize: widget.minChildSize,
-      snap: true,
-      builder: (context, scrollController) {
-        return Material(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(widget.borderRadius)),
-          child: CustomScrollView(
-            controller: scrollController,
-            slivers: [
-              SliverToBoxAdapter(
-                child: MeasureSize(
-                  onChange: widget.onHeaderChange,
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.translucent,
-                    onTap: _onHeaderTap,
-                    child: widget.header,
-                  ),
-                ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return DraggableScrollableSheet(
+          controller: widget.controller.draggableScrollableController,
+          initialChildSize: widget.minChildSize,
+          minChildSize: widget.minChildSize,
+          snap: true,
+          builder: (context, scrollController) {
+            widget.controller.scrollController = scrollController;
+            return Material(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(widget.borderRadius),
               ),
-              widget.expandedSliver,
-            ],
-          ),
+              child: CustomScrollView(
+                controller: scrollController,
+                slivers: [
+                  SliverPersistentHeader(
+                    pinned: true,
+                    delegate: _SliverAppBarDelegate(
+                      maxHeight: widget.headerHeight,
+                      minHeight: widget.headerHeight,
+                      child: MeasureSize(
+                        onChange: widget.onHeaderChange,
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onTap: _onHeaderTap,
+                          child: widget.header,
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Use either the provided sliver or wrap the widget in a sliver
+                  widget.expandedSliver ??
+                      SliverToBoxAdapter(
+                        child: SizedBox(
+                          height: constraints.maxHeight,
+                          child:
+                              widget.expandedBuilder?.call(
+                                context,
+                                scrollController,
+                              ) ??
+                              widget.expandedWidget ??
+                              const SizedBox.shrink(),
+                        ),
+                      ),
+                ],
+              ),
+            );
+          },
         );
       },
     );
@@ -243,5 +303,39 @@ class _MeasureSizeState extends State<MeasureSize> {
   @override
   Widget build(BuildContext context) {
     return Container(key: _widgetKey, child: widget.child);
+  }
+}
+
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  _SliverAppBarDelegate({
+    required this.minHeight,
+    required this.maxHeight,
+    required this.child,
+  });
+
+  final double minHeight;
+  final double maxHeight;
+  final Widget child;
+
+  @override
+  double get minExtent => minHeight;
+
+  @override
+  double get maxExtent => max(maxHeight, minHeight);
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return SizedBox.expand(child: child);
+  }
+
+  @override
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
+    return maxHeight != oldDelegate.maxHeight ||
+        minHeight != oldDelegate.minHeight ||
+        child != oldDelegate.child;
   }
 }

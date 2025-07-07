@@ -11,7 +11,7 @@ extension StringExtension on String {
     return Color(int.parse(hex, radix: 16));
   }
 
-  DateTime? get toDate {
+  DateTime? get toDefaultDate {
     try {
       return DateTime.tryParse(this)?.toLocal();
     } on Exception {
@@ -19,8 +19,16 @@ extension StringExtension on String {
     }
   }
 
+  DateTime? toFormatedDate(String format) {
+    try {
+      return DateFormat(format).parse(this);
+    } on Exception {
+      return null;
+    }
+  }
+
   String? reformatDateString({required String newFormat, String? oldFormat}) {
-    final date = toDate;
+    final date = oldFormat != null ? toFormatedDate(oldFormat) : toDefaultDate;
     if (date != null) {
       final formattedDate = DateFormat(newFormat).format(date);
       return formattedDate;

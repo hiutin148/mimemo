@@ -19,6 +19,11 @@ abstract final class AppColors {
   static const Color airVeryUnhealthy = Color(0XFF8F3F97);
   static const Color airHazardous = Color(0XFF7E0023);
 
+  // Common color
+  static const Color cardBackground = Colors.white12;
+  static const Color whiteBorderColor = Colors.white54;
+  static const Color blackBorderColor = Colors.black26;
+
   static MaterialColor createMaterialColor(Color color) {
     final strengths = <double>[.05];
     final swatch = <int, Color>{};

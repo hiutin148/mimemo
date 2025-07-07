@@ -13,6 +13,7 @@ import 'package:mimemo/ui/screens/daily/daily_cubit.dart';
 import 'package:mimemo/ui/screens/daily/daily_screen.dart';
 import 'package:mimemo/ui/screens/home/home_cubit.dart';
 import 'package:mimemo/ui/screens/home/home_screen.dart';
+import 'package:mimemo/ui/screens/hourly/hourly_cubit.dart';
 import 'package:mimemo/ui/screens/hourly/hourly_screen.dart';
 import 'package:mimemo/ui/screens/radar/radar_screen.dart';
 
@@ -22,23 +23,29 @@ class BottomNavScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dailyCubit = DailyCubit(
+      forecastRepository: locator<ForecastRepository>(),
+      mainCubit: context.read<MainCubit>(),
+    )..init();
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => BottomNavCubit()),
         BlocProvider(
-          create:
-              (context) => HomeCubit(
-                forecastRepository: locator<ForecastRepository>(),
-                mainCubit: context.read<MainCubit>(),
-                currentConditionRepository: locator<CurrentConditionRepository>(),
-              )..init(),
+          create: (context) => HomeCubit(
+            forecastRepository: locator<ForecastRepository>(),
+            mainCubit: context.read<MainCubit>(),
+            currentConditionRepository: locator<CurrentConditionRepository>(),
+          )..init(),
         ),
         BlocProvider(
-          create:
-              (context) => DailyCubit(
-                forecastRepository: locator<ForecastRepository>(),
-                mainCubit: context.read<MainCubit>(),
-              )..init(),
+          create: (context) => dailyCubit,
+        ),
+        BlocProvider(
+          create: (context) => HourlyCubit(
+            dailyCubit: dailyCubit,
+            forecastRepository: locator<ForecastRepository>(),
+            mainCubit: context.read<MainCubit>(),
+          )..init(),
         ),
       ],
       child: const BottomNavView(),
@@ -63,7 +70,7 @@ class _BottomNavViewState extends State<BottomNavView> {
   Widget build(BuildContext context) {
     final screens = <Widget>[
       const HomeScreen(),
-      const HourlyPage(),
+      const HourlyScreen(),
       const DailyScreen(),
       const RadarPage(),
       MorePage(),
@@ -73,10 +80,9 @@ class _BottomNavViewState extends State<BottomNavView> {
         return BlocSelector<MainCubit, MainState, PositionInfo?>(
           builder: (context, positionInfo) {
             final position = positionInfo?.localizedName ?? '';
-            final city =
-                positionInfo?.parentCity?.localizedName != null
-                    ? ', ${positionInfo?.parentCity?.localizedName!}'
-                    : '';
+            final city = positionInfo?.parentCity?.localizedName != null
+                ? ', ${positionInfo?.parentCity?.localizedName!}'
+                : '';
 
             return Scaffold(
               appBar: _buildAppBar(position, city),
@@ -99,18 +105,34 @@ class _BottomNavViewState extends State<BottomNavView> {
                 ),
                 child: BottomNavigationBar(
                   currentIndex: state,
-                  onTap: (index) => context.read<BottomNavCubit>().switchTab(index),
+                  onTap: (index) =>
+                      context.read<BottomNavCubit>().switchTab(index),
                   type: BottomNavigationBarType.fixed,
                   selectedItemColor: const Color(0xFF4A90E2),
                   unselectedItemColor: Colors.grey,
                   backgroundColor: Colors.white,
                   elevation: 0,
                   items: const [
-                    BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Current'),
-                    BottomNavigationBarItem(icon: Icon(Icons.schedule), label: 'Hourly'),
-                    BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Daily'),
-                    BottomNavigationBarItem(icon: Icon(Icons.radar), label: 'Radar'),
-                    BottomNavigationBarItem(icon: Icon(Icons.more_horiz), label: 'More'),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.home),
+                      label: 'Current',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.schedule),
+                      label: 'Hourly',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.calendar_today),
+                      label: 'Daily',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.radar),
+                      label: 'Radar',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.more_horiz),
+                      label: 'More',
+                    ),
                   ],
                 ),
               ),
@@ -127,6 +149,10 @@ class _BottomNavViewState extends State<BottomNavView> {
       backgroundColor: AppColors.primary,
       iconTheme: const IconThemeData(color: Colors.white),
       centerTitle: true,
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(0.5),
+        child: Container(color: AppColors.whiteBorderColor, height: 0.5),
+      ),
       title: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -134,7 +160,11 @@ class _BottomNavViewState extends State<BottomNavView> {
           const Gap(4),
           Text(
             '$position$city',
-            style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ],
       ),
@@ -229,12 +259,86 @@ class WeatherData {
       'Temperature': {'Value': 67, 'Unit': 'F'},
       'PrecipitationProbability': 55,
     },
+    {
+      'DateTime': '2024-01-15T19:00:00',
+      'WeatherIcon': 12,
+      'IconPhrase': 'Showers',
+      'Temperature': {'Value': 67, 'Unit': 'F'},
+      'PrecipitationProbability': 55,
+    },
+    {
+      'DateTime': '2024-01-15T19:00:00',
+      'WeatherIcon': 12,
+      'IconPhrase': 'Showers',
+      'Temperature': {'Value': 67, 'Unit': 'F'},
+      'PrecipitationProbability': 55,
+    },
+    {
+      'DateTime': '2024-01-15T19:00:00',
+      'WeatherIcon': 12,
+      'IconPhrase': 'Showers',
+      'Temperature': {'Value': 67, 'Unit': 'F'},
+      'PrecipitationProbability': 55,
+    },
+    {
+      'DateTime': '2024-01-15T19:00:00',
+      'WeatherIcon': 12,
+      'IconPhrase': 'Showers',
+      'Temperature': {'Value': 67, 'Unit': 'F'},
+      'PrecipitationProbability': 55,
+    },
+    {
+      'DateTime': '2024-01-15T19:00:00',
+      'WeatherIcon': 12,
+      'IconPhrase': 'Showers',
+      'Temperature': {'Value': 67, 'Unit': 'F'},
+      'PrecipitationProbability': 55,
+    },
+    {
+      'DateTime': '2024-01-15T19:00:00',
+      'WeatherIcon': 12,
+      'IconPhrase': 'Showers',
+      'Temperature': {'Value': 67, 'Unit': 'F'},
+      'PrecipitationProbability': 55,
+    },
+    {
+      'DateTime': '2024-01-15T19:00:00',
+      'WeatherIcon': 12,
+      'IconPhrase': 'Showers',
+      'Temperature': {'Value': 67, 'Unit': 'F'},
+      'PrecipitationProbability': 55,
+    },
+    {
+      'DateTime': '2024-01-15T19:00:00',
+      'WeatherIcon': 12,
+      'IconPhrase': 'Showers',
+      'Temperature': {'Value': 67, 'Unit': 'F'},
+      'PrecipitationProbability': 55,
+    },
+    {
+      'DateTime': '2024-01-15T19:00:00',
+      'WeatherIcon': 12,
+      'IconPhrase': 'Showers',
+      'Temperature': {'Value': 67, 'Unit': 'F'},
+      'PrecipitationProbability': 55,
+    },
+    {
+      'DateTime': '2024-01-15T19:00:00',
+      'WeatherIcon': 12,
+      'IconPhrase': 'Showers',
+      'Temperature': {'Value': 67, 'Unit': 'F'},
+      'PrecipitationProbability': 55,
+    },
   ];
 
   static final List<Map<String, dynamic>> dailyForecast = [
     {
       'Date': '2024-01-15',
-      'Day': {'Icon': 3, 'IconPhrase': 'Partly sunny', 'PrecipitationProbability': 25},
+      'Day': {
+        'Icon': 3,
+        'IconPhrase': 'Partly sunny',
+        'PrecipitationProbability': 25,
+      },
       'Night': {'Icon': 35, 'IconPhrase': 'Partly cloudy'},
       'Temperature': {
         'Maximum': {'Value': 76},
@@ -252,7 +356,11 @@ class WeatherData {
     },
     {
       'Date': '2024-01-17',
-      'Day': {'Icon': 12, 'IconPhrase': 'Showers', 'PrecipitationProbability': 75},
+      'Day': {
+        'Icon': 12,
+        'IconPhrase': 'Showers',
+        'PrecipitationProbability': 75,
+      },
       'Night': {'Icon': 12, 'IconPhrase': 'Showers'},
       'Temperature': {
         'Maximum': {'Value': 74},
@@ -261,7 +369,11 @@ class WeatherData {
     },
     {
       'Date': '2024-01-18',
-      'Day': {'Icon': 15, 'IconPhrase': 'Thunderstorms', 'PrecipitationProbability': 85},
+      'Day': {
+        'Icon': 15,
+        'IconPhrase': 'Thunderstorms',
+        'PrecipitationProbability': 85,
+      },
       'Night': {'Icon': 15, 'IconPhrase': 'Thunderstorms'},
       'Temperature': {
         'Maximum': {'Value': 71},
@@ -270,7 +382,11 @@ class WeatherData {
     },
     {
       'Date': '2024-01-19',
-      'Day': {'Icon': 7, 'IconPhrase': 'Cloudy', 'PrecipitationProbability': 15},
+      'Day': {
+        'Icon': 7,
+        'IconPhrase': 'Cloudy',
+        'PrecipitationProbability': 15,
+      },
       'Night': {'Icon': 38, 'IconPhrase': 'Mostly cloudy'},
       'Temperature': {
         'Maximum': {'Value': 69},
@@ -279,7 +395,11 @@ class WeatherData {
     },
     {
       'Date': '2024-01-20',
-      'Day': {'Icon': 3, 'IconPhrase': 'Partly sunny', 'PrecipitationProbability': 10},
+      'Day': {
+        'Icon': 3,
+        'IconPhrase': 'Partly sunny',
+        'PrecipitationProbability': 10,
+      },
       'Night': {'Icon': 35, 'IconPhrase': 'Partly cloudy'},
       'Temperature': {
         'Maximum': {'Value': 73},
@@ -313,7 +433,15 @@ class WeatherData {
   }
 
   static List<String> getDayNames() {
-    return ['Today', 'Tomorrow', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    return [
+      'Today',
+      'Tomorrow',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
   }
 }
 
@@ -364,7 +492,12 @@ class MorePage extends StatelessWidget {
       'icon': Icons.history,
       'hasAlert': false,
     },
-    {'title': 'Settings', 'subtitle': 'App preferences', 'icon': Icons.settings, 'hasAlert': false},
+    {
+      'title': 'Settings',
+      'subtitle': 'App preferences',
+      'icon': Icons.settings,
+      'hasAlert': false,
+    },
   ];
 
   @override
@@ -403,7 +536,11 @@ class MorePage extends StatelessWidget {
                     color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(item['icon'] as IconData, color: Colors.white, size: 24),
+                  child: Icon(
+                    item['icon'] as IconData,
+                    color: Colors.white,
+                    size: 24,
+                  ),
                 ),
                 title: Text(
                   item['title'].toString(),
@@ -415,7 +552,10 @@ class MorePage extends StatelessWidget {
                 ),
                 subtitle: Text(
                   item['subtitle'].toString(),
-                  style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 14),
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.7),
+                    fontSize: 14,
+                  ),
                 ),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -424,7 +564,10 @@ class MorePage extends StatelessWidget {
                       Container(
                         width: 8,
                         height: 8,
-                        decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
                       ),
                     const Gap(8),
                     Icon(

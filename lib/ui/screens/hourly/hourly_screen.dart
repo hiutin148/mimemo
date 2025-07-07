@@ -1,98 +1,135 @@
-// Hourly Screen
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mimemo/core/const/consts.dart';
+import 'package:mimemo/core/extension/extensions.dart';
+import 'package:mimemo/models/entities/hourly_forecast/hourly_forecast.dart';
+import 'package:mimemo/models/enums/load_status.dart';
+import 'package:mimemo/ui/screens/hourly/hourly_cubit.dart';
+import 'package:mimemo/ui/screens/hourly/widgets/hourly_list.dart';
+import 'package:mimemo/ui/screens/hourly/widgets/selected_hour_detail.dart';
+import 'package:mimemo/ui/widgets/widgets.dart';
 
-import 'package:mimemo/ui/screens/bottom_nav/bottom_nav_screen.dart';
+class HourlyScreen extends StatefulWidget {
+  const HourlyScreen({super.key});
 
-class HourlyPage extends StatelessWidget {
-  const HourlyPage({super.key});
+  @override
+  State<HourlyScreen> createState() => _HourlyScreenState();
+}
+
+class _HourlyScreenState extends State<HourlyScreen>
+    with AutomaticKeepAliveClientMixin {
+  late final BottomSheetBarController _bottomSheetBarController;
+
+  @override
+  void initState() {
+    super.initState();
+    _bottomSheetBarController = BottomSheetBarController()..minSize = 0;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Hourly Forecast', style: TextStyle(color: Colors.white)),
-        backgroundColor: const Color(0xFF4A90E2),
-        elevation: 0,
-        leading: Container(),
-      ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF4A90E2), Color(0xFF1E3A8A)],
-          ),
-        ),
-        child: ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: WeatherData.hourlyForecast.length,
-          itemBuilder: (context, index) {
-            final hour = WeatherData.hourlyForecast[index];
-            final dateTime = DateTime.parse(hour['DateTime'].toString());
-            final time = dateTime.hour;
-            final displayTime =
-                time == 12
-                    ? '12 PM'
-                    : time > 12
-                    ? '${time - 12} PM'
-                    : time == 0
-                    ? '12 AM'
-                    : '$time AM';
+    super.build(context);
+    return BlocSelector<HourlyCubit, HourlyState, LoadStatus>(
+      selector: (state) => state.loadStatus,
+      builder: (context, loadStatus) {
+        return Scaffold(
+          backgroundColor: AppColors.primary,
+          body: _buildBody(context, loadStatus),
+        );
+      },
+    );
+  }
 
-            return Container(
-              margin: const EdgeInsets.only(bottom: 12),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-              ),
-              child: Row(
-                children: [
-                  Text(
-                    displayTime,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const Gap(20),
-                  Text(
-                    WeatherData.getWeatherIcon(hour['WeatherIcon'] as int),
-                    style: const TextStyle(fontSize: 28),
-                  ),
-                  const Gap(20),
-                  Expanded(
-                    child: Text(
-                      hour['IconPhrase'].toString(),
-                      style: const TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        '${hour['Temperature']['Value']}°F',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      Text(
-                        '${hour['PrecipitationProbability']}% chance',
-                        style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            );
-          },
+  Widget _buildBody(BuildContext context, LoadStatus loadStatus) {
+    return switch (loadStatus) {
+      LoadStatus.loading => const Center(child: CircularProgressIndicator()),
+      LoadStatus.failure => _buildErrorState(context),
+      _ => _buildSuccessState(context),
+    };
+  }
+
+  Widget _buildErrorState(BuildContext context) {
+    return LoadErrorWidget(
+      onRetry: () => context.read<HourlyCubit>().refresh(),
+    );
+  }
+
+  Widget _buildSuccessState(BuildContext context) {
+    return BlocListener<HourlyCubit, HourlyState>(
+      listenWhen: (previous, current) =>
+          previous.selectedForecast != current.selectedForecast,
+      listener: (BuildContext context, HourlyState state) {
+        _bottomSheetBarController.expand();
+      },
+      child: RefreshIndicator(
+        onRefresh: () => context.read<HourlyCubit>().refresh(),
+        child: BottomSheetBar(
+          controller: _bottomSheetBarController,
+          header: _buildBottomSheetHeader(context),
+          body: HourlyList(
+            onItemTap: (forecast) =>
+                context.read<HourlyCubit>().selectForecast(forecast),
+          ),
+          expandedBuilder: (context, scrollController) =>
+              const SelectedHourDetail(),
+          bodyBottomPadding: 0,
         ),
       ),
     );
   }
+
+  Widget _buildBottomSheetHeader(BuildContext context) {
+    return BlocSelector<HourlyCubit, HourlyState, HourlyForecast?>(
+      builder: (context, selectedDay) {
+        final time =
+            selectedDay?.dateTime?.reformatDateString(
+              newFormat: DateFormatPattern.time,
+            ) ??
+            '';
+        final weekday =
+            selectedDay?.dateTime?.reformatDateString(
+              newFormat: DateFormatPattern.dayOfWeek,
+            ) ??
+            '';
+        return Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            border: Border(
+              bottom: BorderSide(color: AppColors.blackBorderColor),
+            ),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
+          ),
+          child: Center(
+            child: Column(
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(top: 8),
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[400],
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text(
+                    '$time, $weekday',
+                    style: context.textTheme.titleMedium?.copyWith(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+      selector: (state) => state.selectedForecast,
+    );
+  }
+
+  @override
+  bool get wantKeepAlive => true;
 }

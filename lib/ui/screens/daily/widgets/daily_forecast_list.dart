@@ -110,7 +110,7 @@ class _DailyForecastListState extends State<DailyForecastList> {
                   itemCount: forecasts.length,
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (context, index) {
-                    final date = forecasts[index].date?.toDate;
+                    final date = forecasts[index].date?.toDefaultDate;
                     final isFirstNextMonth = date?.month != DateTime.now().month && date?.day == 1;
                     return FifteenDailyForecastItem(
                       key: isFirstNextMonth ? _firstNextMonthKey : null,

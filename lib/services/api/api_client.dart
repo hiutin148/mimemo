@@ -37,6 +37,9 @@ abstract class ApiClient {
   @GET('/forecasts/v1/hourly/12hour/{locationKey}')
   Future<List<HourlyForecast>> getNext12HoursForecast(@Path('locationKey') String locationKey);
 
+  @GET('/forecasts/v1/hourly/240hour/{locationKey}')
+  Future<List<HourlyForecast>> getNext240HoursForecast(@Path('locationKey') String locationKey);
+
   @GET('/forecasts/v1/daily/10day/{locationKey}')
   Future<DailyForecast> get10DaysForecast(@Path('locationKey') String locationKey);
 
