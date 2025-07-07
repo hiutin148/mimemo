@@ -6,7 +6,7 @@ part of 'api_client.dart';
 // RetrofitGenerator
 // **************************************************************************
 
-// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations
+// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations,unused_element_parameter
 
 class _ApiClient implements ApiClient {
   _ApiClient(this._dio, {this.baseUrl, this.errorLogger});
@@ -124,12 +124,9 @@ class _ApiClient implements ApiClient {
     final _result = await _dio.fetch<List<dynamic>>(_options);
     late List<MinuteColor> _value;
     try {
-      _value =
-          _result.data!
-              .map(
-                (dynamic i) => MinuteColor.fromJson(i as Map<String, dynamic>),
-              )
-              .toList();
+      _value = _result.data!
+          .map((dynamic i) => MinuteColor.fromJson(i as Map<String, dynamic>))
+          .toList();
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
@@ -158,13 +155,11 @@ class _ApiClient implements ApiClient {
     final _result = await _dio.fetch<List<dynamic>>(_options);
     late List<HourlyForecast> _value;
     try {
-      _value =
-          _result.data!
-              .map(
-                (dynamic i) =>
-                    HourlyForecast.fromJson(i as Map<String, dynamic>),
-              )
-              .toList();
+      _value = _result.data!
+          .map(
+            (dynamic i) => HourlyForecast.fromJson(i as Map<String, dynamic>),
+          )
+          .toList();
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
@@ -193,13 +188,11 @@ class _ApiClient implements ApiClient {
     final _result = await _dio.fetch<List<dynamic>>(_options);
     late List<HourlyForecast> _value;
     try {
-      _value =
-          _result.data!
-              .map(
-                (dynamic i) =>
-                    HourlyForecast.fromJson(i as Map<String, dynamic>),
-              )
-              .toList();
+      _value = _result.data!
+          .map(
+            (dynamic i) => HourlyForecast.fromJson(i as Map<String, dynamic>),
+          )
+          .toList();
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
@@ -341,13 +334,12 @@ class _ApiClient implements ApiClient {
     final _result = await _dio.fetch<List<dynamic>>(_options);
     late List<CurrentConditions> _value;
     try {
-      _value =
-          _result.data!
-              .map(
-                (dynamic i) =>
-                    CurrentConditions.fromJson(i as Map<String, dynamic>),
-              )
-              .toList();
+      _value = _result.data!
+          .map(
+            (dynamic i) =>
+                CurrentConditions.fromJson(i as Map<String, dynamic>),
+          )
+          .toList();
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
@@ -375,6 +367,52 @@ class _ApiClient implements ApiClient {
     late CurrentAirQuality _value;
     try {
       _value = CurrentAirQuality.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<List<int>> getZXYRadar({
+    required String dateTime,
+    required int z,
+    required int x,
+    required int y,
+    String imageDimensions = '768x432',
+    String colortable = 'off',
+    String displayMode = '',
+    String displayProducts = '',
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'imageDimensions': imageDimensions,
+      r'colortable': colortable,
+      r'display_mode': displayMode,
+      r'display_products': displayProducts,
+    };
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<List<int>>(
+      Options(
+            method: 'GET',
+            headers: _headers,
+            extra: _extra,
+            responseType: ResponseType.bytes,
+          )
+          .compose(
+            _dio.options,
+            '/maps/v1/radar/futureSIR/zxy/${dateTime}/${z}/${x}/${y}.png',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<List<dynamic>>(_options);
+    late List<int> _value;
+    try {
+      _value = _result.data!.cast<int>();
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;

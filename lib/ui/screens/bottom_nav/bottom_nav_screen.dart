@@ -72,7 +72,7 @@ class _BottomNavViewState extends State<BottomNavView> {
       const HomeScreen(),
       const HourlyScreen(),
       const DailyScreen(),
-      const RadarPage(),
+      const RadarScreen(),
       MorePage(),
     ];
     return BlocBuilder<BottomNavCubit, int>(

@@ -7,14 +7,12 @@ part of 'unit_value.dart';
 // **************************************************************************
 
 UnitValue _$UnitValueFromJson(Map<String, dynamic> json) => UnitValue(
-  metric:
-      json['Metric'] == null
-          ? null
-          : UnitValueDetail.fromJson(json['Metric'] as Map<String, dynamic>),
-  imperial:
-      json['Imperial'] == null
-          ? null
-          : UnitValueDetail.fromJson(json['Imperial'] as Map<String, dynamic>),
+  metric: json['Metric'] == null
+      ? null
+      : UnitValueDetail.fromJson(json['Metric'] as Map<String, dynamic>),
+  imperial: json['Imperial'] == null
+      ? null
+      : UnitValueDetail.fromJson(json['Imperial'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$UnitValueToJson(UnitValue instance) => <String, dynamic>{

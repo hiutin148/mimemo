@@ -8,14 +8,12 @@ part of 'daily_forecast.dart';
 
 DailyForecast _$DailyForecastFromJson(Map<String, dynamic> json) =>
     DailyForecast(
-      headline:
-          json['Headline'] == null
-              ? null
-              : Headline.fromJson(json['Headline'] as Map<String, dynamic>),
-      dailyForecasts:
-          (json['DailyForecasts'] as List<dynamic>?)
-              ?.map((e) => ForecastDay.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      headline: json['Headline'] == null
+          ? null
+          : Headline.fromJson(json['Headline'] as Map<String, dynamic>),
+      dailyForecasts: (json['DailyForecasts'] as List<dynamic>?)
+          ?.map((e) => ForecastDay.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$DailyForecastToJson(DailyForecast instance) =>
@@ -51,53 +49,45 @@ Map<String, dynamic> _$HeadlineToJson(Headline instance) => <String, dynamic>{
 ForecastDay _$ForecastDayFromJson(Map<String, dynamic> json) => ForecastDay(
   date: json['Date'] as String?,
   epochDate: (json['EpochDate'] as num?)?.toInt(),
-  sun:
-      json['Sun'] == null
-          ? null
-          : RiseSet.fromJson(json['Sun'] as Map<String, dynamic>),
-  moon:
-      json['Moon'] == null
-          ? null
-          : Moon.fromJson(json['Moon'] as Map<String, dynamic>),
-  temperature:
-      json['Temperature'] == null
-          ? null
-          : UnitValueDetailRange.fromJson(
-            json['Temperature'] as Map<String, dynamic>,
-          ),
-  realFeelTemperature:
-      json['RealFeelTemperature'] == null
-          ? null
-          : UnitValueDetailRange.fromJson(
-            json['RealFeelTemperature'] as Map<String, dynamic>,
-          ),
-  realFeelTemperatureShade:
-      json['RealFeelTemperatureShade'] == null
-          ? null
-          : UnitValueDetailRange.fromJson(
-            json['RealFeelTemperatureShade'] as Map<String, dynamic>,
-          ),
+  sun: json['Sun'] == null
+      ? null
+      : RiseSet.fromJson(json['Sun'] as Map<String, dynamic>),
+  moon: json['Moon'] == null
+      ? null
+      : Moon.fromJson(json['Moon'] as Map<String, dynamic>),
+  temperature: json['Temperature'] == null
+      ? null
+      : UnitValueDetailRange.fromJson(
+          json['Temperature'] as Map<String, dynamic>,
+        ),
+  realFeelTemperature: json['RealFeelTemperature'] == null
+      ? null
+      : UnitValueDetailRange.fromJson(
+          json['RealFeelTemperature'] as Map<String, dynamic>,
+        ),
+  realFeelTemperatureShade: json['RealFeelTemperatureShade'] == null
+      ? null
+      : UnitValueDetailRange.fromJson(
+          json['RealFeelTemperatureShade'] as Map<String, dynamic>,
+        ),
   hoursOfSun: (json['HoursOfSun'] as num?)?.toDouble(),
-  degreeDaySummary:
-      json['DegreeDaySummary'] == null
-          ? null
-          : DegreeDaySummary.fromJson(
-            json['DegreeDaySummary'] as Map<String, dynamic>,
-          ),
-  airAndPollen:
-      (json['AirAndPollen'] as List<dynamic>?)
-          ?.map((e) => AirAndPollen.fromJson(e as Map<String, dynamic>))
-          .toList(),
-  day:
-      json['Day'] == null
-          ? null
-          : DayNight.fromJson(json['Day'] as Map<String, dynamic>),
-  night:
-      json['Night'] == null
-          ? null
-          : DayNight.fromJson(json['Night'] as Map<String, dynamic>),
-  sources:
-      (json['Sources'] as List<dynamic>?)?.map((e) => e as String).toList(),
+  degreeDaySummary: json['DegreeDaySummary'] == null
+      ? null
+      : DegreeDaySummary.fromJson(
+          json['DegreeDaySummary'] as Map<String, dynamic>,
+        ),
+  airAndPollen: (json['AirAndPollen'] as List<dynamic>?)
+      ?.map((e) => AirAndPollen.fromJson(e as Map<String, dynamic>))
+      .toList(),
+  day: json['Day'] == null
+      ? null
+      : DayNight.fromJson(json['Day'] as Map<String, dynamic>),
+  night: json['Night'] == null
+      ? null
+      : DayNight.fromJson(json['Night'] as Map<String, dynamic>),
+  sources: (json['Sources'] as List<dynamic>?)
+      ?.map((e) => e as String)
+      .toList(),
   mobileLink: json['MobileLink'] as String?,
   link: json['Link'] as String?,
 );
@@ -155,14 +145,12 @@ Map<String, dynamic> _$MoonToJson(Moon instance) => <String, dynamic>{
 
 DegreeDaySummary _$DegreeDaySummaryFromJson(Map<String, dynamic> json) =>
     DegreeDaySummary(
-      heating:
-          json['Heating'] == null
-              ? null
-              : UnitValue.fromJson(json['Heating'] as Map<String, dynamic>),
-      cooling:
-          json['Cooling'] == null
-              ? null
-              : UnitValue.fromJson(json['Cooling'] as Map<String, dynamic>),
+      heating: json['Heating'] == null
+          ? null
+          : UnitValue.fromJson(json['Heating'] as Map<String, dynamic>),
+      cooling: json['Cooling'] == null
+          ? null
+          : UnitValue.fromJson(json['Cooling'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$DegreeDaySummaryToJson(DegreeDaySummary instance) =>
@@ -198,63 +186,50 @@ DayNight _$DayNightFromJson(Map<String, dynamic> json) => DayNight(
   rainProbability: (json['RainProbability'] as num?)?.toInt(),
   snowProbability: (json['SnowProbability'] as num?)?.toInt(),
   iceProbability: (json['IceProbability'] as num?)?.toInt(),
-  wind:
-      json['Wind'] == null
-          ? null
-          : Wind.fromJson(json['Wind'] as Map<String, dynamic>),
-  windGust:
-      json['WindGust'] == null
-          ? null
-          : Wind.fromJson(json['WindGust'] as Map<String, dynamic>),
-  totalLiquid:
-      json['TotalLiquid'] == null
-          ? null
-          : UnitValue.fromJson(json['TotalLiquid'] as Map<String, dynamic>),
-  rain:
-      json['Rain'] == null
-          ? null
-          : UnitValue.fromJson(json['Rain'] as Map<String, dynamic>),
-  snow:
-      json['Snow'] == null
-          ? null
-          : UnitValue.fromJson(json['Snow'] as Map<String, dynamic>),
-  ice:
-      json['Ice'] == null
-          ? null
-          : UnitValue.fromJson(json['Ice'] as Map<String, dynamic>),
+  wind: json['Wind'] == null
+      ? null
+      : Wind.fromJson(json['Wind'] as Map<String, dynamic>),
+  windGust: json['WindGust'] == null
+      ? null
+      : Wind.fromJson(json['WindGust'] as Map<String, dynamic>),
+  totalLiquid: json['TotalLiquid'] == null
+      ? null
+      : UnitValue.fromJson(json['TotalLiquid'] as Map<String, dynamic>),
+  rain: json['Rain'] == null
+      ? null
+      : UnitValue.fromJson(json['Rain'] as Map<String, dynamic>),
+  snow: json['Snow'] == null
+      ? null
+      : UnitValue.fromJson(json['Snow'] as Map<String, dynamic>),
+  ice: json['Ice'] == null
+      ? null
+      : UnitValue.fromJson(json['Ice'] as Map<String, dynamic>),
   hoursOfPrecipitation: (json['HoursOfPrecipitation'] as num?)?.toDouble(),
   hoursOfRain: (json['HoursOfRain'] as num?)?.toDouble(),
   hoursOfSnow: (json['HoursOfSnow'] as num?)?.toDouble(),
   hoursOfIce: (json['HoursOfIce'] as num?)?.toDouble(),
   cloudCover: (json['CloudCover'] as num?)?.toInt(),
-  evapotranspiration:
-      json['Evapotranspiration'] == null
-          ? null
-          : UnitValue.fromJson(
-            json['Evapotranspiration'] as Map<String, dynamic>,
-          ),
-  solarIrradiance:
-      json['SolarIrradiance'] == null
-          ? null
-          : UnitValue.fromJson(json['SolarIrradiance'] as Map<String, dynamic>),
-  relativeHumidity:
-      json['RelativeHumidity'] == null
-          ? null
-          : RelativeHumidity.fromJson(
-            json['RelativeHumidity'] as Map<String, dynamic>,
-          ),
-  wetBulbTemperature:
-      json['WetBulbTemperature'] == null
-          ? null
-          : UnitValueRange.fromJson(
-            json['WetBulbTemperature'] as Map<String, dynamic>,
-          ),
-  wetBulbGlobeTemperature:
-      json['WetBulbGlobeTemperature'] == null
-          ? null
-          : UnitValueRange.fromJson(
-            json['WetBulbGlobeTemperature'] as Map<String, dynamic>,
-          ),
+  evapotranspiration: json['Evapotranspiration'] == null
+      ? null
+      : UnitValue.fromJson(json['Evapotranspiration'] as Map<String, dynamic>),
+  solarIrradiance: json['SolarIrradiance'] == null
+      ? null
+      : UnitValue.fromJson(json['SolarIrradiance'] as Map<String, dynamic>),
+  relativeHumidity: json['RelativeHumidity'] == null
+      ? null
+      : RelativeHumidity.fromJson(
+          json['RelativeHumidity'] as Map<String, dynamic>,
+        ),
+  wetBulbTemperature: json['WetBulbTemperature'] == null
+      ? null
+      : UnitValueRange.fromJson(
+          json['WetBulbTemperature'] as Map<String, dynamic>,
+        ),
+  wetBulbGlobeTemperature: json['WetBulbGlobeTemperature'] == null
+      ? null
+      : UnitValueRange.fromJson(
+          json['WetBulbGlobeTemperature'] as Map<String, dynamic>,
+        ),
 );
 
 Map<String, dynamic> _$DayNightToJson(DayNight instance) => <String, dynamic>{

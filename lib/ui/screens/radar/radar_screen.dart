@@ -1,130 +1,95 @@
-// Radar Screen
-import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
+import 'dart:async';
+import 'dart:math';
 
-class RadarPage extends StatelessWidget {
-  const RadarPage({super.key});
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:mimemo/common/blocs/main/main_cubit.dart';
+import 'package:mimemo/locator.dart';
+import 'package:mimemo/repositories/radar_repository.dart';
+import 'package:mimemo/ui/screens/radar/radar_cubit.dart';
+import 'package:mimemo/ui/screens/radar/radar_tile_provider.dart';
+
+class RadarScreen extends StatelessWidget {
+  const RadarScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) =>
+          RadarCubit(radarRepository: locator<RadarRepository>()),
+      child: const RadarView(),
+    );
+  }
+}
+
+class RadarView extends StatefulWidget {
+  const RadarView({super.key});
+
+  @override
+  State<RadarView> createState() => _RadarViewState();
+}
+
+class _RadarViewState extends State<RadarView> {
+  final Completer<GoogleMapController> _controller =
+      Completer<GoogleMapController>();
+  late final MainCubit _mainCubit;
+  late final RadarCubit _radarCubit;
+  late CameraPosition _initialCameraPosition;
+
+  @override
+  void initState() {
+    super.initState();
+    _mainCubit = context.read<MainCubit>();
+    _radarCubit = context.read<RadarCubit>();
+    _initialCameraPosition = CameraPosition(
+      target: LatLng(
+        _mainCubit.state.positionInfo?.geoPosition?.latitude ?? 0,
+        _mainCubit.state.positionInfo?.geoPosition?.longitude ?? 0,
+      ),
+      zoom: 8,
+    );
+  }
+
+  int long2tileX(double lon, int zoom) {
+    return ((lon + 180.0) / 360.0 * (1 << zoom)).floor();
+  }
+
+  int lat2tileY(double lat, int zoom) {
+    final rad = lat * pi / 180.0;
+    return ((1.0 - log(tan(rad) + 1 / cos(rad)) / pi) / 2.0 * (1 << zoom))
+        .floor();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Weather Radar', style: TextStyle(color: Colors.white)),
-        backgroundColor: const Color(0xFF4A90E2),
-        elevation: 0,
-        leading: Container(),
-        actions: [
-          IconButton(icon: const Icon(Icons.layers, color: Colors.white), onPressed: () {}),
-          IconButton(icon: const Icon(Icons.play_arrow, color: Colors.white), onPressed: () {}),
-        ],
-      ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF4A90E2), Color(0xFF1E3A8A)],
-          ),
-        ),
-        child: Column(
-          children: [
-            Expanded(
-              child: Container(
-                margin: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-                ),
-                child: Stack(
-                  children: [
-                    Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.radar, size: 64, color: Colors.white.withValues(alpha: 0.6)),
-                          const Gap( 16),
-                          const Text(
-                            'Weather Radar Map',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const Gap( 8),
-                          Text(
-                            'New York Metro Area',
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.7),
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Mock radar elements
-                    Positioned(
-                      top: 100,
-                      left: 100,
-                      child: Container(
-                        width: 60,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.green.withValues(alpha: 0.3),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      top: 200,
-                      right: 80,
-                      child: Container(
-                        width: 80,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.yellow.withValues(alpha: 0.4),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+      body: GoogleMap(
+        tileOverlays: {
+          TileOverlay(
+            tileOverlayId: const TileOverlayId(
+              'radar_overlay',
             ),
-            Container(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildRadarControl('Satellite', Icons.satellite_alt, false),
-                  _buildRadarControl('Precipitation', Icons.grain, true),
-                  _buildRadarControl('Temperature', Icons.thermostat, false),
-                  _buildRadarControl('Wind', Icons.air, false),
-                ],
-              ),
+            tileProvider: RadarTileProvider(
+              radarRepository: _radarCubit.radarRepository,
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRadarControl(String label, IconData icon, bool isActive) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: isActive ? Colors.white.withValues(alpha: 0.2) : Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
           ),
-          child: Icon(icon, color: Colors.white, size: 24),
-        ),
-        const Gap( 8),
-        Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
-      ],
+        },
+        initialCameraPosition: _initialCameraPosition,
+        onMapCreated: _controller.complete,
+        buildingsEnabled: false,
+        compassEnabled: false,
+        myLocationEnabled: true,
+        markers: {
+          Marker(
+            markerId: const MarkerId('current_position'),
+            position: LatLng(
+              _initialCameraPosition.target.latitude,
+              _initialCameraPosition.target.longitude,
+            ),
+          ),
+        },
+      ),
     );
   }
 }

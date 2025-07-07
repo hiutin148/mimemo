@@ -8,18 +8,15 @@ part of 'unit_value_range.dart';
 
 UnitValueRange _$UnitValueRangeFromJson(Map<String, dynamic> json) =>
     UnitValueRange(
-      minimum:
-          json['Minimum'] == null
-              ? null
-              : UnitValue.fromJson(json['Minimum'] as Map<String, dynamic>),
-      maximum:
-          json['Maximum'] == null
-              ? null
-              : UnitValue.fromJson(json['Maximum'] as Map<String, dynamic>),
-      average:
-          json['Average'] == null
-              ? null
-              : UnitValue.fromJson(json['Average'] as Map<String, dynamic>),
+      minimum: json['Minimum'] == null
+          ? null
+          : UnitValue.fromJson(json['Minimum'] as Map<String, dynamic>),
+      maximum: json['Maximum'] == null
+          ? null
+          : UnitValue.fromJson(json['Maximum'] as Map<String, dynamic>),
+      average: json['Average'] == null
+          ? null
+          : UnitValue.fromJson(json['Average'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$UnitValueRangeToJson(UnitValueRange instance) =>

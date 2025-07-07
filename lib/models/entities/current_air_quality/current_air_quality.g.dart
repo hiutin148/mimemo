@@ -11,10 +11,9 @@ CurrentAirQuality _$CurrentAirQualityFromJson(Map<String, dynamic> json) =>
       success: json['success'] as bool?,
       status: json['status'] as String?,
       version: (json['version'] as num?)?.toInt(),
-      data:
-          json['data'] == null
-              ? null
-              : AirQualityData.fromJson(json['data'] as Map<String, dynamic>),
+      data: json['data'] == null
+          ? null
+          : AirQualityData.fromJson(json['data'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$CurrentAirQualityToJson(CurrentAirQuality instance) =>
@@ -30,17 +29,16 @@ AirQualityData _$AirQualityDataFromJson(Map<String, dynamic> json) =>
       date: json['date'] as String?,
       epochDate: (json['epochDate'] as num?)?.toInt(),
       overallIndex: (json['overallIndex'] as num?)?.toDouble(),
-      overallPlumeLabsIndex:
-          (json['overallPlumeLabsIndex'] as num?)?.toDouble(),
+      overallPlumeLabsIndex: (json['overallPlumeLabsIndex'] as num?)
+          ?.toDouble(),
       dominantPollutant: json['dominantPollutant'] as String?,
       category: json['category'] as String?,
       categoryColor: json['categoryColor'] as String?,
       hazardStatement: json['hazardStatement'] as String?,
       link: json['link'] as String?,
-      pollutants:
-          (json['pollutants'] as List<dynamic>?)
-              ?.map((e) => Pollutant.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      pollutants: (json['pollutants'] as List<dynamic>?)
+          ?.map((e) => Pollutant.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$AirQualityDataToJson(AirQualityData instance) =>
@@ -61,12 +59,9 @@ Pollutant _$PollutantFromJson(Map<String, dynamic> json) => Pollutant(
   type: json['type'] as String?,
   name: json['name'] as String?,
   plumeLabsIndex: (json['plumeLabsIndex'] as num?)?.toDouble(),
-  concentration:
-      json['concentration'] == null
-          ? null
-          : UnitValueDetail.fromJson(
-            json['concentration'] as Map<String, dynamic>,
-          ),
+  concentration: json['concentration'] == null
+      ? null
+      : UnitValueDetail.fromJson(json['concentration'] as Map<String, dynamic>),
   source: json['source'] as String?,
 );
 
