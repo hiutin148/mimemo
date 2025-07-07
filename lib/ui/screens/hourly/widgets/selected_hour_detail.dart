@@ -33,25 +33,11 @@ class _SelectedHourDetailState extends State<SelectedHourDetail>
           child: CustomScrollView(
             physics: const ClampingScrollPhysics(),
             slivers: [
-              _buildHeader(),
               _buildWeatherContent(context, selectedForecast),
             ],
           ),
         );
       },
-    );
-  }
-
-  Widget _buildHeader() {
-    return SliverAppBar(
-      backgroundColor: Colors.white,
-      bottom: PreferredSize(
-        preferredSize: const Size(double.infinity, 0.5),
-        child: Container(
-          color: Colors.black26,
-          height: 0.5,
-        ),
-      ),
     );
   }
 
@@ -71,8 +57,6 @@ class _SelectedHourDetailState extends State<SelectedHourDetail>
           _buildDescription(context, selectedForecast, isDay),
           const Gap(16),
           ..._buildWeatherMetrics(selectedForecast, isDay),
-          // const Gap(24),
-          // _buildSunMoonInfo(context, selectedForecast),
         ]),
       ),
       padding: const EdgeInsets.all(16),
@@ -195,6 +179,45 @@ class _SelectedHourDetailState extends State<SelectedHourDetail>
       ..add((
         'Wind',
         '${selectedForecast.wind?.direction?.localized} ${selectedForecast.wind?.speed?.value} ${selectedForecast.wind?.speed?.unit}',
+      ))
+      ..add((
+        'Wind Gust',
+        '${selectedForecast.windGust?.speed?.value ?? ''} ${selectedForecast.windGust?.speed?.unit ?? ''}',
+      ));
+    if (selectedForecast.rainProbability != null &&
+        selectedForecast.rainProbability! > 0) {
+      metrics.add((
+        'Rain probability',
+        '${selectedForecast.rainProbability} %',
+      ));
+    }
+    if (selectedForecast.snowProbability != null &&
+        selectedForecast.snowProbability! > 0) {
+      metrics.add((
+        'Snow probability',
+        '${selectedForecast.snowProbability} %',
+      ));
+    }
+    if (selectedForecast.iceProbability != null &&
+        selectedForecast.iceProbability! > 0) {
+      metrics.add((
+        'Ice probability',
+        '${selectedForecast.iceProbability} %',
+      ));
+    }
+    metrics
+      ..add(('Cloud cover', '${selectedForecast.cloudCover ?? ''} %'))
+      ..add((
+        'Dew point',
+        '${selectedForecast.dewPoint?.value ?? ''} ${CommonCharacters.degreeChar}',
+      ))
+      ..add((
+        'Visibility',
+        '${selectedForecast.visibility?.value ?? ''} ${selectedForecast.visibility?.unit ?? ''}',
+      ))
+      ..add((
+        'Ceiling',
+        '${selectedForecast.ceiling?.value?.toStringAsFixed(0) ?? ''} ${selectedForecast.ceiling?.unit ?? ''}',
       ));
 
     return metrics

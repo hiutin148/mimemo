@@ -22,6 +22,7 @@ abstract final class AppColors {
   // Common color
   static const Color cardBackground = Colors.white12;
   static const Color whiteBorderColor = Colors.white54;
+  static const Color blackBorderColor = Colors.black26;
 
   static MaterialColor createMaterialColor(Color color) {
     final strengths = <double>[.05];

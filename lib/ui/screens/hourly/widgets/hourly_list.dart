@@ -5,13 +5,14 @@ import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:gap/gap.dart';
 import 'package:mimemo/core/const/app_colors.dart';
 import 'package:mimemo/core/extension/context_extension.dart';
+import 'package:mimemo/models/entities/hourly_forecast/hourly_forecast.dart';
 import 'package:mimemo/ui/screens/hourly/hourly_cubit.dart';
 import 'package:mimemo/ui/screens/hourly/widgets/hourly_list_item.dart';
 
 class HourlyList extends StatelessWidget {
   const HourlyList({required this.onItemTap, super.key});
 
-  final VoidCallback onItemTap;
+  final void Function(HourlyForecast forecast) onItemTap;
 
   @override
   Widget build(BuildContext context) {
@@ -103,7 +104,7 @@ class HourlyList extends StatelessWidget {
                 _buildSunInfo(context, 'Sun rises: ${date.sunRise!}'),
               HourlyListItem(
                 hour: hour,
-                onItemTap: onItemTap,
+                onItemTap: () => onItemTap.call(hour),
               ),
             ],
           );

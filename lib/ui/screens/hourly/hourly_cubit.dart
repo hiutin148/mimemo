@@ -56,7 +56,6 @@ class HourlyCubit extends BaseCubit<HourlyState> {
   List<HourlyDateData> _getHourlyDateDataList(
     List<HourlyForecast> hourlyForecasts,
   ) {
-    // Pre-compute daily forecasts map for O(1) lookup instead of O(n) search
     final dailyForecastMap = <String, ForecastDay>{};
     if (dailyCubit.state.dailyForecast?.dailyForecasts != null) {
       for (final dayForecast
@@ -72,7 +71,7 @@ class HourlyCubit extends BaseCubit<HourlyState> {
 
     final hourlyDates =
         groupBy(
-          hourlyForecasts.where((f) => f.dateTime != null),
+          hourlyForecasts.getRange(0, 72).where((f) => f.dateTime != null),
           (HourlyForecast f) => f.dateTime!.reformatDateString(
             newFormat: DateFormatPattern.date,
           )!,
@@ -80,16 +79,13 @@ class HourlyCubit extends BaseCubit<HourlyState> {
           final dateString = entry.key;
           final forecasts = entry.value;
 
-          // O(1) lookup instead of O(n) search
           final dayForecast = dailyForecastMap[dateString];
           final rise = dayForecast?.sun?.rise;
           final set = dayForecast?.sun?.set;
 
-          // Pre-convert to DateTime once for comparison
           final riseDateTime = rise?.toDefaultDate;
           final setDateTime = set?.toDefaultDate;
 
-          // Find sun rise/set indices more efficiently
           var riseIndex = -1;
           var setIndex = -1;
 
@@ -141,5 +137,9 @@ class HourlyCubit extends BaseCubit<HourlyState> {
 
   Future<void> refresh() async {
     return _fetch(LoadStatus.refreshing);
+  }
+
+  void selectForecast(HourlyForecast forecast) {
+    emit(state.copyWith(selectedForecast: forecast));
   }
 }

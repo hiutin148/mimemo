@@ -19,9 +19,9 @@ class HourlyListItem extends StatelessWidget {
     return AppInkWell(
       onTap: onItemTap,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
+      borderRadius: 4,
+      decoration: const BoxDecoration(
         color: Colors.white12,
-        borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         spacing: 16,

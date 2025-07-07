@@ -1,8 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class BottomSheetBarController {
   BottomSheetBarController();
 
+  late ScrollController scrollController;
   late final DraggableScrollableController draggableScrollableController;
   bool isExpanded = false;
   double maxSize = 1;
@@ -41,9 +44,12 @@ class BottomSheetBar extends StatefulWidget {
     this.controller,
     this.expandedSliver,
     this.expandedWidget,
+    this.expandedBuilder,
   }) : assert(
-         (expandedSliver != null) ^ (expandedWidget != null),
-         'Either expandedSliver or expandedWidget must be provided, but not both',
+         (expandedSliver != null) ^
+             (expandedWidget != null) ^
+             (expandedBuilder != null),
+         'Exactly one of expandedSliver, expandedWidget, or expandedBuilder must be provided',
        );
 
   final Widget body;
@@ -53,6 +59,7 @@ class BottomSheetBar extends StatefulWidget {
   final double bodyBottomPadding;
   final BottomSheetBarController? controller;
   final double borderRadius;
+  final ScrollableWidgetBuilder? expandedBuilder;
 
   @override
   State<BottomSheetBar> createState() => _BottomSheetBarState();
@@ -91,15 +98,21 @@ class _BottomSheetBarState extends State<BottomSheetBar> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final minChildSize = _headerHeight / constraints.maxHeight;
-        controller.minSize = minChildSize;
+        double minChildSize = 0;
+        if (controller.minSize > 0) {
+          minChildSize = _headerHeight / constraints.maxHeight;
+          controller.minSize = minChildSize;
+        }
+
         return Stack(
           alignment: Alignment.bottomCenter,
           children: [
             Positioned.fill(
               child: Padding(
                 padding: EdgeInsets.only(
-                  bottom: _headerHeight + widget.bodyBottomPadding,
+                  bottom: minChildSize != 0
+                      ? _headerHeight + widget.bodyBottomPadding
+                      : 0,
                 ),
                 child: widget.body,
               ),
@@ -112,6 +125,8 @@ class _BottomSheetBarState extends State<BottomSheetBar> {
               expandedWidget: widget.expandedWidget,
               controller: controller,
               borderRadius: widget.borderRadius,
+              expandedBuilder: widget.expandedBuilder,
+              headerHeight: _headerHeight,
             ),
           ],
         );
@@ -127,9 +142,11 @@ class BottomSheetBarSheet extends StatefulWidget {
     required this.minChildSize,
     required this.controller,
     required this.borderRadius,
+    required this.headerHeight,
     super.key,
     this.expandedSliver,
     this.expandedWidget,
+    this.expandedBuilder,
   });
 
   final void Function(Size size) onHeaderChange;
@@ -139,6 +156,8 @@ class BottomSheetBarSheet extends StatefulWidget {
   final double minChildSize;
   final BottomSheetBarController controller;
   final double borderRadius;
+  final ScrollableWidgetBuilder? expandedBuilder;
+  final double headerHeight;
 
   @override
   State<BottomSheetBarSheet> createState() => _BottomSheetBarSheetState();
@@ -193,6 +212,7 @@ class _BottomSheetBarSheetState extends State<BottomSheetBarSheet> {
           minChildSize: widget.minChildSize,
           snap: true,
           builder: (context, scrollController) {
+            widget.controller.scrollController = scrollController;
             return Material(
               color: Colors.white,
               borderRadius: BorderRadius.vertical(
@@ -201,13 +221,18 @@ class _BottomSheetBarSheetState extends State<BottomSheetBarSheet> {
               child: CustomScrollView(
                 controller: scrollController,
                 slivers: [
-                  SliverToBoxAdapter(
-                    child: MeasureSize(
-                      onChange: widget.onHeaderChange,
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.translucent,
-                        onTap: _onHeaderTap,
-                        child: widget.header,
+                  SliverPersistentHeader(
+                    pinned: true,
+                    delegate: _SliverAppBarDelegate(
+                      maxHeight: widget.headerHeight,
+                      minHeight: widget.headerHeight,
+                      child: MeasureSize(
+                        onChange: widget.onHeaderChange,
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onTap: _onHeaderTap,
+                          child: widget.header,
+                        ),
                       ),
                     ),
                   ),
@@ -217,7 +242,12 @@ class _BottomSheetBarSheetState extends State<BottomSheetBarSheet> {
                         child: SizedBox(
                           height: constraints.maxHeight,
                           child:
-                              widget.expandedWidget ?? const SizedBox.shrink(),
+                              widget.expandedBuilder?.call(
+                                context,
+                                scrollController,
+                              ) ??
+                              widget.expandedWidget ??
+                              const SizedBox.shrink(),
                         ),
                       ),
                 ],
@@ -273,5 +303,39 @@ class _MeasureSizeState extends State<MeasureSize> {
   @override
   Widget build(BuildContext context) {
     return Container(key: _widgetKey, child: widget.child);
+  }
+}
+
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  _SliverAppBarDelegate({
+    required this.minHeight,
+    required this.maxHeight,
+    required this.child,
+  });
+
+  final double minHeight;
+  final double maxHeight;
+  final Widget child;
+
+  @override
+  double get minExtent => minHeight;
+
+  @override
+  double get maxExtent => max(maxHeight, minHeight);
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return SizedBox.expand(child: child);
+  }
+
+  @override
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
+    return maxHeight != oldDelegate.maxHeight ||
+        minHeight != oldDelegate.minHeight ||
+        child != oldDelegate.child;
   }
 }
