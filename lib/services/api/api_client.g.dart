@@ -377,6 +377,52 @@ class _ApiClient implements ApiClient {
     return _value;
   }
 
+  @override
+  Future<List<int>> getZXYRadar({
+    required String dateTime,
+    required int z,
+    required int x,
+    required int y,
+    String imageDimensions = '768x432',
+    String colortable = 'off',
+    String displayMode = '',
+    String displayProducts = '',
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'imageDimensions': imageDimensions,
+      r'colortable': colortable,
+      r'display_mode': displayMode,
+      r'display_products': displayProducts,
+    };
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<List<int>>(
+      Options(
+            method: 'GET',
+            headers: _headers,
+            extra: _extra,
+            responseType: ResponseType.bytes,
+          )
+          .compose(
+            _dio.options,
+            '/maps/v1/radar/futureSIR/zxy/${dateTime}/${z}/${x}/${y}.png',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<List<dynamic>>(_options);
+    late List<int> _value;
+    try {
+      _value = _result.data!.cast<int>();
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {
     if (T != dynamic &&
         !(requestOptions.responseType == ResponseType.bytes ||

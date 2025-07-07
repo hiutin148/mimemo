@@ -139,6 +139,13 @@ class _BottomNavViewState extends State<BottomNavView> {
 
   @override
   Widget build(BuildContext context) {
+    final screens = <Widget>[
+      const HomeScreen(),
+      const HourlyScreen(),
+      const DailyScreen(),
+      const RadarScreen(),
+      MorePage(),
+    ];
     return BlocBuilder<BottomNavCubit, int>(
       builder: (context, state) {
         return BlocSelector<MainCubit, MainState, PositionInfo?>(
