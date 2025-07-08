@@ -1,14 +1,16 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mimemo/common/blocs/main/main_cubit.dart';
+import 'package:mimemo/core/extension/extensions.dart';
 import 'package:mimemo/locator.dart';
+import 'package:mimemo/models/enums/app_map_type.dart';
 import 'package:mimemo/repositories/radar_repository.dart';
+import 'package:mimemo/ui/screens/radar/map_type_list.dart';
 import 'package:mimemo/ui/screens/radar/radar_cubit.dart';
-import 'package:mimemo/ui/screens/radar/radar_tile_provider.dart';
+import 'package:mimemo/ui/widgets/app_button.dart';
 
 class RadarScreen extends StatelessWidget {
   const RadarScreen({super.key});
@@ -16,8 +18,10 @@ class RadarScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) =>
-          RadarCubit(radarRepository: locator<RadarRepository>()),
+      create: (context) => RadarCubit(
+        radarRepository: locator<RadarRepository>(),
+        mainCubit: context.read<MainCubit>(),
+      ),
       child: const RadarView(),
     );
   }
@@ -33,61 +37,201 @@ class RadarView extends StatefulWidget {
 class _RadarViewState extends State<RadarView> {
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
-  late final MainCubit _mainCubit;
   late final RadarCubit _radarCubit;
   late CameraPosition _initialCameraPosition;
 
   @override
   void initState() {
     super.initState();
-    _mainCubit = context.read<MainCubit>();
     _radarCubit = context.read<RadarCubit>();
+    _radarCubit.init();
     _initialCameraPosition = CameraPosition(
       target: LatLng(
-        _mainCubit.state.positionInfo?.geoPosition?.latitude ?? 0,
-        _mainCubit.state.positionInfo?.geoPosition?.longitude ?? 0,
+        _radarCubit.mainCubit.state.positionInfo?.geoPosition?.latitude ?? 0,
+        _radarCubit.mainCubit.state.positionInfo?.geoPosition?.longitude ?? 0,
       ),
       zoom: 8,
     );
   }
 
-  int long2tileX(double lon, int zoom) {
-    return ((lon + 180.0) / 360.0 * (1 << zoom)).floor();
-  }
-
-  int lat2tileY(double lat, int zoom) {
-    final rad = lat * pi / 180.0;
-    return ((1.0 - log(tan(rad) + 1 / cos(rad)) / pi) / 2.0 * (1 << zoom))
-        .floor();
+  void _showAllMapTypesBottomSheet() {
+    showModalBottomSheet<void>(
+      isScrollControlled: true,
+      context: context,
+      useSafeArea: true,
+      builder: (context) {
+        return BlocProvider.value(
+          value: _radarCubit,
+          child: const MapTypeList(),
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GoogleMap(
-        tileOverlays: {
-          TileOverlay(
-            tileOverlayId: const TileOverlayId(
-              'radar_overlay',
+      appBar: _buildAppBar(),
+      body: DefaultTabController(
+        length: 3,
+        child: Stack(
+          children: [
+            _buildMaps(),
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: _buildMapTypesButton(),
             ),
-            tileProvider: RadarTileProvider(
-              radarRepository: _radarCubit.radarRepository,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMapTypesButton() {
+    return BlocSelector<RadarCubit, RadarState, AppMapType>(
+      selector: (state) => state.currentMapType,
+      builder: (context, type) {
+        return Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.black54, Colors.transparent],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
             ),
           ),
-        },
-        initialCameraPosition: _initialCameraPosition,
-        onMapCreated: _controller.complete,
-        buildingsEnabled: false,
-        compassEnabled: false,
-        myLocationEnabled: true,
-        markers: {
-          Marker(
-            markerId: const MarkerId('current_position'),
-            position: LatLng(
-              _initialCameraPosition.target.latitude,
-              _initialCameraPosition.target.longitude,
-            ),
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildAllMapsButton(context),
+              ..._buildMapTypeButtons(context, type),
+            ],
           ),
+        );
+      },
+    );
+  }
+
+  Widget _buildAllMapsButton(BuildContext context) {
+    return AppButton(
+      radius: 100,
+      backgroundColor: Colors.white,
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+      onPressed: _showAllMapTypesBottomSheet,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.layers_outlined, color: Colors.black),
+          const SizedBox(width: 4),
+          Text(
+            'All maps',
+            style: context.textTheme.labelMedium?.copyWith(color: Colors.black),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _buildMapTypeButtons(
+    BuildContext context,
+    AppMapType currentType,
+  ) {
+    final mapTypes = [
+      (AppMapType.radar, 'Radar'),
+      (AppMapType.clouds, 'Cloud'),
+      (AppMapType.temperature, 'Temperature'),
+    ];
+
+    return mapTypes.map((mapTypeData) {
+      final (mapType, label) = mapTypeData;
+      final isSelected = currentType == mapType;
+
+      return AppButton(
+        radius: 100,
+        backgroundColor: isSelected ? Colors.black : Colors.white,
+        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+        onPressed: () => _radarCubit.changeMapType(mapType),
+        child: Text(
+          label,
+          style: context.textTheme.labelMedium?.copyWith(
+            color: isSelected ? Colors.white : Colors.black,
+          ),
+        ),
+      );
+    }).toList();
+  }
+
+  Widget _buildMaps() {
+    return BlocSelector<RadarCubit, RadarState, Set<TileOverlay>>(
+      builder: (context, tileOverlays) {
+        return GoogleMap(
+          myLocationButtonEnabled: false,
+          tileOverlays: tileOverlays,
+          initialCameraPosition: _initialCameraPosition,
+          onMapCreated: _controller.complete,
+          buildingsEnabled: false,
+          myLocationEnabled: true,
+          markers: {
+            Marker(
+              markerId: const MarkerId('current_position'),
+              position: LatLng(
+                _initialCameraPosition.target.latitude,
+                _initialCameraPosition.target.longitude,
+              ),
+            ),
+          },
+        );
+      },
+      selector: (state) => state.tileOverlays,
+    );
+  }
+
+  AppBar _buildAppBar() {
+    return AppBar(
+      shadowColor: Colors.black,
+      surfaceTintColor: Colors.white,
+      backgroundColor: Colors.white,
+      title: BlocBuilder<RadarCubit, RadarState>(
+        builder: (context, state) {
+          final listGroupColors = state.precipitationColors;
+          return Container(
+            decoration: const BoxDecoration(color: Colors.white),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: listGroupColors.entries
+                  .map(
+                    (colors) => Column(
+                      spacing: 4,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(50),
+                          child: Row(
+                            children: colors.value
+                                .map(
+                                  (color) => Container(
+                                    width: 16,
+                                    height: 10,
+                                    color: color.hex?.hexToColor,
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        ),
+                        Text(
+                          colors.key ?? '',
+                          style: context.textTheme.bodySmall?.copyWith(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                  .toList(),
+            ),
+          );
         },
       ),
     );
