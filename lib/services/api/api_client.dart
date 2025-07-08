@@ -8,8 +8,6 @@ import 'package:mimemo/models/entities/hourly_forecast/hourly_forecast.dart';
 import 'package:mimemo/models/entities/minute_color/minute_color.dart';
 import 'package:mimemo/models/entities/one_minute_cast/one_minute_cast.dart';
 import 'package:mimemo/models/entities/position_info/position_info.dart';
-import 'package:retrofit/error_logger.dart';
-import 'package:retrofit/http.dart';
 import 'package:retrofit/retrofit.dart';
 
 part 'api_client.g.dart';
@@ -84,14 +82,48 @@ abstract class ApiClient {
   // Radar
   @GET('/maps/v1/radar/futureSIR/zxy/{dateTime}/{z}/{x}/{y}.png')
   @DioResponseType(ResponseType.bytes)
-  Future<List<int>> getZXYRadar({
+  Future<List<int>> getFutureRadar({
     @Path('dateTime') required String dateTime,
     @Path('z') required int z,
     @Path('x') required int x,
     @Path('y') required int y,
-    @Query('imageDimensions') String imageDimensions = '768x432',
     @Query('colortable') String colortable = 'off',
     @Query('display_mode') String displayMode = '',
     @Query('display_products') String displayProducts = '',
+  });
+
+  @GET('/maps/v1/satellite/globalColor/zxy/{dateTime}/{z}/{x}/{y}.png')
+  @DioResponseType(ResponseType.bytes)
+  Future<List<int>> getCloudSatellite({
+    @Path('dateTime') required String dateTime,
+    @Path('z') required int z,
+    @Path('x') required int x,
+    @Path('y') required int y,
+    @Query('display_mode') String displayMode = '10',
+    @Query('display_products') String displayProducts = '',
+  });
+
+  @GET('/maps/v1/models/gfs/zxy/{dateTime}/{z}/{x}/{y}.png')
+  @DioResponseType(ResponseType.bytes)
+  Future<List<int>> getCurrentTemperature({
+    @Path('dateTime') required String dateTime,
+    @Path('z') required int z,
+    @Path('x') required int x,
+    @Path('y') required int y,
+    @Query('colortable') String colortable = 'off',
+    @Query('display_mode') String displayMode = '',
+    @Query('display_products') String displayProducts = '26-1010',
+  });
+
+  @GET('/maps/v1/models/gfs/zxy/{dateTime}/{z}/{x}/{y}.png')
+  @DioResponseType(ResponseType.bytes)
+  Future<List<int>> getRiskTropical({
+    @Path('dateTime') required String dateTime,
+    @Path('z') required int z,
+    @Path('x') required int x,
+    @Path('y') required int y,
+    @Query('colortable') String colortable = 'off',
+    @Query('display_mode') String displayMode = '',
+    @Query('display_products') String displayProducts = '26-1010',
   });
 }

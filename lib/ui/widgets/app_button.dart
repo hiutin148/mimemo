@@ -45,16 +45,17 @@ class AppButton extends StatelessWidget {
         padding: padding,
         minimumSize: Size.zero,
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        foregroundColor: Colors.black,
       ),
       onPressed: enable ? onPressed : null,
-      child: SizedBox(
-        height: height,
-        width: width,
-        child: Center(
-          child:
-              child ?? Text(title, style: titleStyle ?? context.textTheme.titleMedium?.w500.white),
-        ),
-      ),
+      child:
+          child ??
+          Center(
+            child: Text(
+              title,
+              style: titleStyle ?? context.textTheme.titleMedium?.w500.white,
+            ),
+          ),
     );
   }
 }
