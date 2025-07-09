@@ -12,7 +12,7 @@ class AppButton extends StatelessWidget {
     this.width,
     this.radius = 8,
     this.backgroundColor = Colors.white24,
-    this.padding = EdgeInsets.zero,
+    this.padding = const EdgeInsets.all(12),
     this.borderSide = BorderSide.none,
     this.titleStyle,
     this.enable = true,

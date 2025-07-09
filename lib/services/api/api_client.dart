@@ -103,6 +103,17 @@ abstract class ApiClient {
     @Query('display_products') String displayProducts = '',
   });
 
+  @GET('/maps/v1/satellite/globalWV/zxy/{dateTime}/{z}/{x}/{y}.png')
+  @DioResponseType(ResponseType.bytes)
+  Future<List<int>> getWaterVapor({
+    @Path('dateTime') required String dateTime,
+    @Path('z') required int z,
+    @Path('x') required int x,
+    @Path('y') required int y,
+    @Query('display_mode') String displayMode = '10',
+    @Query('display_products') String displayProducts = '',
+  });
+
   @GET('/maps/v1/models/gfs/zxy/{dateTime}/{z}/{x}/{y}.png')
   @DioResponseType(ResponseType.bytes)
   Future<List<int>> getCurrentTemperature({
@@ -115,15 +126,57 @@ abstract class ApiClient {
     @Query('display_products') String displayProducts = '26-1010',
   });
 
-  @GET('/maps/v1/models/gfs/zxy/{dateTime}/{z}/{x}/{y}.png')
+  @GET('/maps/v1//tropical/hurricane/zxy/{z}/{x}/{y}.png')
   @DioResponseType(ResponseType.bytes)
   Future<List<int>> getRiskTropical({
-    @Path('dateTime') required String dateTime,
     @Path('z') required int z,
     @Path('x') required int x,
     @Path('y') required int y,
-    @Query('colortable') String colortable = 'off',
-    @Query('display_mode') String displayMode = '',
-    @Query('display_products') String displayProducts = '26-1010',
+    @Query('categories') String categories = 'RISK_TO_LIFE_PROPERTY',
+  });
+
+  @GET('/maps/v1//tropical/hurricane/zxy/{z}/{x}/{y}.png')
+  @DioResponseType(ResponseType.bytes)
+  Future<List<int>> getRainFallAmounts({
+    @Path('z') required int z,
+    @Path('x') required int x,
+    @Path('y') required int y,
+    @Query('categories') String categories = 'RAINFALL',
+  });
+
+  @GET('/maps/v1//tropical/hurricane/zxy/{z}/{x}/{y}.png')
+  @DioResponseType(ResponseType.bytes)
+  Future<List<int>> getMaximumSustainedWinds({
+    @Path('z') required int z,
+    @Path('x') required int x,
+    @Path('y') required int y,
+    @Query('categories') String categories = 'MAXIMUM_SUSTAINED_WINDS',
+  });
+
+  @GET('/maps/v1//tropical/hurricane/zxy/{z}/{x}/{y}.png')
+  @DioResponseType(ResponseType.bytes)
+  Future<List<int>> getMaximumWindGusts({
+    @Path('z') required int z,
+    @Path('x') required int x,
+    @Path('y') required int y,
+    @Query('categories') String categories = 'MAXIMUM_WIND_GUSTS',
+  });
+
+  @GET('/maps/v1//tropical/hurricane/zxy/{z}/{x}/{y}.png')
+  @DioResponseType(ResponseType.bytes)
+  Future<List<int>> getStormSurge({
+    @Path('z') required int z,
+    @Path('x') required int x,
+    @Path('y') required int y,
+    @Query('categories') String categories = 'STORM_SURGE',
+  });
+
+  @GET('/maps/v1//alerts/globalWarnings/zxy/{z}/{x}/{y}.png')
+  @DioResponseType(ResponseType.bytes)
+  Future<List<int>> getWatchesAndWarnings({
+    @Path('z') required int z,
+    @Path('x') required int x,
+    @Path('y') required int y,
+    @Query('borders') String border = 'false',
   });
 }

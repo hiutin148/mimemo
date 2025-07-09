@@ -8,8 +8,9 @@ import 'package:mimemo/core/extension/extensions.dart';
 import 'package:mimemo/locator.dart';
 import 'package:mimemo/models/enums/app_map_type.dart';
 import 'package:mimemo/repositories/radar_repository.dart';
-import 'package:mimemo/ui/screens/radar/map_type_list.dart';
 import 'package:mimemo/ui/screens/radar/radar_cubit.dart';
+import 'package:mimemo/ui/screens/radar/widgets/map_type_list.dart';
+import 'package:mimemo/ui/screens/radar/widgets/radar_header.dart';
 import 'package:mimemo/ui/widgets/app_button.dart';
 
 class RadarScreen extends StatelessWidget {
@@ -58,6 +59,7 @@ class _RadarViewState extends State<RadarView> {
     showModalBottomSheet<void>(
       isScrollControlled: true,
       context: context,
+      backgroundColor: Colors.white,
       useSafeArea: true,
       builder: (context) {
         return BlocProvider.value(
@@ -103,6 +105,7 @@ class _RadarViewState extends State<RadarView> {
           ),
           padding: const EdgeInsets.all(16),
           child: Row(
+            spacing: 8,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               _buildAllMapsButton(context),
@@ -188,52 +191,16 @@ class _RadarViewState extends State<RadarView> {
     );
   }
 
-  AppBar _buildAppBar() {
-    return AppBar(
-      shadowColor: Colors.black,
-      surfaceTintColor: Colors.white,
-      backgroundColor: Colors.white,
-      title: BlocBuilder<RadarCubit, RadarState>(
-        builder: (context, state) {
-          final listGroupColors = state.precipitationColors;
-          return Container(
-            decoration: const BoxDecoration(color: Colors.white),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: listGroupColors.entries
-                  .map(
-                    (colors) => Column(
-                      spacing: 4,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(50),
-                          child: Row(
-                            children: colors.value
-                                .map(
-                                  (color) => Container(
-                                    width: 16,
-                                    height: 10,
-                                    color: color.hex?.hexToColor,
-                                  ),
-                                )
-                                .toList(),
-                          ),
-                        ),
-                        Text(
-                          colors.key ?? '',
-                          style: context.textTheme.bodySmall?.copyWith(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                  .toList(),
-            ),
-          );
-        },
+  AppBar? _buildAppBar() {
+    final currentMapType = context.watch<RadarCubit>().state.currentMapType;
+    return switch (currentMapType) {
+      AppMapType.radar => AppBar(
+        shadowColor: Colors.black,
+        surfaceTintColor: Colors.white,
+        backgroundColor: Colors.white,
+        title: const RadarHeader(),
       ),
-    );
+      _ => null,
+    };
   }
 }
