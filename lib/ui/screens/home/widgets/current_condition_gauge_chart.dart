@@ -90,10 +90,9 @@ class _CurrentConditionGaugeChartState
   Widget _buildHeader(BuildContext context, HomeState state) {
     return SizedBox(
       height: 48,
-      child:
-          _currentTab == 0
-              ? _buildRainHeader(context, state)
-              : _buildAirQualityHeader(context, state),
+      child: _currentTab == 0
+          ? _buildRainHeader(context, state)
+          : _buildAirQualityHeader(context, state),
     );
   }
 
@@ -173,7 +172,7 @@ class _CurrentConditionGaugeChartState
   Widget _buildActionButton() {
     return AppButton(
       width: _buttonWidth,
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       onPressed: () {
         if (_currentTab == 0) {
           context.pushRoute(const PrecipitationRoute());
@@ -185,8 +184,14 @@ class _CurrentConditionGaugeChartState
         spacing: 2,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(_currentButtonText),
-          const Icon(Icons.keyboard_arrow_right_outlined),
+          Text(
+            _currentButtonText,
+            style: context.textTheme.bodySmall,
+          ),
+          const Icon(
+            Icons.keyboard_arrow_right_outlined,
+            color: Colors.white,
+          ),
         ],
       ),
     );
@@ -195,10 +200,9 @@ class _CurrentConditionGaugeChartState
   Widget _buildFooter(BuildContext context) {
     return SizedBox(
       height: 48,
-      child:
-          _currentTab == 0
-              ? _buildRainFooter(context)
-              : _buildAirQualityFooter(context),
+      child: _currentTab == 0
+          ? _buildRainFooter(context)
+          : _buildAirQualityFooter(context),
     );
   }
 
@@ -246,16 +250,15 @@ class _CurrentConditionGaugeChartState
     return ClipRRect(
       borderRadius: BorderRadius.circular(50),
       child: Row(
-        children:
-            Aqi.values
-                .map(
-                  (aqi) => Container(
-                    width: _aqiBarWidth,
-                    height: _aqiBarHeight,
-                    color: aqi.color,
-                  ),
-                )
-                .toList(),
+        children: Aqi.values
+            .map(
+              (aqi) => Container(
+                width: _aqiBarWidth,
+                height: _aqiBarHeight,
+                color: aqi.color,
+              ),
+            )
+            .toList(),
       ),
     );
   }

@@ -4,7 +4,7 @@ enum AppMapType {
   radar(MapTypeGroup.radar, 'Radar'),
   // Tropical storms maps
   forecastEyePath(MapTypeGroup.tropical, 'Forecast Eye Path'),
-  risk(MapTypeGroup.tropical, 'Risk'),
+  risk(MapTypeGroup.tropical, 'Risk for Life and Property'),
   rainfallAmounts(MapTypeGroup.tropical, 'Rain Fall Amounts'),
   forecastedMaximumSustainedWinds(
     MapTypeGroup.tropical,
