@@ -7,14 +7,12 @@ part of 'wind.dart';
 // **************************************************************************
 
 Wind _$WindFromJson(Map<String, dynamic> json) => Wind(
-  direction:
-      json['Direction'] == null
-          ? null
-          : WindDirection.fromJson(json['Direction'] as Map<String, dynamic>),
-  speed:
-      json['Speed'] == null
-          ? null
-          : UnitValueDetail.fromJson(json['Speed'] as Map<String, dynamic>),
+  direction: json['Direction'] == null
+      ? null
+      : WindDirection.fromJson(json['Direction'] as Map<String, dynamic>),
+  speed: json['Speed'] == null
+      ? null
+      : UnitValueDetail.fromJson(json['Speed'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$WindToJson(Wind instance) => <String, dynamic>{

@@ -6,26 +6,22 @@ part of 'one_minute_cast.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-OneMinuteCast _$OneMinuteCastFromJson(
-  Map<String, dynamic> json,
-) => OneMinuteCast(
-  summary:
-      json['Summary'] == null
+OneMinuteCast _$OneMinuteCastFromJson(Map<String, dynamic> json) =>
+    OneMinuteCast(
+      summary: json['Summary'] == null
           ? null
           : MinuteCastSummary.fromJson(json['Summary'] as Map<String, dynamic>),
-  summaries:
-      (json['Summaries'] as List<dynamic>?)
+      summaries: (json['Summaries'] as List<dynamic>?)
           ?.map(
             (e) => MinuteCastRangeSummary.fromJson(e as Map<String, dynamic>),
           )
           .toList(),
-  intervals:
-      (json['Intervals'] as List<dynamic>?)
+      intervals: (json['Intervals'] as List<dynamic>?)
           ?.map((e) => MinuteInterval.fromJson(e as Map<String, dynamic>))
           .toList(),
-  mobileLink: json['MobileLink'] as String?,
-  link: json['Link'] as String?,
-);
+      mobileLink: json['MobileLink'] as String?,
+      link: json['Link'] as String?,
+    );
 
 Map<String, dynamic> _$OneMinuteCastToJson(OneMinuteCast instance) =>
     <String, dynamic>{

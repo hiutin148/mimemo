@@ -35,4 +35,9 @@ extension StringExtension on String {
     }
     return null;
   }
+
+  bool get isRoundOrHalfHour {
+    final regex = RegExp(r'^(?:[01]?[0-9]|2[0-3]):(?:00|30)$');
+    return regex.hasMatch(this);
+  }
 }

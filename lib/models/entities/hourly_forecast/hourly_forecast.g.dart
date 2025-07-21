@@ -17,60 +17,46 @@ HourlyForecast _$HourlyForecastFromJson(
   precipitationType: json['PrecipitationType'] as String?,
   precipitationIntensity: json['PrecipitationIntensity'] as String?,
   isDaylight: json['IsDaylight'] as bool?,
-  temperature:
-      json['Temperature'] == null
-          ? null
-          : UnitValueDetail.fromJson(
-            json['Temperature'] as Map<String, dynamic>,
-          ),
-  realFeelTemperature:
-      json['RealFeelTemperature'] == null
-          ? null
-          : UnitValueDetail.fromJson(
-            json['RealFeelTemperature'] as Map<String, dynamic>,
-          ),
-  realFeelTemperatureShade:
-      json['RealFeelTemperatureShade'] == null
-          ? null
-          : UnitValueDetail.fromJson(
-            json['RealFeelTemperatureShade'] as Map<String, dynamic>,
-          ),
-  wetBulbTemperature:
-      json['WetBulbTemperature'] == null
-          ? null
-          : UnitValueDetail.fromJson(
-            json['WetBulbTemperature'] as Map<String, dynamic>,
-          ),
-  wetBulbGlobeTemperature:
-      json['WetBulbGlobeTemperature'] == null
-          ? null
-          : UnitValueDetail.fromJson(
-            json['WetBulbGlobeTemperature'] as Map<String, dynamic>,
-          ),
-  dewPoint:
-      json['DewPoint'] == null
-          ? null
-          : UnitValueDetail.fromJson(json['DewPoint'] as Map<String, dynamic>),
-  wind:
-      json['Wind'] == null
-          ? null
-          : Wind.fromJson(json['Wind'] as Map<String, dynamic>),
-  windGust:
-      json['WindGust'] == null
-          ? null
-          : Wind.fromJson(json['WindGust'] as Map<String, dynamic>),
+  temperature: json['Temperature'] == null
+      ? null
+      : UnitValueDetail.fromJson(json['Temperature'] as Map<String, dynamic>),
+  realFeelTemperature: json['RealFeelTemperature'] == null
+      ? null
+      : UnitValueDetail.fromJson(
+          json['RealFeelTemperature'] as Map<String, dynamic>,
+        ),
+  realFeelTemperatureShade: json['RealFeelTemperatureShade'] == null
+      ? null
+      : UnitValueDetail.fromJson(
+          json['RealFeelTemperatureShade'] as Map<String, dynamic>,
+        ),
+  wetBulbTemperature: json['WetBulbTemperature'] == null
+      ? null
+      : UnitValueDetail.fromJson(
+          json['WetBulbTemperature'] as Map<String, dynamic>,
+        ),
+  wetBulbGlobeTemperature: json['WetBulbGlobeTemperature'] == null
+      ? null
+      : UnitValueDetail.fromJson(
+          json['WetBulbGlobeTemperature'] as Map<String, dynamic>,
+        ),
+  dewPoint: json['DewPoint'] == null
+      ? null
+      : UnitValueDetail.fromJson(json['DewPoint'] as Map<String, dynamic>),
+  wind: json['Wind'] == null
+      ? null
+      : Wind.fromJson(json['Wind'] as Map<String, dynamic>),
+  windGust: json['WindGust'] == null
+      ? null
+      : Wind.fromJson(json['WindGust'] as Map<String, dynamic>),
   relativeHumidity: (json['RelativeHumidity'] as num?)?.toInt(),
   indoorRelativeHumidity: (json['IndoorRelativeHumidity'] as num?)?.toInt(),
-  visibility:
-      json['Visibility'] == null
-          ? null
-          : UnitValueDetail.fromJson(
-            json['Visibility'] as Map<String, dynamic>,
-          ),
-  ceiling:
-      json['Ceiling'] == null
-          ? null
-          : UnitValueDetail.fromJson(json['Ceiling'] as Map<String, dynamic>),
+  visibility: json['Visibility'] == null
+      ? null
+      : UnitValueDetail.fromJson(json['Visibility'] as Map<String, dynamic>),
+  ceiling: json['Ceiling'] == null
+      ? null
+      : UnitValueDetail.fromJson(json['Ceiling'] as Map<String, dynamic>),
   uvIndex: (json['UVIndex'] as num?)?.toInt(),
   uvIndexText: json['UVIndexText'] as String?,
   precipitationProbability: (json['PrecipitationProbability'] as num?)?.toInt(),
@@ -78,39 +64,31 @@ HourlyForecast _$HourlyForecastFromJson(
   rainProbability: (json['RainProbability'] as num?)?.toInt(),
   snowProbability: (json['SnowProbability'] as num?)?.toInt(),
   iceProbability: (json['IceProbability'] as num?)?.toInt(),
-  totalLiquid:
-      json['TotalLiquid'] == null
-          ? null
-          : UnitValueDetail.fromJson(
-            json['TotalLiquid'] as Map<String, dynamic>,
-          ),
-  rain:
-      json['Rain'] == null
-          ? null
-          : UnitValueDetail.fromJson(json['Rain'] as Map<String, dynamic>),
-  snow:
-      json['Snow'] == null
-          ? null
-          : UnitValueDetail.fromJson(json['Snow'] as Map<String, dynamic>),
-  ice:
-      json['Ice'] == null
-          ? null
-          : UnitValueDetail.fromJson(json['Ice'] as Map<String, dynamic>),
+  totalLiquid: json['TotalLiquid'] == null
+      ? null
+      : UnitValueDetail.fromJson(json['TotalLiquid'] as Map<String, dynamic>),
+  rain: json['Rain'] == null
+      ? null
+      : UnitValueDetail.fromJson(json['Rain'] as Map<String, dynamic>),
+  snow: json['Snow'] == null
+      ? null
+      : UnitValueDetail.fromJson(json['Snow'] as Map<String, dynamic>),
+  ice: json['Ice'] == null
+      ? null
+      : UnitValueDetail.fromJson(json['Ice'] as Map<String, dynamic>),
   cloudCover: (json['CloudCover'] as num?)?.toInt(),
-  evapotranspiration:
-      json['Evapotranspiration'] == null
-          ? null
-          : UnitValueDetail.fromJson(
-            json['Evapotranspiration'] as Map<String, dynamic>,
-          ),
-  solarIrradiance:
-      json['SolarIrradiance'] == null
-          ? null
-          : UnitValueDetail.fromJson(
-            json['SolarIrradiance'] as Map<String, dynamic>,
-          ),
-  accuLumenBrightnessIndex:
-      (json['AccuLumenBrightnessIndex'] as num?)?.toDouble(),
+  evapotranspiration: json['Evapotranspiration'] == null
+      ? null
+      : UnitValueDetail.fromJson(
+          json['Evapotranspiration'] as Map<String, dynamic>,
+        ),
+  solarIrradiance: json['SolarIrradiance'] == null
+      ? null
+      : UnitValueDetail.fromJson(
+          json['SolarIrradiance'] as Map<String, dynamic>,
+        ),
+  accuLumenBrightnessIndex: (json['AccuLumenBrightnessIndex'] as num?)
+      ?.toDouble(),
   mobileLink: json['MobileLink'] as String?,
   link: json['Link'] as String?,
 );

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:mimemo/common/blocs/main/main_cubit.dart';
-import 'package:mimemo/common/utils/overlay_loading.dart';
+import 'package:mimemo/common/utils/utils.dart';
 import 'package:mimemo/core/extension/context_extension.dart';
 import 'package:mimemo/core/extension/text_style_extension.dart';
 import 'package:mimemo/generated/l10n.dart';
@@ -266,8 +266,12 @@ class LocationPermissionScreen extends StatelessWidget {
   final VoidCallback onSkip;
 
   Future<void> _requestPermission(BuildContext context) async {
-    await OverlayLoading.runWithLoading(context, () => context.read<MainCubit>().init());
-    onNext.call();
+    try {
+      await OverlayLoading.runWithLoading(context, () => context.read<MainCubit>().init());
+      onNext.call();
+    } on Exception catch(e) {
+      logger.e(e);
+    }
   }
 
   @override

@@ -131,10 +131,3 @@ class AirQualityPainter extends CustomPainter {
     return value != oldDelegate.value || strokeWidth != oldDelegate.strokeWidth;
   }
 }
-
-class GradientInfo {
-
-  const GradientInfo(this.colors, this.stops);
-  final List<Color> colors;
-  final List<double> stops;
-}

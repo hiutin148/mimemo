@@ -10,6 +10,7 @@ import 'package:mimemo/router/app_router.gr.dart';
 import 'package:mimemo/ui/screens/home/home_cubit.dart';
 import 'package:mimemo/ui/screens/home/widgets/air_quality_chart.dart';
 import 'package:mimemo/ui/screens/home/widgets/rain_condition_chart.dart';
+import 'package:mimemo/ui/screens/hourly/hourly_cubit.dart';
 import 'package:mimemo/ui/widgets/app_button.dart';
 import 'package:mimemo/ui/widgets/app_icon.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -90,10 +91,9 @@ class _CurrentConditionGaugeChartState
   Widget _buildHeader(BuildContext context, HomeState state) {
     return SizedBox(
       height: 48,
-      child:
-          _currentTab == 0
-              ? _buildRainHeader(context, state)
-              : _buildAirQualityHeader(context, state),
+      child: _currentTab == 0
+          ? _buildRainHeader(context, state)
+          : _buildAirQualityHeader(context, state),
     );
   }
 
@@ -176,7 +176,12 @@ class _CurrentConditionGaugeChartState
       padding: const EdgeInsets.symmetric(vertical: 4),
       onPressed: () {
         if (_currentTab == 0) {
-          context.pushRoute(const PrecipitationRoute());
+          context.pushRoute(
+            PrecipitationRoute(
+              hourlyCubit: context.read<HourlyCubit>(),
+              oneMinuteCast: context.read<HomeCubit>().state.oneMinuteCast,
+            ),
+          );
         } else if (_currentTab == 1) {
           // TODO
         }
@@ -195,10 +200,9 @@ class _CurrentConditionGaugeChartState
   Widget _buildFooter(BuildContext context) {
     return SizedBox(
       height: 48,
-      child:
-          _currentTab == 0
-              ? _buildRainFooter(context)
-              : _buildAirQualityFooter(context),
+      child: _currentTab == 0
+          ? _buildRainFooter(context)
+          : _buildAirQualityFooter(context),
     );
   }
 
@@ -246,16 +250,15 @@ class _CurrentConditionGaugeChartState
     return ClipRRect(
       borderRadius: BorderRadius.circular(50),
       child: Row(
-        children:
-            Aqi.values
-                .map(
-                  (aqi) => Container(
-                    width: _aqiBarWidth,
-                    height: _aqiBarHeight,
-                    color: aqi.color,
-                  ),
-                )
-                .toList(),
+        children: Aqi.values
+            .map(
+              (aqi) => Container(
+                width: _aqiBarWidth,
+                height: _aqiBarHeight,
+                color: aqi.color,
+              ),
+            )
+            .toList(),
       ),
     );
   }

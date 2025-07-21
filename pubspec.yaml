@@ -14,6 +14,7 @@ dependencies:
 
   # Location
   geolocator: ^14.0.1
+  geocoding: ^4.0.0
 
   # Notification
   flutter_local_notifications: ^19.2.1
@@ -60,6 +61,8 @@ dependencies:
   flutter_staggered_animations: ^1.1.1
   fl_chart: ^1.0.0
   flutter_sticky_header: ^0.8.0
+  scrollable_positioned_list: ^0.3.8
+  dotted_line: ^3.2.3
 
 dev_dependencies:
   flutter_test:
