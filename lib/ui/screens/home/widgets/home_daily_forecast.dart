@@ -6,7 +6,7 @@ import 'package:mimemo/core/extension/extensions.dart';
 import 'package:mimemo/models/entities/daily_forecast/daily_forecast.dart';
 import 'package:mimemo/ui/screens/bottom_nav/bottom_nav_cubit.dart';
 import 'package:mimemo/ui/screens/bottom_nav/bottom_nav_tab.dart';
-import 'package:mimemo/ui/screens/home/home_cubit.dart';
+import 'package:mimemo/ui/screens/daily/daily_cubit.dart';
 import 'package:mimemo/ui/widgets/widgets.dart';
 
 class HomeDailyForecast extends StatelessWidget {
@@ -20,20 +20,21 @@ class HomeDailyForecast extends StatelessWidget {
     context.read<BottomNavCubit>().switchTab(BottomNavTab.daily.index);
   }
 
-  void _onForecastItemTapped(BuildContext context, dynamic forecastDay, int index) {
-    // Handle individual forecast item tap
-    // Navigator.of(context).pushNamed('/forecast-detail', arguments: forecastDay);
+  void _onForecastItemTapped(BuildContext context, ForecastDay forecastDay, int index) {
+    context.read<DailyCubit>().changeSelectedDay(forecastDay);
+    context.read<BottomNavCubit>().switchTab(BottomNavTab.daily.index);
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<HomeCubit, HomeState>(
+    return BlocBuilder<DailyCubit, DailyState>(
       buildWhen:
           (previous, current) =>
-              previous.dailyForecastStatus != current.dailyForecastStatus ||
+              previous.loadStatus != current.loadStatus ||
               previous.dailyForecast != current.dailyForecast,
       builder: (context, state) {
-        final forecasts = state.dailyForecast?.dailyForecasts;
+        final forecasts =
+            state.dailyForecast?.dailyForecasts?.getRange(0, 14).whereType<ForecastDay>().toList();
 
         if (forecasts == null || forecasts.isEmpty) {
           return const SizedBox.shrink();

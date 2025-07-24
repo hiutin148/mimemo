@@ -16,14 +16,14 @@ class DailyScreen extends StatefulWidget {
   State<DailyScreen> createState() => _DailyViewState();
 }
 
-class _DailyViewState extends State<DailyScreen> with SingleTickerProviderStateMixin {
+class _DailyViewState extends State<DailyScreen>
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   final BottomSheetBarController _bottomSheetBarController = BottomSheetBarController();
 
   int _currentTab = 0;
 
   void _onForecastItemPressed(ForecastDay? day) {
     context.read<DailyCubit>().changeSelectedDay(day);
-    _bottomSheetBarController.expand();
   }
 
   void _onTabBarTap(int index) {
@@ -34,19 +34,26 @@ class _DailyViewState extends State<DailyScreen> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            return BottomSheetBar(
-              controller: _bottomSheetBarController,
-              header: _buildBottomSheetHeader(context),
-              bodyBottomPadding: _currentTab == 0 ? 48 : 0,
-              body: _buildBottomSheetBarBody(),
-              expandedSliver: const SelectedDayDetail(),
-            );
-          },
+    super.build(context);
+    return BlocListener<DailyCubit, DailyState>(
+      listenWhen: (previous, current) => previous.selectedDay != current.selectedDay,
+      listener: (BuildContext context, DailyState state) {
+        _bottomSheetBarController.expand();
+      },
+      child: DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          body: LayoutBuilder(
+            builder: (context, constraints) {
+              return BottomSheetBar(
+                controller: _bottomSheetBarController,
+                header: _buildBottomSheetHeader(context),
+                bodyBottomPadding: _currentTab == 0 ? 48 : 0,
+                body: _buildBottomSheetBarBody(),
+                expandedSliver: const SelectedDayDetail(),
+              );
+            },
+          ),
         ),
       ),
     );
@@ -59,9 +66,9 @@ class _DailyViewState extends State<DailyScreen> with SingleTickerProviderStateM
           children: [
             Expanded(
               child:
-              _currentTab == 0
-                  ? DailyForecastList(onItemTap: _onForecastItemPressed)
-                  : DailyForecastCalendar(onItemTap: _onForecastItemPressed),
+                  _currentTab == 0
+                      ? DailyForecastList(onItemTap: _onForecastItemPressed)
+                      : DailyForecastCalendar(onItemTap: _onForecastItemPressed),
             ),
           ],
         ),
@@ -130,4 +137,7 @@ class _DailyViewState extends State<DailyScreen> with SingleTickerProviderStateM
       selector: (state) => state.selectedDay,
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

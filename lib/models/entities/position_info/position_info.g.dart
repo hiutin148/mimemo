@@ -14,40 +14,34 @@ PositionInfo _$PositionInfoFromJson(Map<String, dynamic> json) => PositionInfo(
   localizedName: json['LocalizedName'] as String?,
   englishName: json['EnglishName'] as String?,
   primaryPostalCode: json['PrimaryPostalCode'] as String?,
-  region:
-      json['Region'] == null
-          ? null
-          : Region.fromJson(json['Region'] as Map<String, dynamic>),
-  country:
-      json['Country'] == null
-          ? null
-          : Country.fromJson(json['Country'] as Map<String, dynamic>),
-  administrativeArea:
-      json['AdministrativeArea'] == null
-          ? null
-          : AdministrativeArea.fromJson(
-            json['AdministrativeArea'] as Map<String, dynamic>,
-          ),
-  timeZone:
-      json['TimeZone'] == null
-          ? null
-          : TimeZone.fromJson(json['TimeZone'] as Map<String, dynamic>),
-  geoPosition:
-      json['GeoPosition'] == null
-          ? null
-          : GeoPosition.fromJson(json['GeoPosition'] as Map<String, dynamic>),
+  region: json['Region'] == null
+      ? null
+      : Region.fromJson(json['Region'] as Map<String, dynamic>),
+  country: json['Country'] == null
+      ? null
+      : Country.fromJson(json['Country'] as Map<String, dynamic>),
+  administrativeArea: json['AdministrativeArea'] == null
+      ? null
+      : AdministrativeArea.fromJson(
+          json['AdministrativeArea'] as Map<String, dynamic>,
+        ),
+  timeZone: json['TimeZone'] == null
+      ? null
+      : TimeZone.fromJson(json['TimeZone'] as Map<String, dynamic>),
+  geoPosition: json['GeoPosition'] == null
+      ? null
+      : GeoPosition.fromJson(json['GeoPosition'] as Map<String, dynamic>),
   isAlias: json['IsAlias'] as bool?,
-  parentCity:
-      json['ParentCity'] == null
-          ? null
-          : ParentCity.fromJson(json['ParentCity'] as Map<String, dynamic>),
+  parentCity: json['ParentCity'] == null
+      ? null
+      : ParentCity.fromJson(json['ParentCity'] as Map<String, dynamic>),
   supplementalAdminAreas: json['SupplementalAdminAreas'] as List<dynamic>?,
-  dataSets:
-      (json['DataSets'] as List<dynamic>?)?.map((e) => e as String).toList(),
-  details:
-      json['Details'] == null
-          ? null
-          : Details.fromJson(json['Details'] as Map<String, dynamic>),
+  dataSets: (json['DataSets'] as List<dynamic>?)
+      ?.map((e) => e as String)
+      .toList(),
+  details: json['Details'] == null
+      ? null
+      : Details.fromJson(json['Details'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$PositionInfoToJson(PositionInfo instance) =>
@@ -92,10 +86,9 @@ Details _$DetailsFromJson(Map<String, dynamic> json) => Details(
   videoCode: json['VideoCode'] as String?,
   locationStem: json['LocationStem'] as String?,
   partnerId: json['PartnerID'] as String?,
-  sources:
-      (json['Sources'] as List<dynamic>?)
-          ?.map((e) => Source.fromJson(e as Map<String, dynamic>))
-          .toList(),
+  sources: (json['Sources'] as List<dynamic>?)
+      ?.map((e) => Source.fromJson(e as Map<String, dynamic>))
+      .toList(),
   canonicalPostalCode: json['CanonicalPostalCode'] as String?,
   canonicalLocationKey: json['CanonicalLocationKey'] as String?,
 );
@@ -203,10 +196,9 @@ Map<String, dynamic> _$TimeZoneToJson(TimeZone instance) => <String, dynamic>{
 GeoPosition _$GeoPositionFromJson(Map<String, dynamic> json) => GeoPosition(
   latitude: (json['Latitude'] as num?)?.toDouble(),
   longitude: (json['Longitude'] as num?)?.toDouble(),
-  elevation:
-      json['Elevation'] == null
-          ? null
-          : Elevation.fromJson(json['Elevation'] as Map<String, dynamic>),
+  elevation: json['Elevation'] == null
+      ? null
+      : Elevation.fromJson(json['Elevation'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$GeoPositionToJson(GeoPosition instance) =>
@@ -217,14 +209,12 @@ Map<String, dynamic> _$GeoPositionToJson(GeoPosition instance) =>
     };
 
 Elevation _$ElevationFromJson(Map<String, dynamic> json) => Elevation(
-  metric:
-      json['Metric'] == null
-          ? null
-          : UnitValue.fromJson(json['Metric'] as Map<String, dynamic>),
-  imperial:
-      json['Imperial'] == null
-          ? null
-          : UnitValue.fromJson(json['Imperial'] as Map<String, dynamic>),
+  metric: json['Metric'] == null
+      ? null
+      : UnitValue.fromJson(json['Metric'] as Map<String, dynamic>),
+  imperial: json['Imperial'] == null
+      ? null
+      : UnitValue.fromJson(json['Imperial'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$ElevationToJson(Elevation instance) => <String, dynamic>{

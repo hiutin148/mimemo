@@ -46,6 +46,7 @@ class _FifteenDailyForecastItemState extends State<FifteenDailyForecastItem>
 
   @override
   Widget build(BuildContext context) {
+
     final dayMaxTemp = (widget.forecast.temperature?.maximum?.value ?? 0.0).roundToDouble();
     final dayMinTemp = (widget.forecast.temperature?.minimum?.value ?? 0.0).roundToDouble();
 
@@ -63,7 +64,7 @@ class _FifteenDailyForecastItemState extends State<FifteenDailyForecastItem>
         child: DecoratedBox(
           decoration: const BoxDecoration(border: Border(right: BorderSide(color: Colors.white24))),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(vertical: 16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -185,6 +186,7 @@ class _FifteenDailyForecastItemState extends State<FifteenDailyForecastItem>
       padding: const EdgeInsets.only(top: 8),
       decoration: const BoxDecoration(border: Border(top: BorderSide(color: Colors.white24))),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Icon(Icons.water_drop_outlined, color: Colors.white, size: 14),
           Text(

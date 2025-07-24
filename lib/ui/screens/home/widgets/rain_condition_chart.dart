@@ -5,7 +5,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mimemo/common/blocs/main/main_cubit.dart';
-import 'package:mimemo/core/extension/string_extension.dart';
+import 'package:mimemo/common/utils/utils.dart';
+import 'package:mimemo/models/entities/gradient_info/gradient_info.dart';
 import 'package:mimemo/models/entities/minute_color/minute_color.dart';
 import 'package:mimemo/ui/screens/home/home_cubit.dart';
 
@@ -223,7 +224,7 @@ class RainConditionPainter extends CustomPainter {
       return _gradientCache[progress]!;
     }
 
-    final gradientInfo = _getProgressiveDbzGradient(progress);
+    final gradientInfo = Utils.getProgressiveDbzGradient(progress, colors);
     _gradientCache[progress] = gradientInfo;
     return gradientInfo;
   }
@@ -245,69 +246,6 @@ class RainConditionPainter extends CustomPainter {
 
       textPainter.paint(canvas, labelOffset);
     }
-  }
-
-  GradientInfo _getProgressiveDbzGradient(double progress) {
-    if (colors.isEmpty) {
-      return const GradientInfo([Color(0xFFFFFFFF)], [1.0]);
-    }
-
-    if (progress <= 0) {
-      return const GradientInfo([Colors.transparent, Colors.transparent], [0.0, 1.0]);
-    }
-
-    final minDbz = colors.first.startDbz ?? 0.0;
-    final maxDbz = colors.last.endDbz ?? 0.0;
-    final dbzRange = maxDbz - minDbz;
-
-    if (dbzRange <= 0) {
-      final color = colors.first.hex?.hexToColor ?? Colors.white;
-      return GradientInfo([color, color], [0.0, 1.0]);
-    }
-
-    final maxDbzProgress = minDbz + progress * dbzRange;
-    final gradientColors = <Color>[];
-    final gradientStops = <double>[];
-
-    // Optimize the gradient calculation
-    for (var i = 0; i < colors.length; i++) {
-      final currentColor = colors[i];
-      final startDbz = currentColor.startDbz ?? 0.0;
-      final endDbz = currentColor.endDbz ?? 0.0;
-      final color = currentColor.hex?.hexToColor ?? Colors.white;
-
-      if (startDbz > maxDbzProgress) break;
-
-      // Add start color and stop
-      final startStop = ((startDbz - minDbz) / dbzRange).clamp(0.0, 1.0);
-      gradientColors.add(color);
-      gradientStops.add(startStop);
-
-      if (endDbz > maxDbzProgress) {
-        // Add final color at the exact progress point
-        gradientColors.add(color);
-        gradientStops.add(((maxDbzProgress - minDbz) / dbzRange).clamp(0.0, 1.0));
-        break;
-      } else {
-        // Add end color if it doesn't overlap with next segment
-        final endStop = ((endDbz - minDbz) / dbzRange).clamp(0.0, 1.0);
-        final isLast = i == colors.length - 1;
-        final nextStart = isLast ? null : colors[i + 1].startDbz;
-
-        if (isLast || endDbz != nextStart) {
-          gradientColors.add(color);
-          gradientStops.add(endStop);
-        }
-      }
-    }
-
-    // Ensure we have at least 2 colors for gradient
-    if (gradientColors.length == 1) {
-      gradientColors.add(gradientColors.first);
-      gradientStops.add(1);
-    }
-
-    return GradientInfo(gradientColors, gradientStops);
   }
 
   @override
@@ -343,11 +281,4 @@ class _SegmentInfo {
 
   final Offset startPoint;
   final Offset endPoint;
-}
-
-class GradientInfo {
-  const GradientInfo(this.colors, this.stops);
-
-  final List<Color> colors;
-  final List<double> stops;
 }

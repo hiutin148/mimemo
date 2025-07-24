@@ -6,7 +6,7 @@ part of 'api_client.dart';
 // RetrofitGenerator
 // **************************************************************************
 
-// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations
+// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations,unused_element_parameter
 
 class _ApiClient implements ApiClient {
   _ApiClient(this._dio, {this.baseUrl, this.errorLogger});
@@ -124,12 +124,9 @@ class _ApiClient implements ApiClient {
     final _result = await _dio.fetch<List<dynamic>>(_options);
     late List<MinuteColor> _value;
     try {
-      _value =
-          _result.data!
-              .map(
-                (dynamic i) => MinuteColor.fromJson(i as Map<String, dynamic>),
-              )
-              .toList();
+      _value = _result.data!
+          .map((dynamic i) => MinuteColor.fromJson(i as Map<String, dynamic>))
+          .toList();
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
@@ -158,13 +155,11 @@ class _ApiClient implements ApiClient {
     final _result = await _dio.fetch<List<dynamic>>(_options);
     late List<HourlyForecast> _value;
     try {
-      _value =
-          _result.data!
-              .map(
-                (dynamic i) =>
-                    HourlyForecast.fromJson(i as Map<String, dynamic>),
-              )
-              .toList();
+      _value = _result.data!
+          .map(
+            (dynamic i) => HourlyForecast.fromJson(i as Map<String, dynamic>),
+          )
+          .toList();
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
@@ -193,13 +188,11 @@ class _ApiClient implements ApiClient {
     final _result = await _dio.fetch<List<dynamic>>(_options);
     late List<HourlyForecast> _value;
     try {
-      _value =
-          _result.data!
-              .map(
-                (dynamic i) =>
-                    HourlyForecast.fromJson(i as Map<String, dynamic>),
-              )
-              .toList();
+      _value = _result.data!
+          .map(
+            (dynamic i) => HourlyForecast.fromJson(i as Map<String, dynamic>),
+          )
+          .toList();
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
@@ -341,13 +334,12 @@ class _ApiClient implements ApiClient {
     final _result = await _dio.fetch<List<dynamic>>(_options);
     late List<CurrentConditions> _value;
     try {
-      _value =
-          _result.data!
-              .map(
-                (dynamic i) =>
-                    CurrentConditions.fromJson(i as Map<String, dynamic>),
-              )
-              .toList();
+      _value = _result.data!
+          .map(
+            (dynamic i) =>
+                CurrentConditions.fromJson(i as Map<String, dynamic>),
+          )
+          .toList();
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;

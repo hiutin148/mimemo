@@ -26,6 +26,8 @@ class _DailyForecastListState extends State<DailyForecastList> {
 
   late final String _nextMonth;
 
+  static const double _itemWidth = 72;
+
   @override
   void initState() {
     super.initState();
@@ -74,7 +76,7 @@ class _DailyForecastListState extends State<DailyForecastList> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<DailyCubit, DailyState>(
+    return BlocConsumer<DailyCubit, DailyState>(
       builder: (context, state) {
         if (state.loadStatus == LoadStatus.loading) {
           return const Center(child: CircularProgressIndicator());
@@ -112,12 +114,15 @@ class _DailyForecastListState extends State<DailyForecastList> {
                   itemBuilder: (context, index) {
                     final date = forecasts[index].date?.toDefaultDate;
                     final isFirstNextMonth = date?.month != DateTime.now().month && date?.day == 1;
-                    return FifteenDailyForecastItem(
-                      key: isFirstNextMonth ? _firstNextMonthKey : null,
-                      forecast: forecasts[index],
-                      maxTem: max,
-                      minTem: min,
-                      onDayPressed: widget.onItemTap,
+                    return SizedBox(
+                      width: _itemWidth,
+                      child: FifteenDailyForecastItem(
+                        key: isFirstNextMonth ? _firstNextMonthKey : null,
+                        forecast: forecasts[index],
+                        maxTem: max,
+                        minTem: min,
+                        onDayPressed: widget.onItemTap,
+                      ),
                     );
                   },
                 ),
@@ -125,6 +130,19 @@ class _DailyForecastListState extends State<DailyForecastList> {
             ],
           );
         }
+      },
+      listenWhen: (previous, current) => previous.selectedDay != current.selectedDay,
+      listener: (BuildContext context, DailyState state) {
+        final selectedIndex =
+            state.dailyForecast?.dailyForecasts
+                ?.indexWhere((element) => element.date == state.selectedDay?.date)
+                .toDouble() ??
+            0.0;
+        _scrollController.animateTo(
+          selectedIndex * _itemWidth - context.width / 2 + _itemWidth / 2,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeIn,
+        );
       },
     );
   }
