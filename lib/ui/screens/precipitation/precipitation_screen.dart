@@ -8,6 +8,7 @@ import 'package:mimemo/common/blocs/main/main_cubit.dart';
 import 'package:mimemo/common/utils/utils.dart';
 import 'package:mimemo/core/const/consts.dart';
 import 'package:mimemo/core/extension/extensions.dart';
+import 'package:mimemo/models/entities/hourly_forecast/hourly_forecast.dart';
 import 'package:mimemo/models/entities/minute_color/minute_color.dart';
 import 'package:mimemo/models/entities/one_minute_cast/one_minute_cast.dart';
 import 'package:mimemo/ui/screens/hourly/hourly_cubit.dart';
@@ -96,104 +97,114 @@ class _PrecipitationViewState extends State<PrecipitationView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('MinuteCast')),
-      body: BlocBuilder<PrecipitationCubit, PrecipitationState>(
-        builder: _buildBody,
-      ),
-    );
-  }
-
-  Widget _buildBody(BuildContext context, PrecipitationState state) {
-    final intervals = state.oneMinuteCast?.intervals ?? [];
-    final selectedHour = state.selectedHour;
-    final temp = selectedHour?.temperature?.value?.toStringAsFixed(0) ?? '';
-    final realFeel = selectedHour?.realFeelTemperature?.value?.toStringAsFixed(0) ?? '';
-    final unit = selectedHour?.temperature?.unit ?? '';
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: LayoutBuilder(
-        builder: (context, constraints) => Column(
-          children: [
-            const Text('Next 4 hours'),
-            Text(state.oneMinuteCast?.summary?.longPhrase ?? ''),
-            const SizedBox(height: 24),
-            Expanded(
-              child: Column(
-                children: [
-                  _buildHeaderRow(state, temp, realFeel, unit),
-                  SizedBox(
-                    height: constraints.maxHeight * 0.45,
-                    child: _buildChartSection(state, intervals),
-                  ),
-                  _buildMinuteColors(),
-                  const Gap(12),
-                  _buildDetailLocation(),
-                  const SizedBox(height: kBottomNavigationBarHeight),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeaderRow(PrecipitationState state, String temp, String realFeel, String unit) {
-    final selectedMinute = state.selectedMinute;
-    return Row(
-      children: [
-        const Gap(48),
-        AppIcon(icon: Utils.getIconAsset(selectedMinute?.iconCode ?? 0)),
-        const Gap(8),
-        Text(selectedMinute?.shortPhrase ?? ''),
-        const Spacer(),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('$temp °$unit', style: context.textTheme.bodyLarge),
-            Text('RealFeel $realFeel°', style: context.textTheme.labelSmall),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildChartSection(PrecipitationState state, List<MinuteInterval> intervals) {
-    return Stack(
-      children: [
-        Container(
-          margin: const EdgeInsets.only(top: 24),
-          decoration: const BoxDecoration(
-            border: Border(
-              bottom: BorderSide(color: Colors.white, width: 0.5),
-              top: BorderSide(color: AppColors.whiteBorderColor, width: 0.5),
-            ),
-          ),
-          child: Row(
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: LayoutBuilder(
+          builder: (context, constraints) => Column(
             children: [
-              const SizedBox(
-                width: 60,
+              const Text('Next 4 hours'),
+              BlocSelector<PrecipitationCubit, PrecipitationState, String>(
+                selector: (state) => state.oneMinuteCast?.summary?.longPhrase ?? '',
+                builder: (context, longPhrase) => Text(longPhrase),
+              ),
+              const SizedBox(height: 24),
+              Expanded(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Spacer(),
-                    Center(child: Text('Heavy')),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [Text('Light'), Gap(28)],
-                      ),
+                    _buildHeaderRow(),
+                    SizedBox(
+                      height: constraints.maxHeight * 0.45,
+                      child: _buildChartSection(),
                     ),
+                    _buildMinuteColors(),
+                    const Gap(12),
+                    _buildDetailLocation(),
+                    const SizedBox(height: kBottomNavigationBarHeight),
                   ],
                 ),
               ),
-              Expanded(child: _buildScrollableChart(intervals)),
             ],
           ),
         ),
-        _buildGradientOverlay(),
-        _buildCurrentTimeIndicator(state),
-      ],
+      ),
+    );
+  }
+
+  Widget _buildHeaderRow() {
+    return BlocSelector<PrecipitationCubit, PrecipitationState, ({
+    MinuteInterval? selectedMinute,
+    HourlyForecast? selectedHour,
+    })>(
+      selector: (state) => (
+      selectedMinute: state.selectedMinute,
+      selectedHour: state.selectedHour,
+      ),
+      builder: (context, data) {
+        final temp = data.selectedHour?.temperature?.value?.toStringAsFixed(0) ?? '';
+        final realFeel = data.selectedHour?.realFeelTemperature?.value?.toStringAsFixed(0) ?? '';
+        final unit = data.selectedHour?.temperature?.unit ?? '';
+
+        return Row(
+          children: [
+            const Gap(48),
+            AppIcon(icon: Utils.getIconAsset(data.selectedMinute?.iconCode ?? 0)),
+            const Gap(8),
+            Text(data.selectedMinute?.shortPhrase ?? ''),
+            const Spacer(),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('$temp °$unit', style: context.textTheme.bodyLarge),
+                Text('RealFeel $realFeel°', style: context.textTheme.labelSmall),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildChartSection() {
+    return BlocSelector<PrecipitationCubit, PrecipitationState, List<MinuteInterval>>(
+      selector: (state) => state.oneMinuteCast?.intervals ?? [],
+      builder: (context, intervals) {
+        return Stack(
+          children: [
+            Container(
+              margin: const EdgeInsets.only(top: 24),
+              decoration: const BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(color: Colors.white, width: 0.5),
+                  top: BorderSide(color: AppColors.whiteBorderColor, width: 0.5),
+                ),
+              ),
+              child: Row(
+                children: [
+                  const SizedBox(
+                    width: 60,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Spacer(),
+                        Center(child: Text('Heavy')),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [Text('Light'), Gap(28)],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(child: _buildScrollableChart(intervals)),
+                ],
+              ),
+            ),
+            _buildGradientOverlay(),
+            _buildCurrentTimeIndicator(),
+          ],
+        );
+      },
     );
   }
 
@@ -315,9 +326,9 @@ class _PrecipitationViewState extends State<PrecipitationView> {
     final itemRatio = (item.dbz ?? 0) / maxDbz;
     final gradientInfo = Utils.getProgressiveDbzGradient(itemRatio, _minuteColors);
 
-    return BlocBuilder<PrecipitationCubit, PrecipitationState>(
-      builder: (context, state) {
-        final intervalItem = state.oneMinuteCast?.intervals?[index];
+    return BlocSelector<PrecipitationCubit, PrecipitationState, MinuteInterval?>(
+      selector: (state) => state.oneMinuteCast?.intervals?.elementAtOrNull(index),
+      builder: (context, intervalItem) {
         final itemTime = intervalItem?.startDateTime?.reformatDateString(
           newFormat: DateFormatPattern.time,
         );
@@ -389,31 +400,34 @@ class _PrecipitationViewState extends State<PrecipitationView> {
     );
   }
 
-  Widget _buildCurrentTimeIndicator(PrecipitationState state) {
-    final timeText = state.selectedMinute?.startDateTime?.reformatDateString(
-      newFormat: DateFormatPattern.time,
-    ) ?? '';
+  Widget _buildCurrentTimeIndicator() {
+    return BlocSelector<PrecipitationCubit, PrecipitationState, String>(
+      selector: (state) => state.selectedMinute?.startDateTime?.reformatDateString(
+        newFormat: DateFormatPattern.time,
+      ) ?? '',
+      builder: (context, timeText) {
+        if (timeText.isEmpty) return const SizedBox.shrink();
 
-    if (timeText.isEmpty) return const SizedBox.shrink();
-
-    return Positioned.fill(
-      left: 60,
-      child: IgnorePointer(
-        child: Container(
-          padding: const EdgeInsets.only(top: 28, left: 4),
-          decoration: const BoxDecoration(
-            border: Border(
-              left: BorderSide(color: Colors.white, width: 0.5),
+        return Positioned.fill(
+          left: 60,
+          child: IgnorePointer(
+            child: Container(
+              padding: const EdgeInsets.only(top: 28, left: 4),
+              decoration: const BoxDecoration(
+                border: Border(
+                  left: BorderSide(color: Colors.white, width: 0.5),
+                ),
+              ),
+              child: Text(
+                timeText,
+                style: context.textTheme.bodyMedium?.copyWith(
+                  color: AppColors.whiteBorderColor,
+                ),
+              ),
             ),
           ),
-          child: Text(
-            timeText,
-            style: context.textTheme.bodyMedium?.copyWith(
-              color: AppColors.whiteBorderColor,
-            ),
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
