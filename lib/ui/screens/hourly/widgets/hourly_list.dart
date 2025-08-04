@@ -54,7 +54,7 @@ class HourlyList extends StatelessWidget {
   ) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.primary,
+        color: AppColors.surface,
         border: state.isPinned
             ? const Border(
                 bottom: BorderSide(

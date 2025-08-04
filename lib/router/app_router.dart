@@ -9,5 +9,11 @@ class AppRouter extends RootStackRouter {
     AutoRoute(page: OnboardingRoute.page),
     AutoRoute(page: BottomNavRoute.page),
     AutoRoute(page: PrecipitationRoute.page),
+    CustomRoute<dynamic>(
+      transitionsBuilder: TransitionsBuilders.slideBottom, // Example pre-built transition
+      duration: const Duration(milliseconds: 350),
+      reverseDuration: const Duration(milliseconds: 350),
+      page: SearchLocationRoute.page,
+    ),
   ];
 }

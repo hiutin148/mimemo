@@ -86,13 +86,13 @@ class _SelectedDayDetailState extends State<SelectedDayDetail> with SingleTicker
   Widget _buildTabBar() {
     return TabBar(
       onTap: _onTabBarTap,
-      dividerColor: AppColors.primary,
-      indicatorColor: AppColors.primary,
-      labelColor: AppColors.primary,
+      dividerColor: AppColors.surface,
+      indicatorColor: AppColors.surface,
+      labelColor: AppColors.surface,
       isScrollable: true,
       labelPadding: const EdgeInsets.symmetric(horizontal: 16),
       tabAlignment: TabAlignment.center,
-      overlayColor: WidgetStatePropertyAll(AppColors.primary.withValues(alpha: 0.2)),
+      overlayColor: WidgetStatePropertyAll(AppColors.surface.withValues(alpha: 0.2)),
       controller: _tabController,
       dividerHeight: 0.5,
       tabs: const [

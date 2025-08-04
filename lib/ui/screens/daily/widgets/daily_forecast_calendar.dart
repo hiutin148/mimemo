@@ -211,7 +211,7 @@ class _DailyForecastCalendarState extends State<DailyForecastCalendar> {
                                               ) ??
                                               '',
                                           style: context.textTheme.bodySmall?.w600.copyWith(
-                                            color: isSelected ? AppColors.primary : Colors.white,
+                                            color: isSelected ? AppColors.surface : Colors.white,
                                           ),
                                         ),
                                       );

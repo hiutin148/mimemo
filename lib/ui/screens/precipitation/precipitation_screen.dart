@@ -58,8 +58,8 @@ class _PrecipitationViewState extends State<PrecipitationView> {
   List<Placemark> placemarks = [];
 
   late final List<MinuteColor> _minuteColors;
-  static const double _itemWidth = 4.0;
-  static const double _separateSpace = 2.0;
+  static const double _itemWidth = 4;
+  static const double _separateSpace = 2;
 
   @override
   void initState() {
@@ -87,8 +87,8 @@ class _PrecipitationViewState extends State<PrecipitationView> {
       if (mounted) {
         setState(() => placemarks = result);
       }
-    } catch (e) {
-      // Handle error silently or log it
+    } on Exception catch (e) {
+      logger.e(e);
     }
   }
 
@@ -207,8 +207,8 @@ class _PrecipitationViewState extends State<PrecipitationView> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              AppColors.primary,
-              AppColors.primary.withValues(alpha: 0.1),
+              AppColors.surface,
+              AppColors.surface.withValues(alpha: 0.1),
             ],
             stops: const [0.25, 1],
           ),

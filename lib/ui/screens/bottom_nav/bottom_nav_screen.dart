@@ -1,13 +1,18 @@
-import 'package:auto_route/annotations.dart';
+import 'dart:async';
+
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:mimemo/common/blocs/main/main_cubit.dart';
+import 'package:mimemo/common/utils/utils.dart';
 import 'package:mimemo/core/const/consts.dart';
 import 'package:mimemo/locator.dart';
+import 'package:mimemo/main.dart';
 import 'package:mimemo/models/entities/position_info/position_info.dart';
 import 'package:mimemo/repositories/current_condition_repository.dart';
 import 'package:mimemo/repositories/forecast_repository.dart';
+import 'package:mimemo/router/app_router.gr.dart';
 import 'package:mimemo/ui/screens/bottom_nav/bottom_nav_cubit.dart';
 import 'package:mimemo/ui/screens/daily/daily_cubit.dart';
 import 'package:mimemo/ui/screens/daily/daily_screen.dart';
@@ -18,35 +23,92 @@ import 'package:mimemo/ui/screens/hourly/hourly_screen.dart';
 import 'package:mimemo/ui/screens/radar/radar_screen.dart';
 
 @RoutePage()
-class BottomNavScreen extends StatelessWidget {
+class BottomNavScreen extends StatefulWidget {
   const BottomNavScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final dailyCubit = DailyCubit(
+  State<BottomNavScreen> createState() => _BottomNavScreenState();
+}
+
+class _BottomNavScreenState extends State<BottomNavScreen> with RouteAware, WidgetsBindingObserver {
+  late final DailyCubit _dailyCubit;
+  late final MainCubit _mainCubit;
+  late final HomeCubit _homeCubit;
+  late final HourlyCubit _hourlyCubit;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _mainCubit = context.read<MainCubit>();
+    _dailyCubit = DailyCubit(
       forecastRepository: locator<ForecastRepository>(),
-      mainCubit: context.read<MainCubit>(),
-    )..init();
+      mainCubit: _mainCubit,
+    );
+    _homeCubit = HomeCubit(
+      forecastRepository: locator<ForecastRepository>(),
+      mainCubit: _mainCubit,
+      currentConditionRepository: locator<CurrentConditionRepository>(),
+    );
+    _hourlyCubit = HourlyCubit(
+      dailyCubit: _dailyCubit,
+      forecastRepository: locator<ForecastRepository>(),
+      mainCubit: _mainCubit,
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route != null) {
+      routeObserver.subscribe(this, route);
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    refreshData();
+    super.didPopNext();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      refreshData();
+    }
+  }
+
+  Future<void> refreshData() async {
+    await OverlayLoading.runWithLoading(
+      context,
+      () async {
+        await _mainCubit.init();
+      },
+    );
+    await Future.wait([
+      _homeCubit.init(),
+      _dailyCubit.init(),
+      _hourlyCubit.init()
+    ]);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => BottomNavCubit()),
-        BlocProvider(
-          create: (context) => HomeCubit(
-            forecastRepository: locator<ForecastRepository>(),
-            mainCubit: context.read<MainCubit>(),
-            currentConditionRepository: locator<CurrentConditionRepository>(),
-          )..init(),
-        ),
-        BlocProvider(
-          create: (context) => dailyCubit,
-        ),
-        BlocProvider(
-          create: (context) => HourlyCubit(
-            dailyCubit: dailyCubit,
-            forecastRepository: locator<ForecastRepository>(),
-            mainCubit: context.read<MainCubit>(),
-          )..init(),
-        ),
+        BlocProvider(create: (_) => BottomNavCubit()),
+        BlocProvider(create: (_) => _homeCubit..init()),
+        BlocProvider(create: (_) => _dailyCubit..init()),
+        BlocProvider(create: (_) => _hourlyCubit..init()),
       ],
       child: const BottomNavView(),
     );
@@ -61,36 +123,68 @@ class BottomNavView extends StatefulWidget {
 }
 
 class _BottomNavViewState extends State<BottomNavView> {
+  late final List<Widget> _screens;
+
   @override
   void initState() {
     super.initState();
+    _screens = const [
+      HomeScreen(),
+      HourlyScreen(),
+      DailyScreen(),
+      RadarPage(),
+      MorePage(),
+    ];
   }
 
   @override
   Widget build(BuildContext context) {
-    final screens = <Widget>[
-      const HomeScreen(),
-      const HourlyScreen(),
-      const DailyScreen(),
-      const RadarPage(),
-      MorePage(),
-    ];
     return BlocBuilder<BottomNavCubit, int>(
       builder: (context, state) {
         return BlocSelector<MainCubit, MainState, PositionInfo?>(
+          selector: (state) => state.positionInfo,
           builder: (context, positionInfo) {
             final position = positionInfo?.localizedName ?? '';
             final city = positionInfo?.parentCity?.localizedName != null
-                ? ', ${positionInfo?.parentCity?.localizedName!}'
+                ? ', ${positionInfo!.parentCity!.localizedName}'
                 : '';
 
             return Scaffold(
-              appBar: _buildAppBar(position, city),
-              drawer: Container(),
+              appBar: AppBar(
+                backgroundColor: AppColors.surface,
+                iconTheme: const IconThemeData(color: Colors.white),
+                centerTitle: true,
+                bottom: PreferredSize(
+                  preferredSize: const Size.fromHeight(0.5),
+                  child: Container(color: AppColors.whiteBorderColor, height: 0.5),
+                ),
+                title: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: () {
+                    context.pushRoute(SearchLocationRoute(homeCubit: context.read<HomeCubit>()));
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.location_on, color: Colors.white, size: 20),
+                      const Gap(4),
+                      Text(
+                        '$position$city',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              drawer: const SizedBox.shrink(),
               body: PageView(
                 physics: const NeverScrollableScrollPhysics(),
                 controller: context.read<BottomNavCubit>().pageController,
-                children: screens,
+                children: _screens,
               ),
               bottomNavigationBar: Container(
                 decoration: BoxDecoration(
@@ -105,351 +199,30 @@ class _BottomNavViewState extends State<BottomNavView> {
                 ),
                 child: BottomNavigationBar(
                   currentIndex: state,
-                  onTap: (index) =>
-                      context.read<BottomNavCubit>().switchTab(index),
+                  onTap: (index) => context.read<BottomNavCubit>().switchTab(index),
                   type: BottomNavigationBarType.fixed,
-                  selectedItemColor: const Color(0xFF4A90E2),
-                  unselectedItemColor: Colors.grey,
-                  backgroundColor: Colors.white,
                   elevation: 0,
                   items: const [
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.home),
-                      label: 'Current',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.schedule),
-                      label: 'Hourly',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.calendar_today),
-                      label: 'Daily',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.radar),
-                      label: 'Radar',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.more_horiz),
-                      label: 'More',
-                    ),
+                    BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Current'),
+                    BottomNavigationBarItem(icon: Icon(Icons.schedule), label: 'Hourly'),
+                    BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Daily'),
+                    BottomNavigationBarItem(icon: Icon(Icons.radar), label: 'Radar'),
+                    BottomNavigationBarItem(icon: Icon(Icons.more_horiz), label: 'More'),
                   ],
                 ),
               ),
             );
           },
-          selector: (state) => state.positionInfo,
         );
       },
     );
   }
-
-  AppBar _buildAppBar(String position, String city) {
-    return AppBar(
-      backgroundColor: AppColors.primary,
-      iconTheme: const IconThemeData(color: Colors.white),
-      centerTitle: true,
-      bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(0.5),
-        child: Container(color: AppColors.whiteBorderColor, height: 0.5),
-      ),
-      title: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.location_on, color: Colors.white, size: 20),
-          const Gap(4),
-          Text(
-            '$position$city',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
-// Mock API Data Structure
-class WeatherData {
-  static final Map<String, dynamic> currentConditions = {
-    'WeatherText': 'Partly cloudy',
-    'WeatherIcon': 3,
-    'HasPrecipitation': false,
-    'Temperature': {
-      'Metric': {'Value': 22.2, 'Unit': 'C'},
-      'Imperial': {'Value': 72.0, 'Unit': 'F'},
-    },
-    'RealFeelTemperature': {
-      'Imperial': {'Value': 75.0, 'Unit': 'F'},
-    },
-    'RelativeHumidity': 65,
-    'Wind': {
-      'Speed': {
-        'Imperial': {'Value': 8.1, 'Unit': 'mi/h'},
-      },
-    },
-    'UVIndex': 6,
-    'UVIndexText': 'High',
-    'Visibility': {
-      'Imperial': {'Value': 10.0, 'Unit': 'mi'},
-    },
-    'Pressure': {
-      'Imperial': {'Value': 30.12, 'Unit': 'inHg'},
-    },
-    'CloudCover': 45,
-  };
-
-  static final List<Map<String, dynamic>> hourlyForecast = [
-    {
-      'DateTime': '2024-01-15T12:00:00',
-      'WeatherIcon': 3,
-      'IconPhrase': 'Partly sunny',
-      'Temperature': {'Value': 72, 'Unit': 'F'},
-      'PrecipitationProbability': 15,
-    },
-    {
-      'DateTime': '2024-01-15T13:00:00',
-      'WeatherIcon': 1,
-      'IconPhrase': 'Sunny',
-      'Temperature': {'Value': 74, 'Unit': 'F'},
-      'PrecipitationProbability': 5,
-    },
-    {
-      'DateTime': '2024-01-15T14:00:00',
-      'WeatherIcon': 1,
-      'IconPhrase': 'Sunny',
-      'Temperature': {'Value': 76, 'Unit': 'F'},
-      'PrecipitationProbability': 0,
-    },
-    {
-      'DateTime': '2024-01-15T15:00:00',
-      'WeatherIcon': 3,
-      'IconPhrase': 'Partly sunny',
-      'Temperature': {'Value': 75, 'Unit': 'F'},
-      'PrecipitationProbability': 10,
-    },
-    {
-      'DateTime': '2024-01-15T16:00:00',
-      'WeatherIcon': 7,
-      'IconPhrase': 'Cloudy',
-      'Temperature': {'Value': 73, 'Unit': 'F'},
-      'PrecipitationProbability': 25,
-    },
-    {
-      'DateTime': '2024-01-15T17:00:00',
-      'WeatherIcon': 12,
-      'IconPhrase': 'Showers',
-      'Temperature': {'Value': 71, 'Unit': 'F'},
-      'PrecipitationProbability': 60,
-    },
-    {
-      'DateTime': '2024-01-15T18:00:00',
-      'WeatherIcon': 18,
-      'IconPhrase': 'Rain',
-      'Temperature': {'Value': 69, 'Unit': 'F'},
-      'PrecipitationProbability': 80,
-    },
-    {
-      'DateTime': '2024-01-15T19:00:00',
-      'WeatherIcon': 12,
-      'IconPhrase': 'Showers',
-      'Temperature': {'Value': 67, 'Unit': 'F'},
-      'PrecipitationProbability': 55,
-    },
-    {
-      'DateTime': '2024-01-15T19:00:00',
-      'WeatherIcon': 12,
-      'IconPhrase': 'Showers',
-      'Temperature': {'Value': 67, 'Unit': 'F'},
-      'PrecipitationProbability': 55,
-    },
-    {
-      'DateTime': '2024-01-15T19:00:00',
-      'WeatherIcon': 12,
-      'IconPhrase': 'Showers',
-      'Temperature': {'Value': 67, 'Unit': 'F'},
-      'PrecipitationProbability': 55,
-    },
-    {
-      'DateTime': '2024-01-15T19:00:00',
-      'WeatherIcon': 12,
-      'IconPhrase': 'Showers',
-      'Temperature': {'Value': 67, 'Unit': 'F'},
-      'PrecipitationProbability': 55,
-    },
-    {
-      'DateTime': '2024-01-15T19:00:00',
-      'WeatherIcon': 12,
-      'IconPhrase': 'Showers',
-      'Temperature': {'Value': 67, 'Unit': 'F'},
-      'PrecipitationProbability': 55,
-    },
-    {
-      'DateTime': '2024-01-15T19:00:00',
-      'WeatherIcon': 12,
-      'IconPhrase': 'Showers',
-      'Temperature': {'Value': 67, 'Unit': 'F'},
-      'PrecipitationProbability': 55,
-    },
-    {
-      'DateTime': '2024-01-15T19:00:00',
-      'WeatherIcon': 12,
-      'IconPhrase': 'Showers',
-      'Temperature': {'Value': 67, 'Unit': 'F'},
-      'PrecipitationProbability': 55,
-    },
-    {
-      'DateTime': '2024-01-15T19:00:00',
-      'WeatherIcon': 12,
-      'IconPhrase': 'Showers',
-      'Temperature': {'Value': 67, 'Unit': 'F'},
-      'PrecipitationProbability': 55,
-    },
-    {
-      'DateTime': '2024-01-15T19:00:00',
-      'WeatherIcon': 12,
-      'IconPhrase': 'Showers',
-      'Temperature': {'Value': 67, 'Unit': 'F'},
-      'PrecipitationProbability': 55,
-    },
-    {
-      'DateTime': '2024-01-15T19:00:00',
-      'WeatherIcon': 12,
-      'IconPhrase': 'Showers',
-      'Temperature': {'Value': 67, 'Unit': 'F'},
-      'PrecipitationProbability': 55,
-    },
-    {
-      'DateTime': '2024-01-15T19:00:00',
-      'WeatherIcon': 12,
-      'IconPhrase': 'Showers',
-      'Temperature': {'Value': 67, 'Unit': 'F'},
-      'PrecipitationProbability': 55,
-    },
-  ];
-
-  static final List<Map<String, dynamic>> dailyForecast = [
-    {
-      'Date': '2024-01-15',
-      'Day': {
-        'Icon': 3,
-        'IconPhrase': 'Partly sunny',
-        'PrecipitationProbability': 25,
-      },
-      'Night': {'Icon': 35, 'IconPhrase': 'Partly cloudy'},
-      'Temperature': {
-        'Maximum': {'Value': 76},
-        'Minimum': {'Value': 62},
-      },
-    },
-    {
-      'Date': '2024-01-16',
-      'Day': {'Icon': 1, 'IconPhrase': 'Sunny', 'PrecipitationProbability': 5},
-      'Night': {'Icon': 33, 'IconPhrase': 'Clear'},
-      'Temperature': {
-        'Maximum': {'Value': 78},
-        'Minimum': {'Value': 64},
-      },
-    },
-    {
-      'Date': '2024-01-17',
-      'Day': {
-        'Icon': 12,
-        'IconPhrase': 'Showers',
-        'PrecipitationProbability': 75,
-      },
-      'Night': {'Icon': 12, 'IconPhrase': 'Showers'},
-      'Temperature': {
-        'Maximum': {'Value': 74},
-        'Minimum': {'Value': 59},
-      },
-    },
-    {
-      'Date': '2024-01-18',
-      'Day': {
-        'Icon': 15,
-        'IconPhrase': 'Thunderstorms',
-        'PrecipitationProbability': 85,
-      },
-      'Night': {'Icon': 15, 'IconPhrase': 'Thunderstorms'},
-      'Temperature': {
-        'Maximum': {'Value': 71},
-        'Minimum': {'Value': 56},
-      },
-    },
-    {
-      'Date': '2024-01-19',
-      'Day': {
-        'Icon': 7,
-        'IconPhrase': 'Cloudy',
-        'PrecipitationProbability': 15,
-      },
-      'Night': {'Icon': 38, 'IconPhrase': 'Mostly cloudy'},
-      'Temperature': {
-        'Maximum': {'Value': 69},
-        'Minimum': {'Value': 54},
-      },
-    },
-    {
-      'Date': '2024-01-20',
-      'Day': {
-        'Icon': 3,
-        'IconPhrase': 'Partly sunny',
-        'PrecipitationProbability': 10,
-      },
-      'Night': {'Icon': 35, 'IconPhrase': 'Partly cloudy'},
-      'Temperature': {
-        'Maximum': {'Value': 73},
-        'Minimum': {'Value': 58},
-      },
-    },
-    {
-      'Date': '2024-01-21',
-      'Day': {'Icon': 1, 'IconPhrase': 'Sunny', 'PrecipitationProbability': 0},
-      'Night': {'Icon': 33, 'IconPhrase': 'Clear'},
-      'Temperature': {
-        'Maximum': {'Value': 77},
-        'Minimum': {'Value': 61},
-      },
-    },
-  ];
-
-  static String getWeatherIcon(int iconNumber) {
-    final icons = <int, String>{
-      1: '☀️',
-      3: '⛅',
-      7: '☁️',
-      12: '🌧️',
-      15: '⛈️',
-      18: '🌧️',
-      33: '🌙',
-      35: '🌙',
-      38: '☁️',
-    };
-    return icons[iconNumber] ?? '☀️';
-  }
-
-  static List<String> getDayNames() {
-    return [
-      'Today',
-      'Tomorrow',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday',
-    ];
-  }
-}
-
-// More Screen
 class MorePage extends StatelessWidget {
-  MorePage({super.key});
+  const MorePage({super.key});
 
-  final List<Map<String, dynamic>> menuItems = [
+  static const List<Map<String, dynamic>> _menuItems = [
     {
       'title': 'Severe Weather',
       'subtitle': 'Alerts and warnings',
@@ -492,12 +265,7 @@ class MorePage extends StatelessWidget {
       'icon': Icons.history,
       'hasAlert': false,
     },
-    {
-      'title': 'Settings',
-      'subtitle': 'App preferences',
-      'icon': Icons.settings,
-      'hasAlert': false,
-    },
+    {'title': 'Settings', 'subtitle': 'App preferences', 'icon': Icons.settings, 'hasAlert': false},
   ];
 
   @override
@@ -507,7 +275,7 @@ class MorePage extends StatelessWidget {
         title: const Text('More', style: TextStyle(color: Colors.white)),
         backgroundColor: const Color(0xFF4A90E2),
         elevation: 0,
-        leading: Container(),
+        leading: const SizedBox.shrink(),
       ),
       body: Container(
         decoration: const BoxDecoration(
@@ -519,78 +287,73 @@ class MorePage extends StatelessWidget {
         ),
         child: ListView.builder(
           padding: const EdgeInsets.all(16),
-          itemCount: menuItems.length,
-          itemBuilder: (context, index) {
-            final item = menuItems[index];
-            return Container(
-              margin: const EdgeInsets.only(bottom: 12),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-              ),
-              child: ListTile(
-                leading: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    item['icon'] as IconData,
-                    color: Colors.white,
-                    size: 24,
-                  ),
-                ),
-                title: Text(
-                  item['title'].toString(),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                subtitle: Text(
-                  item['subtitle'].toString(),
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.7),
-                    fontSize: 14,
-                  ),
-                ),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (item['hasAlert'] as bool)
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: const BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    const Gap(8),
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      color: Colors.white.withValues(alpha: 0.7),
-                      size: 16,
-                    ),
-                  ],
-                ),
-                onTap: () {
-                  // Handle navigation to specific screens
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Opening ${item['title']}...'),
-                      backgroundColor: const Color(0xFF4A90E2),
-                      duration: const Duration(seconds: 1),
-                    ),
-                  );
-                },
-              ),
-            );
-          },
+          itemCount: _menuItems.length,
+          itemBuilder: (context, index) => _MenuItemWidget(
+            item: _menuItems[index],
+            onTap: () => _showItemSnackBar(context, _menuItems[index]['title'].toString()),
+          ),
         ),
+      ),
+    );
+  }
+
+  void _showItemSnackBar(BuildContext context, String title) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Opening $title...'),
+        backgroundColor: const Color(0xFF4A90E2),
+        duration: const Duration(seconds: 1),
+      ),
+    );
+  }
+}
+
+class _MenuItemWidget extends StatelessWidget {
+  const _MenuItemWidget({required this.item, required this.onTap});
+
+  final Map<String, dynamic> item;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+      ),
+      child: ListTile(
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.2),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(item['icon'] as IconData, color: Colors.white, size: 24),
+        ),
+        title: Text(
+          item['title'].toString(),
+          style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+        ),
+        subtitle: Text(
+          item['subtitle'].toString(),
+          style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 14),
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (item['hasAlert'] as bool)
+              Container(
+                width: 8,
+                height: 8,
+                decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+              ),
+            if (item['hasAlert'] as bool) const Gap(8),
+            Icon(Icons.arrow_forward_ios, color: Colors.white.withValues(alpha: 0.7), size: 16),
+          ],
+        ),
+        onTap: onTap,
       ),
     );
   }

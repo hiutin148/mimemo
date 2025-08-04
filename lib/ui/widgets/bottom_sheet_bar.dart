@@ -6,10 +6,21 @@ class BottomSheetBarController {
   BottomSheetBarController();
 
   late ScrollController scrollController;
-  late final DraggableScrollableController draggableScrollableController;
+  DraggableScrollableController? _draggableScrollableController;
   bool isExpanded = false;
   double maxSize = 1;
   double minSize = 0.2;
+
+  // Getter that creates the controller if it doesn't exist
+  DraggableScrollableController get draggableScrollableController {
+    _draggableScrollableController ??= DraggableScrollableController();
+    return _draggableScrollableController!;
+  }
+
+  // Setter for backward compatibility
+  set draggableScrollableController(DraggableScrollableController controller) {
+    _draggableScrollableController = controller;
+  }
 
   void expand() {
     draggableScrollableController.animateTo(
@@ -30,7 +41,8 @@ class BottomSheetBarController {
   }
 
   void dispose() {
-    draggableScrollableController.dispose();
+    _draggableScrollableController?.dispose();
+    _draggableScrollableController = null;
   }
 }
 
@@ -167,11 +179,10 @@ class _BottomSheetBarSheetState extends State<BottomSheetBarSheet> {
   @override
   void initState() {
     super.initState();
-    widget.controller.draggableScrollableController =
-        DraggableScrollableController();
-    widget.controller.draggableScrollableController.addListener(
-      _controllerListener,
-    );
+    // Access the controller through the getter, which will create it if needed
+    // Remove any existing listener to avoid duplicates
+    widget.controller.draggableScrollableController.removeListener(_controllerListener);
+    widget.controller.draggableScrollableController.addListener(_controllerListener);
   }
 
   void _controllerListener() {
@@ -190,7 +201,9 @@ class _BottomSheetBarSheetState extends State<BottomSheetBarSheet> {
 
   @override
   void dispose() {
-    widget.controller.dispose();
+    // Only remove the listener, don't dispose the controller here
+    // since it's managed by the BottomSheetBarController
+    widget.controller.draggableScrollableController.removeListener(_controllerListener);
     super.dispose();
   }
 
@@ -242,10 +255,10 @@ class _BottomSheetBarSheetState extends State<BottomSheetBarSheet> {
                         child: SizedBox(
                           height: constraints.maxHeight,
                           child:
-                              widget.expandedBuilder?.call(
-                                context,
-                                scrollController,
-                              ) ??
+                          widget.expandedBuilder?.call(
+                            context,
+                            scrollController,
+                          ) ??
                               widget.expandedWidget ??
                               const SizedBox.shrink(),
                         ),

@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:mimemo/models/entities/temperature/unit_value.dart';
 import 'package:mimemo/models/entities/unit_value_range/unit_value_range.dart';
@@ -5,9 +6,8 @@ import 'package:mimemo/models/entities/unit_value_range/unit_value_range.dart';
 part 'climo_summary.g.dart';
 
 @JsonSerializable()
-class ClimoSummary {
-
-  ClimoSummary({
+class ClimoSummary extends Equatable {
+  const ClimoSummary({
     this.actual,
     this.normal,
   });
@@ -20,12 +20,17 @@ class ClimoSummary {
   final NormalData? normal;
 
   Map<String, dynamic> toJson() => _$ClimoSummaryToJson(this);
+
+  @override
+  List<Object?> get props => [
+    actual,
+    normal,
+  ];
 }
 
 @JsonSerializable()
-class ActualData {
-
-  ActualData({
+class ActualData extends Equatable {
+  const ActualData({
     this.date,
     this.epochDate,
     this.actuals,
@@ -42,12 +47,14 @@ class ActualData {
   final Actuals? actuals;
 
   Map<String, dynamic> toJson() => _$ActualDataToJson(this);
+
+  @override
+  List<Object?> get props => [];
 }
 
 @JsonSerializable()
-class NormalData {
-
-  NormalData({
+class NormalData extends Equatable {
+  const NormalData({
     this.date,
     this.epochDate,
     this.normals,
@@ -64,12 +71,18 @@ class NormalData {
   final Normals? normals;
 
   Map<String, dynamic> toJson() => _$NormalDataToJson(this);
+
+  @override
+  List<Object?> get props => [
+    date,
+    epochDate,
+    normals,
+  ];
 }
 
 @JsonSerializable()
-class Actuals {
-
-  Actuals({
+class Actuals extends Equatable {
+  const Actuals({
     this.temperatures,
     this.degreeDays,
     this.precipitation,
@@ -94,12 +107,20 @@ class Actuals {
   final UnitValue? snowDepth;
 
   Map<String, dynamic> toJson() => _$ActualsToJson(this);
+
+  @override
+  List<Object?> get props => [
+    temperatures,
+    degreeDays,
+    precipitation,
+    snowfall,
+    snowDepth,
+  ];
 }
 
 @JsonSerializable()
-class Normals {
-
-  Normals({
+class Normals extends Equatable {
+  const Normals({
     this.temperatures,
     this.degreeDays,
     this.precipitation,
@@ -116,12 +137,18 @@ class Normals {
   final UnitValue? precipitation;
 
   Map<String, dynamic> toJson() => _$NormalsToJson(this);
+
+  @override
+  List<Object?> get props => [
+    temperatures,
+    degreeDays,
+    precipitation,
+  ];
 }
 
 @JsonSerializable()
-class DegreeDays {
-
-  DegreeDays({
+class DegreeDays extends Equatable {
+  const DegreeDays({
     this.heating,
     this.cooling,
   });
@@ -134,4 +161,10 @@ class DegreeDays {
   final UnitValue? cooling;
 
   Map<String, dynamic> toJson() => _$DegreeDaysToJson(this);
+
+  @override
+  List<Object?> get props => [
+    heating,
+    cooling,
+  ];
 }

@@ -110,7 +110,7 @@ class _FifteenDailyForecastItemState extends State<FifteenDailyForecastItem>
               child: Text(
                 widget.forecast.date?.reformatDateString(newFormat: DateFormatPattern.day) ?? '',
                 style: context.textTheme.bodySmall?.w600.copyWith(
-                  color: isSelected ? AppColors.primary : Colors.white,
+                  color: isSelected ? AppColors.surface : Colors.white,
                 ),
               ),
             );

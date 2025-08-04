@@ -1,12 +1,12 @@
+import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:mimemo/models/entities/temperature/unit_value.dart';
 
 part 'position_info.g.dart';
 
 @JsonSerializable(explicitToJson: true)
-class PositionInfo {
-
-  PositionInfo({
+class PositionInfo extends Equatable {
+  const PositionInfo({
     this.version,
     this.key,
     this.type,
@@ -26,8 +26,7 @@ class PositionInfo {
     this.details,
   });
 
-  factory PositionInfo.fromJson(Map<String, dynamic> json) =>
-      _$PositionInfoFromJson(json);
+  factory PositionInfo.fromJson(Map<String, dynamic> json) => _$PositionInfoFromJson(json);
   @JsonKey(name: 'Version')
   final int? version;
 
@@ -78,13 +77,34 @@ class PositionInfo {
 
   @JsonKey(name: 'Details')
   final Details? details;
+
   Map<String, dynamic> toJson() => _$PositionInfoToJson(this);
+
+  @override
+  List<Object?> get props => [
+    version,
+    key,
+    type,
+    rank,
+    localizedName,
+    englishName,
+    primaryPostalCode,
+    region,
+    country,
+    administrativeArea,
+    timeZone,
+    geoPosition,
+    isAlias,
+    parentCity,
+    supplementalAdminAreas,
+    dataSets,
+    details,
+  ];
 }
 
 @JsonSerializable()
-class Details {
-
-  Details({
+class Details extends Equatable {
+  const Details({
     this.key,
     this.stationCode,
     this.stationGmtOffset,
@@ -110,8 +130,7 @@ class Details {
     this.canonicalLocationKey,
   });
 
-  factory Details.fromJson(Map<String, dynamic> json) =>
-      _$DetailsFromJson(json);
+  factory Details.fromJson(Map<String, dynamic> json) => _$DetailsFromJson(json);
   @JsonKey(name: 'Key')
   final String? key;
 
@@ -180,16 +199,42 @@ class Details {
 
   @JsonKey(name: 'CanonicalLocationKey')
   final String? canonicalLocationKey;
+
   Map<String, dynamic> toJson() => _$DetailsToJson(this);
+
+  @override
+  List<Object?> get props => [
+    key,
+    stationCode,
+    stationGmtOffset,
+    bandMap,
+    climo,
+    localRadar,
+    mediaRegion,
+    metar,
+    nxMetro,
+    nxState,
+    population,
+    primaryWarningCountyCode,
+    primaryWarningZoneCode,
+    satellite,
+    synoptic,
+    marineStation,
+    marineStationGmtOffset,
+    videoCode,
+    locationStem,
+    partnerId,
+    sources,
+    canonicalPostalCode,
+    canonicalLocationKey,
+  ];
 }
 
 @JsonSerializable()
-class Source {
+class Source extends Equatable {
+  const Source({this.dataType, this.source, this.sourceId});
 
-  Source({this.dataType, this.source, this.sourceId});
-
-  factory Source.fromJson(Map<String, dynamic> json) =>
-      _$SourceFromJson(json);
+  factory Source.fromJson(Map<String, dynamic> json) => _$SourceFromJson(json);
   @JsonKey(name: 'DataType')
   final String? dataType;
 
@@ -198,14 +243,16 @@ class Source {
 
   @JsonKey(name: 'SourceId')
   final int? sourceId;
+
   Map<String, dynamic> toJson() => _$SourceToJson(this);
+
+  @override
+  List<Object?> get props => [dataType, source, sourceId];
 }
 
-
 @JsonSerializable()
-class Region {
-
-  Region({this.id, this.localizedName, this.englishName});
+class Region extends Equatable {
+  const Region({this.id, this.localizedName, this.englishName});
 
   factory Region.fromJson(Map<String, dynamic> json) => _$RegionFromJson(json);
   @JsonKey(name: 'ID')
@@ -216,13 +263,16 @@ class Region {
 
   @JsonKey(name: 'EnglishName')
   final String? englishName;
+
   Map<String, dynamic> toJson() => _$RegionToJson(this);
+
+  @override
+  List<Object?> get props => [id, localizedName, englishName];
 }
 
 @JsonSerializable()
-class Country {
-
-  Country({this.id, this.localizedName, this.englishName});
+class Country extends Equatable {
+  const Country({this.id, this.localizedName, this.englishName});
 
   factory Country.fromJson(Map<String, dynamic> json) => _$CountryFromJson(json);
   @JsonKey(name: 'ID')
@@ -233,13 +283,16 @@ class Country {
 
   @JsonKey(name: 'EnglishName')
   final String? englishName;
+
   Map<String, dynamic> toJson() => _$CountryToJson(this);
+
+  @override
+  List<Object?> get props => [id, localizedName, englishName];
 }
 
 @JsonSerializable()
-class AdministrativeArea {
-
-  AdministrativeArea({
+class AdministrativeArea extends Equatable {
+  const AdministrativeArea({
     this.id,
     this.localizedName,
     this.englishName,
@@ -249,7 +302,8 @@ class AdministrativeArea {
     this.countryId,
   });
 
-  factory AdministrativeArea.fromJson(Map<String, dynamic> json) => _$AdministrativeAreaFromJson(json);
+  factory AdministrativeArea.fromJson(Map<String, dynamic> json) =>
+      _$AdministrativeAreaFromJson(json);
   @JsonKey(name: 'ID')
   final String? id;
 
@@ -270,13 +324,24 @@ class AdministrativeArea {
 
   @JsonKey(name: 'CountryID')
   final String? countryId;
+
   Map<String, dynamic> toJson() => _$AdministrativeAreaToJson(this);
+
+  @override
+  List<Object?> get props => [
+    id,
+    localizedName,
+    englishName,
+    level,
+    localizedType,
+    englishType,
+    countryId,
+  ];
 }
 
 @JsonSerializable()
-class TimeZone {
-
-  TimeZone({
+class TimeZone extends Equatable {
+  const TimeZone({
     this.code,
     this.name,
     this.gmtOffset,
@@ -299,13 +364,22 @@ class TimeZone {
 
   @JsonKey(name: 'NextOffsetChange')
   final String? nextOffsetChange;
+
   Map<String, dynamic> toJson() => _$TimeZoneToJson(this);
+
+  @override
+  List<Object?> get props => [
+    code,
+    name,
+    gmtOffset,
+    isDaylightSaving,
+    nextOffsetChange,
+  ];
 }
 
 @JsonSerializable()
-class GeoPosition {
-
-  GeoPosition({this.latitude, this.longitude, this.elevation});
+class GeoPosition extends Equatable {
+  const GeoPosition({this.latitude, this.longitude, this.elevation});
 
   factory GeoPosition.fromJson(Map<String, dynamic> json) => _$GeoPositionFromJson(json);
   @JsonKey(name: 'Latitude')
@@ -316,13 +390,16 @@ class GeoPosition {
 
   @JsonKey(name: 'Elevation')
   final Elevation? elevation;
+
   Map<String, dynamic> toJson() => _$GeoPositionToJson(this);
+
+  @override
+  List<Object?> get props => [latitude, longitude, elevation];
 }
 
 @JsonSerializable()
-class Elevation {
-
-  Elevation({this.metric, this.imperial});
+class Elevation extends Equatable {
+  const Elevation({this.metric, this.imperial});
 
   factory Elevation.fromJson(Map<String, dynamic> json) => _$ElevationFromJson(json);
   @JsonKey(name: 'Metric')
@@ -330,13 +407,16 @@ class Elevation {
 
   @JsonKey(name: 'Imperial')
   final UnitValue? imperial;
+
   Map<String, dynamic> toJson() => _$ElevationToJson(this);
+
+  @override
+  List<Object?> get props => [metric, imperial];
 }
 
 @JsonSerializable()
-class ParentCity {
-
-  ParentCity({this.key, this.localizedName, this.englishName});
+class ParentCity extends Equatable {
+  const ParentCity({this.key, this.localizedName, this.englishName});
 
   factory ParentCity.fromJson(Map<String, dynamic> json) => _$ParentCityFromJson(json);
   @JsonKey(name: 'Key')
@@ -347,5 +427,9 @@ class ParentCity {
 
   @JsonKey(name: 'EnglishName')
   final String? englishName;
+
   Map<String, dynamic> toJson() => _$ParentCityToJson(this);
+
+  @override
+  List<Object?> get props => [key, localizedName, englishName];
 }

@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:mimemo/models/entities/temperature/unit_value.dart';
 import 'package:mimemo/models/entities/unit_value_range/unit_value_range.dart';
@@ -6,9 +7,8 @@ import 'package:mimemo/models/entities/wind/wind.dart';
 part 'current_conditions.g.dart';
 
 @JsonSerializable()
-class CurrentConditions {
-
-  CurrentConditions({
+class CurrentConditions extends Equatable {
+  const CurrentConditions({
     this.localObservationDateTime,
     this.epochTime,
     this.weatherText,
@@ -150,12 +150,49 @@ class CurrentConditions {
   final String? link;
 
   Map<String, dynamic> toJson() => _$CurrentConditionsToJson(this);
+
+  @override
+  List<Object?> get props => [
+    localObservationDateTime,
+    epochTime,
+    weatherText,
+    weatherIcon,
+    hasPrecipitation,
+    precipitationType,
+    isDayTime,
+    temperature,
+    realFeelTemperature,
+    realFeelTemperatureShade,
+    relativeHumidity,
+    indoorRelativeHumidity,
+    dewPoint,
+    wind,
+    windGust,
+    uvIndex,
+    uvIndexText,
+    visibility,
+    obstructionsToVisibility,
+    cloudCover,
+    ceiling,
+    pressure,
+    pressureTendency,
+    past24HourTemperatureDeparture,
+    apparentTemperature,
+    windChillTemperature,
+    wetBulbTemperature,
+    wetBulbGlobeTemperature,
+    precip1hr,
+    precipitationSummary,
+    temperatureSummary,
+    photos,
+    mobileLink,
+    link,
+  ];
 }
 
 @JsonSerializable()
-class PressureTendency {
-
-  PressureTendency({this.localizedText, this.code});
+class PressureTendency extends Equatable {
+  const PressureTendency({this.localizedText, this.code});
 
   factory PressureTendency.fromJson(Map<String, dynamic> json) => _$PressureTendencyFromJson(json);
   @JsonKey(name: 'LocalizedText')
@@ -165,12 +202,15 @@ class PressureTendency {
   final String? code;
 
   Map<String, dynamic> toJson() => _$PressureTendencyToJson(this);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [localizedText, code];
 }
 
 @JsonSerializable()
-class PrecipitationSummary {
-
-  PrecipitationSummary({
+class PrecipitationSummary extends Equatable {
+  const PrecipitationSummary({
     this.precipitation,
     this.pastHour,
     this.past3Hours,
@@ -208,12 +248,23 @@ class PrecipitationSummary {
   final UnitValue? past24Hours;
 
   Map<String, dynamic> toJson() => _$PrecipitationSummaryToJson(this);
+
+  @override
+  List<Object?> get props => [
+    precipitation,
+    pastHour,
+    past3Hours,
+    past6Hours,
+    past9Hours,
+    past12Hours,
+    past18Hours,
+    past24Hours,
+  ];
 }
 
 @JsonSerializable()
-class TemperatureSummary {
-
-  TemperatureSummary({this.past6HourRange, this.past12HourRange, this.past24HourRange});
+class TemperatureSummary extends Equatable {
+  const TemperatureSummary({this.past6HourRange, this.past12HourRange, this.past24HourRange});
 
   factory TemperatureSummary.fromJson(Map<String, dynamic> json) =>
       _$TemperatureSummaryFromJson(json);
@@ -227,12 +278,20 @@ class TemperatureSummary {
   final UnitValueRange? past24HourRange;
 
   Map<String, dynamic> toJson() => _$TemperatureSummaryToJson(this);
+
+  @override
+  List<Object?> get props => [past6HourRange, past12HourRange, past24HourRange];
 }
 
 @JsonSerializable()
-class Photo {
-
-  Photo({this.dateTaken, this.source, this.description, this.portraitLink, this.landscapeLink});
+class Photo extends Equatable {
+  const Photo({
+    this.dateTaken,
+    this.source,
+    this.description,
+    this.portraitLink,
+    this.landscapeLink,
+  });
 
   factory Photo.fromJson(Map<String, dynamic> json) => _$PhotoFromJson(json);
   @JsonKey(name: 'DateTaken')
@@ -251,4 +310,13 @@ class Photo {
   final String? landscapeLink;
 
   Map<String, dynamic> toJson() => _$PhotoToJson(this);
+
+  @override
+  List<Object?> get props => [
+    dateTaken,
+    source,
+    description,
+    portraitLink,
+    landscapeLink,
+  ];
 }

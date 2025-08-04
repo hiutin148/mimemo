@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:mimemo/models/entities/temperature/unit_value.dart';
 import 'package:mimemo/models/entities/unit_value_detail_range/unit_value_detail_range.dart';
@@ -7,9 +8,8 @@ import 'package:mimemo/models/entities/wind/wind.dart';
 part 'daily_forecast.g.dart';
 
 @JsonSerializable()
-class DailyForecast {
-
-  DailyForecast({this.headline, this.dailyForecasts});
+class DailyForecast extends Equatable {
+  const DailyForecast({this.headline, this.dailyForecasts});
 
   factory DailyForecast.fromJson(Map<String, dynamic> json) => _$DailyForecastFromJson(json);
   @JsonKey(name: 'Headline')
@@ -19,12 +19,14 @@ class DailyForecast {
   final List<ForecastDay>? dailyForecasts;
 
   Map<String, dynamic> toJson() => _$DailyForecastToJson(this);
+
+  @override
+  List<Object?> get props => [headline, dailyForecasts];
 }
 
 @JsonSerializable()
-class Headline {
-
-  Headline({
+class Headline extends Equatable {
+  const Headline({
     this.effectiveDate,
     this.effectiveEpochDate,
     this.severity,
@@ -65,12 +67,24 @@ class Headline {
   final String? link;
 
   Map<String, dynamic> toJson() => _$HeadlineToJson(this);
+
+  @override
+  List<Object?> get props => [
+    effectiveDate,
+    effectiveEpochDate,
+    severity,
+    text,
+    category,
+    endDate,
+    endEpochDate,
+    mobileLink,
+    link,
+  ];
 }
 
 @JsonSerializable()
-class ForecastDay {
-
-  ForecastDay({
+class ForecastDay extends Equatable {
+  const ForecastDay({
     this.date,
     this.epochDate,
     this.sun,
@@ -135,12 +149,30 @@ class ForecastDay {
   final String? link;
 
   Map<String, dynamic> toJson() => _$ForecastDayToJson(this);
+
+  @override
+  List<Object?> get props => [
+    date,
+    epochDate,
+    sun,
+    moon,
+    temperature,
+    realFeelTemperature,
+    realFeelTemperatureShade,
+    hoursOfSun,
+    degreeDaySummary,
+    airAndPollen,
+    day,
+    night,
+    sources,
+    mobileLink,
+    link,
+  ];
 }
 
 @JsonSerializable()
-class RiseSet {
-
-  RiseSet({this.rise, this.epochRise, this.set, this.epochSet});
+class RiseSet extends Equatable {
+  const RiseSet({this.rise, this.epochRise, this.set, this.epochSet});
 
   factory RiseSet.fromJson(Map<String, dynamic> json) => _$RiseSetFromJson(json);
   @JsonKey(name: 'Rise')
@@ -156,12 +188,14 @@ class RiseSet {
   final int? epochSet;
 
   Map<String, dynamic> toJson() => _$RiseSetToJson(this);
+
+  @override
+  List<Object?> get props => [rise, epochRise, set, epochSet];
 }
 
 @JsonSerializable()
 class Moon extends RiseSet {
-
-  Moon({super.rise, super.epochRise, super.set, super.epochSet, this.phase, this.age});
+  const Moon({super.rise, super.epochRise, super.set, super.epochSet, this.phase, this.age});
 
   factory Moon.fromJson(Map<String, dynamic> json) => _$MoonFromJson(json);
   @JsonKey(name: 'Phase')
@@ -172,12 +206,14 @@ class Moon extends RiseSet {
 
   @override
   Map<String, dynamic> toJson() => _$MoonToJson(this);
+
+  @override
+  List<Object?> get props => [rise, epochRise, set, epochSet, phase, age];
 }
 
 @JsonSerializable()
-class DegreeDaySummary {
-
-  DegreeDaySummary({this.heating, this.cooling});
+class DegreeDaySummary extends Equatable {
+  const DegreeDaySummary({this.heating, this.cooling});
 
   factory DegreeDaySummary.fromJson(Map<String, dynamic> json) => _$DegreeDaySummaryFromJson(json);
   @JsonKey(name: 'Heating')
@@ -187,12 +223,14 @@ class DegreeDaySummary {
   final UnitValue? cooling;
 
   Map<String, dynamic> toJson() => _$DegreeDaySummaryToJson(this);
+
+  @override
+  List<Object?> get props => [heating, cooling];
 }
 
 @JsonSerializable()
-class AirAndPollen {
-
-  AirAndPollen({this.name, this.value, this.category, this.categoryValue, this.type});
+class AirAndPollen extends Equatable {
+  const AirAndPollen({this.name, this.value, this.category, this.categoryValue, this.type});
 
   factory AirAndPollen.fromJson(Map<String, dynamic> json) => _$AirAndPollenFromJson(json);
   @JsonKey(name: 'Name')
@@ -211,12 +249,14 @@ class AirAndPollen {
   final String? type;
 
   Map<String, dynamic> toJson() => _$AirAndPollenToJson(this);
+
+  @override
+  List<Object?> get props => [name, value, category, categoryValue, type];
 }
 
 @JsonSerializable()
-class DayNight {
-
-  DayNight({
+class DayNight extends Equatable {
+  const DayNight({
     this.icon,
     this.iconPhrase,
     this.hasPrecipitation,
@@ -333,12 +373,43 @@ class DayNight {
   final UnitValueRange? wetBulbGlobeTemperature;
 
   Map<String, dynamic> toJson() => _$DayNightToJson(this);
+
+  @override
+  List<Object?> get props => [
+    icon,
+    iconPhrase,
+    hasPrecipitation,
+    precipitationType,
+    precipitationIntensity,
+    shortPhrase,
+    longPhrase,
+    precipitationProbability,
+    thunderstormProbability,
+    rainProbability,
+    snowProbability,
+    iceProbability,
+    wind,
+    windGust,
+    totalLiquid,
+    rain,
+    snow,
+    ice,
+    hoursOfPrecipitation,
+    hoursOfRain,
+    hoursOfSnow,
+    hoursOfIce,
+    cloudCover,
+    evapotranspiration,
+    solarIrradiance,
+    relativeHumidity,
+    wetBulbTemperature,
+    wetBulbGlobeTemperature,
+  ];
 }
 
 @JsonSerializable()
-class RelativeHumidity {
-
-  RelativeHumidity({this.minimum, this.maximum, this.average});
+class RelativeHumidity extends Equatable {
+  const RelativeHumidity({this.minimum, this.maximum, this.average});
 
   factory RelativeHumidity.fromJson(Map<String, dynamic> json) => _$RelativeHumidityFromJson(json);
   @JsonKey(name: 'Minimum')
@@ -351,4 +422,7 @@ class RelativeHumidity {
   final int? average;
 
   Map<String, dynamic> toJson() => _$RelativeHumidityToJson(this);
+
+  @override
+  List<Object?> get props => [minimum, maximum, average];
 }

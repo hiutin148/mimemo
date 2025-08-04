@@ -19,18 +19,14 @@ class CurrentConditionGaugeChart extends StatefulWidget {
   const CurrentConditionGaugeChart({super.key});
 
   @override
-  State<CurrentConditionGaugeChart> createState() =>
-      _CurrentConditionGaugeChartState();
+  State<CurrentConditionGaugeChart> createState() => _CurrentConditionGaugeChartState();
 }
 
-class _CurrentConditionGaugeChartState
-    extends State<CurrentConditionGaugeChart> {
-  // Constants moved to static for better memory usage
+class _CurrentConditionGaugeChartState extends State<CurrentConditionGaugeChart> {
   static const String _rainConditionButtonText = '4 hours';
   static const String _airQualityButtonText = 'Hourly';
   static const String _airQualityTitle = 'Current air pollutants are';
-  static const String _lastUpdatedText =
-      'Last updated at 11h37'; // TODO: Make dynamic
+  static const String _lastUpdatedText = 'Last updated at 11h37'; // TODO: Make dynamic
   static const String _excellentLabel = 'EXCELLENT';
   static const String _dangerousLabel = 'DANGEROUS';
 
@@ -70,7 +66,17 @@ class _CurrentConditionGaugeChartState
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<HomeCubit, HomeState>(builder: _buildContent);
+    return BlocBuilder<HomeCubit, HomeState>(
+      builder: _buildContent,
+      buildWhen: (previous, current) {
+        return previous.currentConditions != current.currentConditions ||
+            previous.currentConditionsStatus != current.currentConditionsStatus ||
+            previous.airQuality != current.airQuality ||
+            previous.airQualityStatus != current.airQualityStatus ||
+            previous.oneMinuteCast != current.oneMinuteCast ||
+            previous.oneMinuteCastStatus != current.oneMinuteCastStatus;
+      },
+    );
   }
 
   Widget _buildContent(BuildContext context, HomeState state) {
@@ -146,8 +152,7 @@ class _CurrentConditionGaugeChartState
     final temperature = currentConditions?.temperature?.metric?.value;
     final unit = currentConditions?.temperature?.metric?.unit ?? '';
     final temperatureText = temperature != null ? '$temperature °$unit' : '';
-    final realFeel =
-        currentConditions?.realFeelTemperature?.metric?.value ?? '';
+    final realFeel = currentConditions?.realFeelTemperature?.metric?.value ?? '';
     final icon = currentConditions?.weatherIcon ?? 0;
 
     return Center(
@@ -200,9 +205,7 @@ class _CurrentConditionGaugeChartState
   Widget _buildFooter(BuildContext context) {
     return SizedBox(
       height: 48,
-      child: _currentTab == 0
-          ? _buildRainFooter(context)
-          : _buildAirQualityFooter(context),
+      child: _currentTab == 0 ? _buildRainFooter(context) : _buildAirQualityFooter(context),
     );
   }
 

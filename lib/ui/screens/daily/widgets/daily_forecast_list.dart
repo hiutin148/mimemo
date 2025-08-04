@@ -82,8 +82,10 @@ class _DailyForecastListState extends State<DailyForecastList> {
           return const Center(child: CircularProgressIndicator());
         } else {
           final dailyForecast = state.dailyForecast;
-          final forecasts =
-              dailyForecast?.dailyForecasts?.getRange(0, 14).whereType<ForecastDay>().toList();
+          final forecasts = dailyForecast?.dailyForecasts
+              ?.getRange(0, 14)
+              .whereType<ForecastDay>()
+              .toList();
 
           if (forecasts == null || forecasts.isEmpty) {
             return const Center(child: Text('No forecast data available'));
@@ -138,11 +140,13 @@ class _DailyForecastListState extends State<DailyForecastList> {
                 ?.indexWhere((element) => element.date == state.selectedDay?.date)
                 .toDouble() ??
             0.0;
-        _scrollController.animateTo(
-          selectedIndex * _itemWidth - context.width / 2 + _itemWidth / 2,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeIn,
-        );
+        if (_scrollController.hasClients) {
+          _scrollController.animateTo(
+            selectedIndex * _itemWidth - context.width / 2 + _itemWidth / 2,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeIn,
+          );
+        }
       },
     );
   }

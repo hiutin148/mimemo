@@ -3,6 +3,7 @@ import 'package:mimemo/repositories/app_setting_repository.dart';
 import 'package:mimemo/repositories/current_condition_repository.dart';
 import 'package:mimemo/repositories/forecast_repository.dart';
 import 'package:mimemo/repositories/position_repository.dart';
+import 'package:mimemo/repositories/search_location_repository.dart';
 import 'package:mimemo/services/api/api_client.dart';
 import 'package:mimemo/services/api/dio_client.dart';
 import 'package:mimemo/services/geolocation_service.dart';
@@ -17,7 +18,10 @@ void initLocator() {
     ..registerLazySingleton<ApiClient>(() => ApiClient(locator<DioClient>().dio))
     ..registerLazySingleton<SharedPreferencesService>(() => SharedPreferencesService()..init())
     ..registerLazySingleton<PositionRepository>(
-      () => PositionRepositoryImpl(apiClient: locator<ApiClient>()),
+      () => PositionRepositoryImpl(
+        apiClient: locator<ApiClient>(),
+        sharedPreferencesService: locator<SharedPreferencesService>(),
+      ),
     )
     ..registerLazySingleton<AppSettingRepository>(
       () => AppSettingRepositoryImpl(sharedPreferencesService: locator<SharedPreferencesService>()),
@@ -27,5 +31,11 @@ void initLocator() {
     )
     ..registerLazySingleton<CurrentConditionRepository>(
       () => CurrentConditionRepositoryImpl(apiClient: locator<ApiClient>()),
+    )
+    ..registerLazySingleton<SearchLocationRepository>(
+      () => SearchLocationRepositoryImpl(
+        dioClient: locator<DioClient>(),
+        sharedPreferencesService: locator<SharedPreferencesService>(),
+      ),
     );
 }

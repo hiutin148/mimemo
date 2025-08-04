@@ -19,7 +19,7 @@ class ApiInterceptor extends InterceptorsWrapper {
 
   @override
   void onResponse(Response<dynamic> response, ResponseInterceptorHandler handler) {
-    logger.i('RESPONSE[${response.statusCode}] => DATA: ${response.data}');
+    logger.i('RESPONSE[${response.statusCode}] for ${response.realUri} \n => DATA: ${response.data}');
     return handler.next(response);
   }
 
