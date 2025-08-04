@@ -1,11 +1,11 @@
+import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'minute_color.g.dart';
 
 @JsonSerializable()
-class MinuteColor {
-
-  MinuteColor({
+class MinuteColor extends Equatable {
+  const MinuteColor({
     this.type,
     this.threshold,
     this.startDbz,
@@ -16,8 +16,7 @@ class MinuteColor {
     this.hex,
   });
 
-  factory MinuteColor.fromJson(Map<String, dynamic> json) =>
-      _$MinuteColorFromJson(json);
+  factory MinuteColor.fromJson(Map<String, dynamic> json) => _$MinuteColorFromJson(json);
   @JsonKey(name: 'Type')
   final String? type;
 
@@ -43,4 +42,16 @@ class MinuteColor {
   final String? hex;
 
   Map<String, dynamic> toJson() => _$MinuteColorToJson(this);
+
+  @override
+  List<Object?> get props => [
+    type,
+    threshold,
+    startDbz,
+    endDbz,
+    red,
+    green,
+    blue,
+    hex,
+  ];
 }

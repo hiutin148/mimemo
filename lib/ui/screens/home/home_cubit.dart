@@ -16,7 +16,6 @@ import 'package:mimemo/repositories/forecast_repository.dart';
 part 'home_state.dart';
 
 class HomeCubit extends BaseCubit<HomeState> {
-
   HomeCubit({
     required this.forecastRepository,
     required this.mainCubit,
@@ -33,7 +32,7 @@ class HomeCubit extends BaseCubit<HomeState> {
       unawaited(getAirQuality());
       unawaited(getNext12HoursForecast());
       unawaited(getDailyForecast());
-    } on Exception catch(e) {
+    } on Exception catch (e) {
       logger.e(e);
     }
   }
@@ -44,7 +43,7 @@ class HomeCubit extends BaseCubit<HomeState> {
       final (lat, long) = await mainCubit.getCurrentCoordinates();
       final oneMinuteCast = await forecastRepository.get1MinuteCast(lat, long);
       emit(state.copyWith(oneMinuteCastStatus: LoadStatus.success, oneMinuteCast: oneMinuteCast));
-    } on Exception catch(e) {
+    } on Exception catch (e) {
       logger.e(e);
       emit(state.copyWith(oneMinuteCastStatus: LoadStatus.failure));
     }
@@ -62,7 +61,7 @@ class HomeCubit extends BaseCubit<HomeState> {
           currentConditions: currentConditions,
         ),
       );
-    } on Exception catch(e) {
+    } on Exception catch (e) {
       logger.e(e);
       emit(state.copyWith(currentConditionsStatus: LoadStatus.failure));
     }
@@ -75,7 +74,7 @@ class HomeCubit extends BaseCubit<HomeState> {
         mainCubit.state.positionInfo?.key ?? '',
       );
       emit(state.copyWith(airQualityStatus: LoadStatus.success, airQuality: airQuality));
-    } on Exception catch(e) {
+    } on Exception catch (e) {
       logger.e(e);
       emit(state.copyWith(airQualityStatus: LoadStatus.failure));
     }
@@ -93,7 +92,7 @@ class HomeCubit extends BaseCubit<HomeState> {
           next12HoursForecast: next12HoursForecast,
         ),
       );
-    } on Exception catch(e) {
+    } on Exception catch (e) {
       logger.e(e);
       emit(state.copyWith(next12HoursForecastStatus: LoadStatus.failure));
     }
@@ -106,7 +105,7 @@ class HomeCubit extends BaseCubit<HomeState> {
         mainCubit.state.positionInfo?.key ?? '',
       );
       emit(state.copyWith(dailyForecastStatus: LoadStatus.success, dailyForecast: dailyForecast));
-    } on Exception catch(e) {
+    } on Exception catch (e) {
       logger.e(e);
       emit(state.copyWith(dailyForecastStatus: LoadStatus.failure));
     }

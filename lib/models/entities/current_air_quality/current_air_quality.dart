@@ -1,12 +1,12 @@
+import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:mimemo/models/entities/temperature/unit_value.dart';
 
 part 'current_air_quality.g.dart';
 
 @JsonSerializable(explicitToJson: true)
-class CurrentAirQuality {
-
-  CurrentAirQuality({this.success, this.status, this.version, this.data});
+class CurrentAirQuality extends Equatable {
+  const CurrentAirQuality({this.success, this.status, this.version, this.data});
 
   factory CurrentAirQuality.fromJson(Map<String, dynamic> json) =>
       _$CurrentAirQualityFromJson(json);
@@ -21,13 +21,16 @@ class CurrentAirQuality {
 
   @JsonKey(name: 'data')
   final AirQualityData? data;
+
   Map<String, dynamic> toJson() => _$CurrentAirQualityToJson(this);
+
+  @override
+  List<Object?> get props => [success, status, version, data];
 }
 
 @JsonSerializable(explicitToJson: true)
-class AirQualityData {
-
-  AirQualityData({
+class AirQualityData extends Equatable {
+  const AirQualityData({
     this.date,
     this.epochDate,
     this.overallIndex,
@@ -40,8 +43,7 @@ class AirQualityData {
     this.pollutants,
   });
 
-  factory AirQualityData.fromJson(Map<String, dynamic> json) =>
-      _$AirQualityDataFromJson(json);
+  factory AirQualityData.fromJson(Map<String, dynamic> json) => _$AirQualityDataFromJson(json);
   @JsonKey(name: 'date')
   final String? date;
 
@@ -71,13 +73,27 @@ class AirQualityData {
 
   @JsonKey(name: 'pollutants')
   final List<Pollutant>? pollutants;
+
   Map<String, dynamic> toJson() => _$AirQualityDataToJson(this);
+
+  @override
+  List<Object?> get props => [
+    date,
+    epochDate,
+    overallIndex,
+    overallPlumeLabsIndex,
+    dominantPollutant,
+    category,
+    categoryColor,
+    hazardStatement,
+    link,
+    pollutants,
+  ];
 }
 
 @JsonSerializable()
-class Pollutant {
-
-  Pollutant({
+class Pollutant extends Equatable {
+  const Pollutant({
     this.type,
     this.name,
     this.plumeLabsIndex,
@@ -85,8 +101,7 @@ class Pollutant {
     this.source,
   });
 
-  factory Pollutant.fromJson(Map<String, dynamic> json) =>
-      _$PollutantFromJson(json);
+  factory Pollutant.fromJson(Map<String, dynamic> json) => _$PollutantFromJson(json);
   @JsonKey(name: 'type')
   final String? type;
 
@@ -101,5 +116,15 @@ class Pollutant {
 
   @JsonKey(name: 'source')
   final String? source;
+
   Map<String, dynamic> toJson() => _$PollutantToJson(this);
+
+  @override
+  List<Object?> get props => [
+    type,
+    name,
+    plumeLabsIndex,
+    concentration,
+    source,
+  ];
 }

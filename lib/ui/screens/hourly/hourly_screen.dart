@@ -33,7 +33,7 @@ class _HourlyScreenState extends State<HourlyScreen>
       selector: (state) => state.loadStatus,
       builder: (context, loadStatus) {
         return Scaffold(
-          backgroundColor: AppColors.primary,
+          backgroundColor: AppColors.surface,
           body: _buildBody(context, loadStatus),
         );
       },

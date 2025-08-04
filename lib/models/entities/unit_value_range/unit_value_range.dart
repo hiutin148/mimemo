@@ -1,11 +1,12 @@
+import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:mimemo/models/entities/temperature/unit_value.dart';
 
 part 'unit_value_range.g.dart';
 
 @JsonSerializable()
-class UnitValueRange {
-  UnitValueRange({this.minimum, this.maximum, this.average});
+class UnitValueRange extends Equatable {
+  const UnitValueRange({this.minimum, this.maximum, this.average});
 
   factory UnitValueRange.fromJson(Map<String, dynamic> json) => _$UnitValueRangeFromJson(json);
   @JsonKey(name: 'Minimum')
@@ -18,4 +19,7 @@ class UnitValueRange {
   final UnitValue? average;
 
   Map<String, dynamic> toJson() => _$UnitValueRangeToJson(this);
+
+  @override
+  List<Object?> get props => [minimum, maximum, average];
 }

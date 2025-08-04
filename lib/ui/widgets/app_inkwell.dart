@@ -27,6 +27,8 @@ class AppInkWell extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
+          splashColor: Colors.black12,
+          highlightColor: Colors.black12,
           borderRadius: BorderRadius.circular(borderRadius ?? 0),
           onTap: onTap,
           child: Ink(width: width, height: height, padding: padding, child: child),

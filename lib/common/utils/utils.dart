@@ -5,6 +5,7 @@ import 'package:mimemo/generated/assets.dart';
 import 'package:mimemo/models/entities/gradient_info/gradient_info.dart';
 import 'package:mimemo/models/entities/minute_color/minute_color.dart';
 
+export 'app_bloc_observer.dart';
 export 'logger.dart';
 export 'overlay_loading.dart';
 

@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:mimemo/models/entities/temperature/unit_value.dart';
 import 'package:mimemo/models/entities/wind/wind.dart';
@@ -5,8 +6,7 @@ import 'package:mimemo/models/entities/wind/wind.dart';
 part 'hourly_forecast.g.dart';
 
 @JsonSerializable()
-class HourlyForecast {
-
+class HourlyForecast extends Equatable {
   const HourlyForecast({
     this.dateTime,
     this.epochDateTime,
@@ -47,8 +47,7 @@ class HourlyForecast {
     this.link,
   });
 
-  factory HourlyForecast.fromJson(Map<String, dynamic> json) =>
-      _$HourlyForecastFromJson(json);
+  factory HourlyForecast.fromJson(Map<String, dynamic> json) => _$HourlyForecastFromJson(json);
   @JsonKey(name: 'DateTime')
   final String? dateTime;
 
@@ -161,4 +160,45 @@ class HourlyForecast {
   final String? link;
 
   Map<String, dynamic> toJson() => _$HourlyForecastToJson(this);
+
+  @override
+  List<Object?> get props => [
+    dateTime,
+    epochDateTime,
+    weatherIcon,
+    iconPhrase,
+    hasPrecipitation,
+    precipitationType,
+    precipitationIntensity,
+    isDaylight,
+    temperature,
+    realFeelTemperature,
+    realFeelTemperatureShade,
+    wetBulbTemperature,
+    wetBulbGlobeTemperature,
+    dewPoint,
+    wind,
+    windGust,
+    relativeHumidity,
+    indoorRelativeHumidity,
+    visibility,
+    ceiling,
+    uvIndex,
+    uvIndexText,
+    precipitationProbability,
+    thunderstormProbability,
+    rainProbability,
+    snowProbability,
+    iceProbability,
+    totalLiquid,
+    rain,
+    snow,
+    ice,
+    cloudCover,
+    evapotranspiration,
+    solarIrradiance,
+    accuLumenBrightnessIndex,
+    mobileLink,
+    link,
+  ];
 }

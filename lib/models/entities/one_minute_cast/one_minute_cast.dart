@@ -1,11 +1,11 @@
+import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'one_minute_cast.g.dart';
 
 @JsonSerializable(explicitToJson: true)
-class OneMinuteCast {
-
-  OneMinuteCast({
+class OneMinuteCast extends Equatable {
+  const OneMinuteCast({
     this.summary,
     this.summaries,
     this.intervals,
@@ -13,8 +13,7 @@ class OneMinuteCast {
     this.link,
   });
 
-  factory OneMinuteCast.fromJson(Map<String, dynamic> json) =>
-      _$OneMinuteCastFromJson(json);
+  factory OneMinuteCast.fromJson(Map<String, dynamic> json) => _$OneMinuteCastFromJson(json);
   @JsonKey(name: 'Summary')
   final MinuteCastSummary? summary;
 
@@ -29,12 +28,21 @@ class OneMinuteCast {
 
   @JsonKey(name: 'Link')
   final String? link;
+
   Map<String, dynamic> toJson() => _$OneMinuteCastToJson(this);
+
+  @override
+  List<Object?> get props => [
+    summary,
+    summaries,
+    intervals,
+    mobileLink,
+    link,
+  ];
 }
 
 @JsonSerializable()
 class MinuteCastSummary {
-
   MinuteCastSummary({
     this.phrase,
     this.phrase60,
@@ -67,12 +75,12 @@ class MinuteCastSummary {
 
   @JsonKey(name: 'IconCode')
   final int? iconCode;
+
   Map<String, dynamic> toJson() => _$MinuteCastSummaryToJson(this);
 }
 
 @JsonSerializable()
 class MinuteCastRangeSummary {
-
   MinuteCastRangeSummary({
     this.startMinute,
     this.endMinute,
@@ -117,12 +125,12 @@ class MinuteCastRangeSummary {
 
   @JsonKey(name: 'IconCode')
   final int? iconCode;
+
   Map<String, dynamic> toJson() => _$MinuteCastRangeSummaryToJson(this);
 }
 
 @JsonSerializable()
 class MinuteInterval {
-
   MinuteInterval({
     this.startDateTime,
     this.startEpochDateTime,
@@ -134,8 +142,7 @@ class MinuteInterval {
     this.lightningRate,
   });
 
-  factory MinuteInterval.fromJson(Map<String, dynamic> json) =>
-      _$MinuteIntervalFromJson(json);
+  factory MinuteInterval.fromJson(Map<String, dynamic> json) => _$MinuteIntervalFromJson(json);
   @JsonKey(name: 'StartDateTime')
   final String? startDateTime;
 
@@ -159,5 +166,6 @@ class MinuteInterval {
 
   @JsonKey(name: 'LightningRate')
   final int? lightningRate;
+
   Map<String, dynamic> toJson() => _$MinuteIntervalToJson(this);
 }

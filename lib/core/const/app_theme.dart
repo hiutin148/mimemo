@@ -4,12 +4,35 @@ import 'package:mimemo/core/const/app_colors.dart';
 
 class AppTheme {
   static final ThemeData themeData = ThemeData(
-    primarySwatch: AppColors.createMaterialColor(AppColors.primary),
-    scaffoldBackgroundColor: AppColors.primary,
+    colorScheme: const ColorScheme(
+      brightness: Brightness.dark,
+      primary: AppColors.primary,
+      onPrimary: Colors.white,
+      secondary: AppColors.secondary,
+      onSecondary: Colors.white,
+      error: Colors.red,
+      onError: Colors.white,
+      surface: AppColors.surface,
+      onSurface: Colors.white,
+      surfaceContainerHighest: AppColors.surface,
+      onSurfaceVariant: Colors.white70,
+      outline: Colors.white24,
+      shadow: Colors.black,
+      inverseSurface: Colors.white,
+      onInverseSurface: AppColors.surface,
+    ),
+    scaffoldBackgroundColor: AppColors.surface,
+    useMaterial3: true,
+
     appBarTheme: const AppBarTheme(
-      backgroundColor: AppColors.primary,
+      backgroundColor: AppColors.surface,
       titleTextStyle: TextStyle(fontSize: 16, color: Colors.white),
       iconTheme: IconThemeData(color: Colors.white),
+    ),
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      backgroundColor: AppColors.surface,
+      selectedItemColor: Colors.white,
+      unselectedItemColor: AppColors.secondary,
     ),
     tabBarTheme: TabBarThemeData(
       dividerColor: Colors.white24,
