@@ -40,4 +40,8 @@ extension StringExtension on String {
     final regex = RegExp(r'^(?:[01]?[0-9]|2[0-3]):(?:00|30)$');
     return regex.hasMatch(this);
   }
+
+  String get capitalize {
+    return '${this[0].toUpperCase()}${substring(1).toLowerCase()}';
+  }
 }

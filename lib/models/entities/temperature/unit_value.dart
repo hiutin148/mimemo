@@ -42,3 +42,26 @@ class UnitValueDetail extends Equatable {
   @override
   List<Object?> get props => [value, unit, unitType, phrase];
 }
+
+@JsonSerializable()
+class UnitValueDetailV2 extends Equatable {
+  const UnitValueDetailV2({this.value, this.unit, this.unitType, this.phrase});
+
+  factory UnitValueDetailV2.fromJson(Map<String, dynamic> json) => _$UnitValueDetailV2FromJson(json);
+  @JsonKey(name: 'value')
+  final double? value;
+
+  @JsonKey(name: 'unit')
+  final String? unit;
+
+  @JsonKey(name: 'unitType')
+  final int? unitType;
+
+  @JsonKey(name: 'phrase')
+  final String? phrase;
+
+  Map<String, dynamic> toJson() => _$UnitValueDetailV2ToJson(this);
+
+  @override
+  List<Object?> get props => [value, unit, unitType, phrase];
+}

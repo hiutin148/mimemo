@@ -348,9 +348,12 @@ class _ApiClient implements ApiClient {
   }
 
   @override
-  Future<CurrentAirQuality> getCurrentAirQuality(String locationKey) async {
+  Future<CurrentAirQuality> getCurrentAirQuality(
+    String locationKey, {
+    String pollutants = 'true',
+  }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'pollutants': pollutants};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<CurrentAirQuality>(

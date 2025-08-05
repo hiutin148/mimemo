@@ -3,26 +3,63 @@ import 'dart:ui';
 import 'package:mimemo/core/const/app_colors.dart';
 
 enum Aqi {
-  green(color: AppColors.airGood, min: 0, max: 50),
-  yellow(color: AppColors.airModerate, min: 51, max: 100),
-  orange(color: AppColors.airUnhealthyForSensitiveGroups, min: 101, max: 150),
-  red(color: AppColors.airUnhealthy, min: 151, max: 200),
-  purple(color: AppColors.airVeryUnhealthy, min: 201, max: 300),
-  maroon(color: AppColors.airHazardous, min: 301, max: double.infinity);
+  excellent(
+    color: AppColors.airGood,
+    min: 0,
+    max: 19,
+    description:
+        'The air quality is ideal for most individuals; enjoy your normal outdoor activities.',
+  ),
+  fair(
+    color: AppColors.airModerate,
+    min: 20,
+    max: 49,
+    description:
+        'The air quality is generally acceptable for most individuals. However, sensitive groups may experience minor to moderate symptoms from long-term exposure.',
+  ),
+  poor(
+    color: AppColors.airPoor,
+    min: 50,
+    max: 99,
+    description:
+        'The air has reached a high level of pollution and is unhealthy for sensitive groups. Reduce time spent outside if you are feeling symptoms such as difficulty breathing or throat irritation.',
+  ),
+  unhealthy(
+    color: AppColors.airUnhealthy,
+    min: 100,
+    max: 149,
+    description:
+        'Health effects can be immediately felt by sensitive groups. Healthy individuals may experience difficulty breathing and throat irritation with prolonged exposure. Limit outdoor activity.',
+  ),
+  veryUnhealthy(
+    color: AppColors.airVeryUnhealthy,
+    min: 150,
+    max: 249,
+    description:
+        'Health effects will be immediately felt by sensitive groups and should avoid outdoor activity. Healthy individuals are likely to experience difficulty breathing and throat irritation; consider staying indoors and rescheduling outdoor activities.',
+  ),
+  dangerous(
+    color: AppColors.airHazardous,
+    min: 250,
+    max: double.infinity,
+    description:
+        'Any exposure to the air, even for a few minutes, can lead to serious health effects on everybody. Avoid outdoor activities.',
+  );
 
-  const Aqi({required this.color, required this.min, required this.max});
+  const Aqi({required this.color, required this.min, required this.max, this.description});
 
   final Color color;
   final double min;
   final double max;
+  final String? description;
 }
 
 extension AqiExtension on Aqi {
   /// Calculates the interpolated color for a given AQI value
   static Color getAQIColor(double aqiValue) {
     // Handle edge cases
-    if (aqiValue <= Aqi.green.min) return Aqi.green.color;
-    if (aqiValue >= Aqi.maroon.min) return Aqi.maroon.color;
+    if (aqiValue <= Aqi.excellent.min) return Aqi.excellent.color;
+    if (aqiValue >= Aqi.dangerous.min) return Aqi.dangerous.color;
 
     // Find the current AQI category
     Aqi? currentAqi;
@@ -33,7 +70,7 @@ extension AqiExtension on Aqi {
       }
     }
 
-    if (currentAqi == null) return Aqi.maroon.color;
+    if (currentAqi == null) return Aqi.dangerous.color;
 
     // Find current AQI index
     final currentIndex = Aqi.values.indexOf(currentAqi);
@@ -62,6 +99,6 @@ extension AqiExtension on Aqi {
         return aqi;
       }
     }
-    return Aqi.maroon; // Default to hazardous for values above 300
+    return Aqi.dangerous; // Default to hazardous for values above 300
   }
 }

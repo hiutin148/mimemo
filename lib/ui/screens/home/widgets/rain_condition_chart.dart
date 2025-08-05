@@ -113,7 +113,6 @@ class RainConditionPainter extends CustomPainter {
     final radius = (size.width - strokeWidth) / 2;
     final segmentCount = math.min(values.length, _maxSegments);
 
-    // Initialize cached paints
     _initializePaints();
 
     _drawSegments(canvas, center, radius, segmentCount);

@@ -14,12 +14,12 @@ abstract final class AppColors {
   static const Color blue = Color(0XFF1982c4);
 
   // AQI Basics for Ozone and Particle Pollution Colors
-  static const Color airGood = Color(0XFF00E400);
-  static const Color airModerate = Color(0XFFFFFF00);
-  static const Color airUnhealthyForSensitiveGroups = Color(0XFFFF7E00);
-  static const Color airUnhealthy = Color(0XFFFF0000);
-  static const Color airVeryUnhealthy = Color(0XFF8F3F97);
-  static const Color airHazardous = Color(0XFF7E0023);
+  static const Color airGood = Color(0XFF1DCFFF);
+  static const Color airModerate = Color(0XFF43D357);
+  static const Color airPoor = Color(0XFFFDB80D);
+  static const Color airUnhealthy = Color(0XFFE9365A);
+  static const Color airVeryUnhealthy = Color(0XFFA829D4);
+  static const Color airHazardous = Color(0XFF6A0AFF);
 
   // Common color
   static const Color cardBackground = Colors.white12;

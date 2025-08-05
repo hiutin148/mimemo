@@ -42,7 +42,6 @@ class AirQualityPainter extends CustomPainter {
   final double value;
   final double strokeWidth;
 
-  // Cache for expensive calculations
   static const double _endAngle = 9 * math.pi / 4;
   static const double _startAngle = 3 * math.pi / 4;
   static const int _maxSegments = 45;

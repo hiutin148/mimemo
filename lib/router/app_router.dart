@@ -15,5 +15,6 @@ class AppRouter extends RootStackRouter {
       reverseDuration: const Duration(milliseconds: 350),
       page: SearchLocationRoute.page,
     ),
+    AutoRoute(page: AirQualityRoute.page),
   ];
 }
