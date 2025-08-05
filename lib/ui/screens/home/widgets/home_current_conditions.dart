@@ -10,11 +10,9 @@ class HomeCurrentConditions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HomeCubit, HomeState>(
-      buildWhen:
-          (previous, current) =>
-              previous.currentConditions != current.currentConditions ||
-              previous.currentConditionsStatus !=
-                  current.currentConditionsStatus,
+      buildWhen: (previous, current) =>
+          previous.currentConditions != current.currentConditions ||
+          previous.currentConditionsStatus != current.currentConditionsStatus,
       builder: (context, state) {
         final currentConditions = state.currentConditions;
         return Container(
@@ -47,7 +45,7 @@ class HomeCurrentConditions extends StatelessWidget {
                   Expanded(
                     child: _buildDetailItem(
                       'Wind Speed',
-                      '${currentConditions?.wind?.speed?.value ?? ''} ${currentConditions?.wind?.speed?.unit ?? ''}',
+                      '${currentConditions?.wind?.speed?.metric?.value ?? ''} ${currentConditions?.wind?.speed?.metric?.unit ?? ''}',
                       Icons.air,
                     ),
                   ),

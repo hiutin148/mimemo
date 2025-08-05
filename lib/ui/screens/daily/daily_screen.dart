@@ -18,9 +18,14 @@ class DailyScreen extends StatefulWidget {
 
 class _DailyViewState extends State<DailyScreen>
     with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
-  final BottomSheetBarController _bottomSheetBarController = BottomSheetBarController();
-
+  late final DailyCubit _dailyCubit;
   int _currentTab = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _dailyCubit = context.read<DailyCubit>();
+  }
 
   void _onForecastItemPressed(ForecastDay? day) {
     context.read<DailyCubit>().changeSelectedDay(day);
@@ -35,25 +40,19 @@ class _DailyViewState extends State<DailyScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return BlocListener<DailyCubit, DailyState>(
-      listenWhen: (previous, current) => previous.selectedDay != current.selectedDay,
-      listener: (BuildContext context, DailyState state) {
-        _bottomSheetBarController.expand();
-      },
-      child: DefaultTabController(
-        length: 2,
-        child: Scaffold(
-          body: LayoutBuilder(
-            builder: (context, constraints) {
-              return BottomSheetBar(
-                controller: _bottomSheetBarController,
-                header: _buildBottomSheetHeader(context),
-                bodyBottomPadding: _currentTab == 0 ? 48 : 0,
-                body: _buildBottomSheetBarBody(),
-                expandedSliver: const SelectedDayDetail(),
-              );
-            },
-          ),
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            return BottomSheetBar(
+              controller: _dailyCubit.bottomSheetBarController,
+              header: _buildBottomSheetHeader(context),
+              bodyBottomPadding: _currentTab == 0 ? 48 : 0,
+              body: _buildBottomSheetBarBody(),
+              expandedSliver: const SelectedDayDetail(),
+            );
+          },
         ),
       ),
     );
@@ -65,10 +64,9 @@ class _DailyViewState extends State<DailyScreen>
         Column(
           children: [
             Expanded(
-              child:
-                  _currentTab == 0
-                      ? DailyForecastList(onItemTap: _onForecastItemPressed)
-                      : DailyForecastCalendar(onItemTap: _onForecastItemPressed),
+              child: _currentTab == 0
+                  ? DailyForecastList(onItemTap: _onForecastItemPressed)
+                  : DailyForecastCalendar(onItemTap: _onForecastItemPressed),
             ),
           ],
         ),
@@ -94,7 +92,10 @@ class _DailyViewState extends State<DailyScreen>
           unselectedLabelColor: Colors.white,
           labelStyle: context.textTheme.labelLarge,
           overlayColor: const WidgetStatePropertyAll(Colors.transparent),
-          tabs: const [Tab(text: '15 days', height: 20), Tab(text: '45 days', height: 20)],
+          tabs: const [
+            Tab(text: '15 days', height: 20),
+            Tab(text: '45 days', height: 20),
+          ],
           onTap: _onTabBarTap,
         ),
       ),

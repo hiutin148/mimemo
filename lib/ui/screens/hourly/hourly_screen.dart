@@ -16,14 +16,13 @@ class HourlyScreen extends StatefulWidget {
   State<HourlyScreen> createState() => _HourlyScreenState();
 }
 
-class _HourlyScreenState extends State<HourlyScreen>
-    with AutomaticKeepAliveClientMixin {
-  late final BottomSheetBarController _bottomSheetBarController;
+class _HourlyScreenState extends State<HourlyScreen> with AutomaticKeepAliveClientMixin {
+  late final HourlyCubit _cubit;
 
   @override
   void initState() {
     super.initState();
-    _bottomSheetBarController = BottomSheetBarController()..minSize = 0;
+    _cubit = context.read<HourlyCubit>();
   }
 
   @override
@@ -55,25 +54,16 @@ class _HourlyScreenState extends State<HourlyScreen>
   }
 
   Widget _buildSuccessState(BuildContext context) {
-    return BlocListener<HourlyCubit, HourlyState>(
-      listenWhen: (previous, current) =>
-          previous.selectedForecast != current.selectedForecast,
-      listener: (BuildContext context, HourlyState state) {
-        _bottomSheetBarController.expand();
-      },
-      child: RefreshIndicator(
-        onRefresh: () => context.read<HourlyCubit>().refresh(),
-        child: BottomSheetBar(
-          controller: _bottomSheetBarController,
-          header: _buildBottomSheetHeader(context),
-          body: HourlyList(
-            onItemTap: (forecast) =>
-                context.read<HourlyCubit>().selectForecast(forecast),
-          ),
-          expandedBuilder: (context, scrollController) =>
-              const SelectedHourDetail(),
-          bodyBottomPadding: 0,
+    return RefreshIndicator(
+      onRefresh: () => context.read<HourlyCubit>().refresh(),
+      child: BottomSheetBar(
+        controller: _cubit.bottomSheetBarController,
+        header: _buildBottomSheetHeader(context),
+        body: HourlyList(
+          onItemTap: (forecast) => context.read<HourlyCubit>().selectForecast(forecast),
         ),
+        expandedBuilder: (context, scrollController) => const SelectedHourDetail(),
+        bodyBottomPadding: 0,
       ),
     );
   }

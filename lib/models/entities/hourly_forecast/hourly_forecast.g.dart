@@ -45,10 +45,10 @@ HourlyForecast _$HourlyForecastFromJson(
       : UnitValueDetail.fromJson(json['DewPoint'] as Map<String, dynamic>),
   wind: json['Wind'] == null
       ? null
-      : Wind.fromJson(json['Wind'] as Map<String, dynamic>),
+      : WindDetail.fromJson(json['Wind'] as Map<String, dynamic>),
   windGust: json['WindGust'] == null
       ? null
-      : Wind.fromJson(json['WindGust'] as Map<String, dynamic>),
+      : WindDetail.fromJson(json['WindGust'] as Map<String, dynamic>),
   relativeHumidity: (json['RelativeHumidity'] as num?)?.toInt(),
   indoorRelativeHumidity: (json['IndoorRelativeHumidity'] as num?)?.toInt(),
   visibility: json['Visibility'] == null

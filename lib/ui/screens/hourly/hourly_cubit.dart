@@ -10,6 +10,7 @@ import 'package:mimemo/models/entities/hourly_forecast/hourly_forecast.dart';
 import 'package:mimemo/models/enums/load_status.dart';
 import 'package:mimemo/repositories/forecast_repository.dart';
 import 'package:mimemo/ui/screens/daily/daily_cubit.dart';
+import 'package:mimemo/ui/widgets/widgets.dart';
 
 part 'hourly_state.dart';
 
@@ -22,6 +23,13 @@ class HourlyCubit extends BaseCubit<HourlyState> {
   final DailyCubit dailyCubit;
   final MainCubit mainCubit;
   final ForecastRepository forecastRepository;
+
+  late final BottomSheetBarController bottomSheetBarController;
+
+  Future<void> init() async {
+    bottomSheetBarController = BottomSheetBarController()..minSize = 0;
+    return _fetch(LoadStatus.loading);
+  }
 
   Future<void> _fetch(LoadStatus loadStatus) async {
     try {
@@ -131,15 +139,12 @@ class HourlyCubit extends BaseCubit<HourlyState> {
     return hourlyDates;
   }
 
-  Future<void> init() async {
-    return _fetch(LoadStatus.loading);
-  }
-
   Future<void> refresh() async {
     return _fetch(LoadStatus.refreshing);
   }
 
   void selectForecast(HourlyForecast forecast) {
+    bottomSheetBarController.expand();
     emit(state.copyWith(selectedForecast: forecast));
   }
 }

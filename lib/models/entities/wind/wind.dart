@@ -13,9 +13,26 @@ class Wind extends Equatable {
   final WindDirection? direction;
 
   @JsonKey(name: 'Speed')
-  final UnitValueDetail? speed;
+  final UnitValue? speed;
 
   Map<String, dynamic> toJson() => _$WindToJson(this);
+
+  @override
+  List<Object?> get props => [direction, speed];
+}
+
+@JsonSerializable()
+class WindDetail extends Equatable {
+  const WindDetail({this.direction, this.speed});
+
+  factory WindDetail.fromJson(Map<String, dynamic> json) => _$WindDetailFromJson(json);
+  @JsonKey(name: 'Direction')
+  final WindDirection? direction;
+
+  @JsonKey(name: 'Speed')
+  final UnitValueDetail? speed;
+
+  Map<String, dynamic> toJson() => _$WindDetailToJson(this);
 
   @override
   List<Object?> get props => [direction, speed];

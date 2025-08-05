@@ -188,10 +188,10 @@ DayNight _$DayNightFromJson(Map<String, dynamic> json) => DayNight(
   iceProbability: (json['IceProbability'] as num?)?.toInt(),
   wind: json['Wind'] == null
       ? null
-      : Wind.fromJson(json['Wind'] as Map<String, dynamic>),
+      : WindDetail.fromJson(json['Wind'] as Map<String, dynamic>),
   windGust: json['WindGust'] == null
       ? null
-      : Wind.fromJson(json['WindGust'] as Map<String, dynamic>),
+      : WindDetail.fromJson(json['WindGust'] as Map<String, dynamic>),
   totalLiquid: json['TotalLiquid'] == null
       ? null
       : UnitValue.fromJson(json['TotalLiquid'] as Map<String, dynamic>),

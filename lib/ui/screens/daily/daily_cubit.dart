@@ -7,17 +7,20 @@ import 'package:mimemo/models/entities/climo_summary/climo_summary.dart';
 import 'package:mimemo/models/entities/daily_forecast/daily_forecast.dart';
 import 'package:mimemo/models/enums/load_status.dart';
 import 'package:mimemo/repositories/forecast_repository.dart';
+import 'package:mimemo/ui/widgets/widgets.dart';
 
 part 'daily_state.dart';
 
 class DailyCubit extends BaseCubit<DailyState> {
   DailyCubit({required this.forecastRepository, required this.mainCubit})
-    : super(const DailyState());
+      : super(const DailyState());
   final ForecastRepository forecastRepository;
   final MainCubit mainCubit;
+  late final BottomSheetBarController bottomSheetBarController;
 
   Future<void> init() async {
     try {
+      bottomSheetBarController = BottomSheetBarController();
       emit(state.copyWith(loadStatus: LoadStatus.loading));
       final locationKey = mainCubit.state.positionInfo?.key ?? '';
       final dailyForecast = await forecastRepository.get45DaysForecast(locationKey);
@@ -67,6 +70,7 @@ class DailyCubit extends BaseCubit<DailyState> {
       date.month.toString(),
       date.day.toString(),
     );
+    bottomSheetBarController.expand();
     emit(state.copyWith(selectedDayClimo: climo));
   }
 }

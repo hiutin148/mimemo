@@ -91,10 +91,10 @@ class HourlyForecast extends Equatable {
   final UnitValueDetail? dewPoint;
 
   @JsonKey(name: 'Wind')
-  final Wind? wind;
+  final WindDetail? wind;
 
   @JsonKey(name: 'WindGust')
-  final Wind? windGust;
+  final WindDetail? windGust;
 
   @JsonKey(name: 'RelativeHumidity')
   final int? relativeHumidity;

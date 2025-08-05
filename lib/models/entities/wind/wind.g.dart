@@ -12,13 +12,25 @@ Wind _$WindFromJson(Map<String, dynamic> json) => Wind(
       : WindDirection.fromJson(json['Direction'] as Map<String, dynamic>),
   speed: json['Speed'] == null
       ? null
-      : UnitValueDetail.fromJson(json['Speed'] as Map<String, dynamic>),
+      : UnitValue.fromJson(json['Speed'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$WindToJson(Wind instance) => <String, dynamic>{
   'Direction': instance.direction,
   'Speed': instance.speed,
 };
+
+WindDetail _$WindDetailFromJson(Map<String, dynamic> json) => WindDetail(
+  direction: json['Direction'] == null
+      ? null
+      : WindDirection.fromJson(json['Direction'] as Map<String, dynamic>),
+  speed: json['Speed'] == null
+      ? null
+      : UnitValueDetail.fromJson(json['Speed'] as Map<String, dynamic>),
+);
+
+Map<String, dynamic> _$WindDetailToJson(WindDetail instance) =>
+    <String, dynamic>{'Direction': instance.direction, 'Speed': instance.speed};
 
 WindDirection _$WindDirectionFromJson(Map<String, dynamic> json) =>
     WindDirection(

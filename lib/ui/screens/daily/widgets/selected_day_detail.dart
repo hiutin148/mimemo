@@ -56,10 +56,9 @@ class _SelectedDayDetailState extends State<SelectedDayDetail> with SingleTicker
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<DailyCubit, DailyState>(
-      buildWhen:
-          (previous, current) =>
-              previous.selectedDay != current.selectedDay ||
-              previous.selectedDayClimo != current.selectedDayClimo,
+      buildWhen: (previous, current) =>
+          previous.selectedDay != current.selectedDay ||
+          previous.selectedDayClimo != current.selectedDayClimo,
       builder: (context, state) {
         final selectedDay = state.selectedDay;
         if (selectedDay == null) {
@@ -72,10 +71,9 @@ class _SelectedDayDetailState extends State<SelectedDayDetail> with SingleTicker
             const Gap(16),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              child:
-                  _selectedTab != 2
-                      ? _buildWeatherContent(context, selectedDay)
-                      : _buildHistorical(selectedDay, state.selectedDayClimo),
+              child: _selectedTab != 2
+                  ? _buildWeatherContent(context, selectedDay)
+                  : _buildHistorical(selectedDay, state.selectedDayClimo),
             ),
           ]),
         );
@@ -89,6 +87,9 @@ class _SelectedDayDetailState extends State<SelectedDayDetail> with SingleTicker
       dividerColor: AppColors.surface,
       indicatorColor: AppColors.surface,
       labelColor: AppColors.surface,
+      labelStyle: context.textTheme.bodyMedium?.w700.copyWith(color: AppColors.surface),
+      unselectedLabelColor: Colors.black54,
+      unselectedLabelStyle: context.textTheme.bodyMedium?.copyWith(color: Colors.black54),
       isScrollable: true,
       labelPadding: const EdgeInsets.symmetric(horizontal: 16),
       tabAlignment: TabAlignment.center,
@@ -96,9 +97,15 @@ class _SelectedDayDetailState extends State<SelectedDayDetail> with SingleTicker
       controller: _tabController,
       dividerHeight: 0.5,
       tabs: const [
-        Tab(child: SizedBox(width: 60, child: Center(child: Text('Day')))),
-        Tab(child: SizedBox(width: 60, child: Center(child: Text('Night')))),
-        Tab(child: SizedBox(width: 60, child: Center(child: Text('History')))),
+        Tab(
+          child: SizedBox(width: 60, child: Center(child: Text('Day'))),
+        ),
+        Tab(
+          child: SizedBox(width: 60, child: Center(child: Text('Night'))),
+        ),
+        Tab(
+          child: SizedBox(width: 60, child: Center(child: Text('History'))),
+        ),
       ],
     );
   }
@@ -481,10 +488,9 @@ class _SelectedDayDetailState extends State<SelectedDayDetail> with SingleTicker
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        border:
-            bottomBorder
-                ? const Border(bottom: BorderSide(color: Colors.black12))
-                : const Border(top: BorderSide(color: Colors.black12)),
+        border: bottomBorder
+            ? const Border(bottom: BorderSide(color: Colors.black12))
+            : const Border(top: BorderSide(color: Colors.black12)),
       ),
       child: Row(
         spacing: 8,
