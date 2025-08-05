@@ -178,7 +178,7 @@ class _CurrentConditionGaugeChartState extends State<CurrentConditionGaugeChart>
   Widget _buildActionButton() {
     return AppButton(
       width: _buttonWidth,
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       onPressed: () {
         if (_currentTab == 0) {
           context.pushRoute(
@@ -189,7 +189,7 @@ class _CurrentConditionGaugeChartState extends State<CurrentConditionGaugeChart>
           );
         } else if (_currentTab == 1) {
           context.pushRoute(
-             AirQualityRoute(
+            AirQualityRoute(
               homeCubit: context.read<HomeCubit>(),
             ),
           );
@@ -199,8 +199,11 @@ class _CurrentConditionGaugeChartState extends State<CurrentConditionGaugeChart>
         spacing: 2,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(_currentButtonText),
-          const Icon(Icons.keyboard_arrow_right_outlined),
+          Text(
+            _currentButtonText,
+            style: context.textTheme.bodyMedium?.white,
+          ),
+          const Icon(Icons.keyboard_arrow_right_outlined, color: Colors.white,),
         ],
       ),
     );

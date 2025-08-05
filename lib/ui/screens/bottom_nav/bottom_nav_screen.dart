@@ -94,11 +94,7 @@ class _BottomNavScreenState extends State<BottomNavScreen> with RouteAware, Widg
         await _mainCubit.init();
       },
     );
-    await Future.wait([
-      _homeCubit.init(),
-      _dailyCubit.init(),
-      _hourlyCubit.init()
-    ]);
+    await Future.wait([_homeCubit.init(), _dailyCubit.init(), _hourlyCubit.init()]);
   }
 
   @override
@@ -176,6 +172,8 @@ class _BottomNavViewState extends State<BottomNavView> {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
+                      const Gap(4),
+                      const Icon(Icons.keyboard_arrow_down, color: Colors.white, size: 20),
                     ],
                   ),
                 ),

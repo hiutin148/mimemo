@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mimemo/ui/widgets/widgets.dart';
 
 class AppCustomScrollView extends StatefulWidget {
   const AppCustomScrollView({
@@ -57,7 +58,7 @@ class _AppCustomScrollViewState extends State<AppCustomScrollView> {
       },
       child:
           widget.onRefresh != null
-              ? RefreshIndicator(onRefresh: widget.onRefresh!, child: _getScrollView())
+              ? AppRefreshIndicator(onRefresh: widget.onRefresh!, child: _getScrollView())
               : _getScrollView(),
     );
   }
