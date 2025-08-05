@@ -62,5 +62,8 @@ abstract class ApiClient {
   Future<List<CurrentConditions>> getCurrentConditions(@Path('locationKey') String locationKey);
 
   @GET('/airquality/v2/currentconditions/{locationKey}')
-  Future<CurrentAirQuality> getCurrentAirQuality(@Path('locationKey') String locationKey);
+  Future<CurrentAirQuality> getCurrentAirQuality(
+    @Path('locationKey') String locationKey, {
+    @Query('pollutants') String pollutants = 'true',
+  });
 }

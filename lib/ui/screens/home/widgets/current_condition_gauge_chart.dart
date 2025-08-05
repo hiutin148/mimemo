@@ -24,7 +24,7 @@ class CurrentConditionGaugeChart extends StatefulWidget {
 
 class _CurrentConditionGaugeChartState extends State<CurrentConditionGaugeChart> {
   static const String _rainConditionButtonText = '4 hours';
-  static const String _airQualityButtonText = 'Hourly';
+  static const String _airQualityButtonText = 'See more';
   static const String _airQualityTitle = 'Current air pollutants are';
   static const String _lastUpdatedText = 'Last updated at 11h37'; // TODO: Make dynamic
   static const String _excellentLabel = 'EXCELLENT';
@@ -188,7 +188,11 @@ class _CurrentConditionGaugeChartState extends State<CurrentConditionGaugeChart>
             ),
           );
         } else if (_currentTab == 1) {
-          // TODO
+          context.pushRoute(
+             AirQualityRoute(
+              homeCubit: context.read<HomeCubit>(),
+            ),
+          );
         }
       },
       child: Row(

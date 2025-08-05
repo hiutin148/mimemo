@@ -112,7 +112,7 @@ class Pollutant extends Equatable {
   final double? plumeLabsIndex;
 
   @JsonKey(name: 'concentration')
-  final UnitValueDetail? concentration;
+  final UnitValueDetailV2? concentration;
 
   @JsonKey(name: 'source')
   final String? source;

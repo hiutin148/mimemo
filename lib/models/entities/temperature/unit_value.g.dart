@@ -35,3 +35,19 @@ Map<String, dynamic> _$UnitValueDetailToJson(UnitValueDetail instance) =>
       'UnitType': instance.unitType,
       'Phrase': instance.phrase,
     };
+
+UnitValueDetailV2 _$UnitValueDetailV2FromJson(Map<String, dynamic> json) =>
+    UnitValueDetailV2(
+      value: (json['value'] as num?)?.toDouble(),
+      unit: json['unit'] as String?,
+      unitType: (json['unitType'] as num?)?.toInt(),
+      phrase: json['phrase'] as String?,
+    );
+
+Map<String, dynamic> _$UnitValueDetailV2ToJson(UnitValueDetailV2 instance) =>
+    <String, dynamic>{
+      'value': instance.value,
+      'unit': instance.unit,
+      'unitType': instance.unitType,
+      'phrase': instance.phrase,
+    };

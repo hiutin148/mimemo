@@ -61,7 +61,9 @@ Pollutant _$PollutantFromJson(Map<String, dynamic> json) => Pollutant(
   plumeLabsIndex: (json['plumeLabsIndex'] as num?)?.toDouble(),
   concentration: json['concentration'] == null
       ? null
-      : UnitValueDetail.fromJson(json['concentration'] as Map<String, dynamic>),
+      : UnitValueDetailV2.fromJson(
+          json['concentration'] as Map<String, dynamic>,
+        ),
   source: json['source'] as String?,
 );
 
