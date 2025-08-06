@@ -84,6 +84,7 @@ flutter:
 
   assets:
     - assets/icons/
+    - assets/map_styles/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

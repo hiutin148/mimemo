@@ -11,5 +11,6 @@ class Assets {
   static const String iconsSunCloudLittleRain = 'assets/icons/sun_cloud_little_rain.svg';
   static const String iconsSunCloudZap = 'assets/icons/sun_cloud_zap.svg';
   static const String iconsSunSlowWind = 'assets/icons/sun_slow_wind.svg';
+  static const String mapStylesDark = 'assets/map_styles/dark.json';
 
 }

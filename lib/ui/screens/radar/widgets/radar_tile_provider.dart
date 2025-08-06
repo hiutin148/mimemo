@@ -34,9 +34,9 @@ class RadarTileProvider implements TileProvider {
 
   Future<Uint8List> _getTileData(ZXY zxy) async {
     return switch (appMapType) {
-      // Time-dependent tiles
-      AppMapType.radar || AppMapType.forecastEyePath =>
-        radarRepository.getFutureRadar(zxy, _getCurrentTimestamp()),
+      AppMapType.radar ||
+      // TODO
+      AppMapType.forecastEyePath => radarRepository.getFutureRadar(zxy, _getCurrentTimestamp()),
 
       AppMapType.clouds => radarRepository.getCloudSatellite(
         zxy,
@@ -62,11 +62,9 @@ class RadarTileProvider implements TileProvider {
 
       AppMapType.rainfallAmounts => radarRepository.getRainFallAmounts(zxy),
 
-      AppMapType.forecastedMaximumSustainedWinds =>
-        radarRepository.getMaximumSustainedWinds(zxy),
+      AppMapType.forecastedMaximumSustainedWinds => radarRepository.getMaximumSustainedWinds(zxy),
 
-      AppMapType.forecastedMaximumWindGusts =>
-        radarRepository.getMaximumWindGusts(zxy),
+      AppMapType.forecastedMaximumWindGusts => radarRepository.getMaximumWindGusts(zxy),
 
       AppMapType.stormSurge => radarRepository.getStormSurge(zxy),
 

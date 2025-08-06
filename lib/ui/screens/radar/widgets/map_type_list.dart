@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:mimemo/common/utils/dialog_util.dart';
 import 'package:mimemo/core/const/app_colors.dart';
 import 'package:mimemo/core/extension/context_extension.dart';
 import 'package:mimemo/models/enums/app_map_type.dart';
@@ -17,7 +18,8 @@ class MapTypeList extends StatelessWidget {
     return BlocSelector<RadarCubit, RadarState, AppMapType>(
       builder: (context, currentMapType) {
         return DefaultTabController(
-          length: 2,
+          // length: 2,
+          length: 1,
           child: LayoutBuilder(
             builder: (context, constraints) {
               return SizedBox(
@@ -53,7 +55,7 @@ class MapTypeList extends StatelessWidget {
                           dividerHeight: 0.5,
                           tabs: const [
                             Tab(text: 'Radar and map'),
-                            Tab(text: 'Settings'),
+                            // Tab(text: 'Settings'),
                           ],
                         ),
                       ],
@@ -65,8 +67,7 @@ class MapTypeList extends StatelessWidget {
                         itemBuilder: (context, index) {
                           final group = AppMapType.values
                               .where(
-                                (element) =>
-                                    element.group == MapTypeGroup.values[index],
+                                (element) => element.group == MapTypeGroup.values[index],
                               )
                               .toList();
                           final groupTitle = MapTypeGroup.values[index].title;
@@ -77,11 +78,10 @@ class MapTypeList extends StatelessWidget {
                               if (groupTitle.isNotEmpty)
                                 Text(
                                   groupTitle,
-                                  style: context.textTheme.titleMedium
-                                      ?.copyWith(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.w500,
-                                      ),
+                                  style: context.textTheme.titleMedium?.copyWith(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               ListView.separated(
                                 shrinkWrap: true,
@@ -89,6 +89,16 @@ class MapTypeList extends StatelessWidget {
                                 itemBuilder: (context, index) {
                                   return AppInkWell(
                                     onTap: () {
+                                      if (group[index] == AppMapType.forecastEyePath) {
+                                        // TODO
+                                        DialogUtil.showAlertDialog(
+                                          context,
+                                          title: 'Not supported',
+                                          message: 'This type of map is not supported yet.',
+                                          agreeText: 'Ok',
+                                        );
+                                        return;
+                                      }
                                       context.read<RadarCubit>().changeMapType(
                                         group[index],
                                       );
@@ -106,10 +116,9 @@ class MapTypeList extends StatelessWidget {
                                       children: [
                                         Text(
                                           group[index].title,
-                                          style: context.textTheme.bodyMedium
-                                              ?.copyWith(
-                                                color: Colors.black,
-                                              ),
+                                          style: context.textTheme.bodyMedium?.copyWith(
+                                            color: Colors.black,
+                                          ),
                                         ),
                                         if (currentMapType == group[index])
                                           const Icon(
@@ -121,9 +130,8 @@ class MapTypeList extends StatelessWidget {
                                     ),
                                   );
                                 },
-                                separatorBuilder:
-                                    (BuildContext context, int index) =>
-                                        const Gap(12),
+                                separatorBuilder: (BuildContext context, int index) =>
+                                    const Gap(12),
                                 itemCount: group.length,
                               ),
                             ],

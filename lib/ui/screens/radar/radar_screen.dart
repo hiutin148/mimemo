@@ -36,8 +36,7 @@ class RadarView extends StatefulWidget {
 }
 
 class _RadarViewState extends State<RadarView> {
-  final Completer<GoogleMapController> _controller =
-      Completer<GoogleMapController>();
+  final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
   late final RadarCubit _radarCubit;
   late CameraPosition _initialCameraPosition;
 
@@ -176,6 +175,7 @@ class _RadarViewState extends State<RadarView> {
           onMapCreated: _controller.complete,
           buildingsEnabled: false,
           myLocationEnabled: true,
+          style: _radarCubit.mapType,
           markers: {
             Marker(
               markerId: const MarkerId('current_position'),
