@@ -11,6 +11,7 @@ abstract class ForecastRepository {
   Future<List<MinuteColor>> getMinuteColors();
 
   Future<List<HourlyForecast>> getNext12HoursForecast(String locationKey);
+
   Future<List<HourlyForecast>> getNext240HoursForecast(String locationKey);
 
   Future<DailyForecast> get10DaysForecast(String locationKey);
@@ -71,7 +72,12 @@ class ForecastRepositoryImpl extends ForecastRepository {
     required String month,
     required String day,
   }) {
-    return apiClient.getClimoSummary(locationKey: locationKey, year: year, month: month, day: day);
+    return apiClient.getClimoSummary(
+      locationKey: locationKey,
+      year: year,
+      month: month,
+      day: day,
+    );
   }
 
   @override

@@ -61,6 +61,7 @@ dependencies:
   flutter_staggered_animations: ^1.1.1
   fl_chart: ^1.0.0
   flutter_sticky_header: ^0.8.0
+  google_maps_flutter: ^2.12.3
   scrollable_positioned_list: ^0.3.8
   dotted_line: ^3.2.3
   shimmer: ^3.0.0
@@ -83,6 +84,7 @@ flutter:
 
   assets:
     - assets/icons/
+    - assets/map_styles/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

@@ -132,7 +132,7 @@ class _BottomNavViewState extends State<BottomNavView> {
       HomeScreen(),
       HourlyScreen(),
       DailyScreen(),
-      RadarPage(),
+      RadarScreen(),
       MorePage(),
     ];
   }

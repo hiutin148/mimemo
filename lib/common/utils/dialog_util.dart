@@ -120,4 +120,89 @@ abstract final class DialogUtil {
       },
     );
   }
+
+  static Future<bool?> showAlertDialog(
+      BuildContext context, {
+        String? title,
+        String? message,
+        String agreeText = 'Agree',
+        VoidCallback? onAgree,
+        Color? agreeButtonColor,
+        bool barrierDismissible = true,
+      }) {
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: barrierDismissible,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 400),
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (title != null) ...[
+                  Text(
+                    title,
+                    style: Theme.of(context).textTheme.titleLarge?.w500,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                ],
+
+                if (message != null) ...[
+                  Text(
+                    message,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                    textAlign: TextAlign.start,
+                  ),
+                  const SizedBox(height: 24),
+                ],
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (onAgree != null) {
+                            onAgree();
+                            Navigator.of(context).pop();
+                          } else {
+                            Navigator.of(context).pop(true);
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                          agreeButtonColor ?? Theme.of(context).colorScheme.primary,
+                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: Text(
+                          agreeText,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 }

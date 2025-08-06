@@ -8,8 +8,7 @@ import 'package:mimemo/models/entities/hourly_forecast/hourly_forecast.dart';
 import 'package:mimemo/models/entities/minute_color/minute_color.dart';
 import 'package:mimemo/models/entities/one_minute_cast/one_minute_cast.dart';
 import 'package:mimemo/models/entities/position_info/position_info.dart';
-import 'package:retrofit/error_logger.dart';
-import 'package:retrofit/http.dart';
+import 'package:retrofit/retrofit.dart';
 
 part 'api_client.g.dart';
 
@@ -22,7 +21,9 @@ abstract class ApiClient {
   Future<PositionInfo> getGeoPosition(@Query('q') String latLong);
 
   @GET('/locations/v1/{locationKey}')
-  Future<PositionInfo> getPositionByLocationKey(@Path('locationKey') String locationKey);
+  Future<PositionInfo> getPositionByLocationKey(
+    @Path('locationKey') String locationKey,
+  );
 
   // Forecast
   @GET('/forecasts/v1/minute/1minute')
@@ -35,19 +36,29 @@ abstract class ApiClient {
   Future<List<MinuteColor>> getMinuteColors();
 
   @GET('/forecasts/v1/hourly/12hour/{locationKey}')
-  Future<List<HourlyForecast>> getNext12HoursForecast(@Path('locationKey') String locationKey);
+  Future<List<HourlyForecast>> getNext12HoursForecast(
+    @Path('locationKey') String locationKey,
+  );
 
   @GET('/forecasts/v1/hourly/240hour/{locationKey}')
-  Future<List<HourlyForecast>> getNext240HoursForecast(@Path('locationKey') String locationKey);
+  Future<List<HourlyForecast>> getNext240HoursForecast(
+    @Path('locationKey') String locationKey,
+  );
 
   @GET('/forecasts/v1/daily/10day/{locationKey}')
-  Future<DailyForecast> get10DaysForecast(@Path('locationKey') String locationKey);
+  Future<DailyForecast> get10DaysForecast(
+    @Path('locationKey') String locationKey,
+  );
 
   @GET('/forecasts/v1/daily/15day/{locationKey}')
-  Future<DailyForecast> get15DaysForecast(@Path('locationKey') String locationKey);
+  Future<DailyForecast> get15DaysForecast(
+    @Path('locationKey') String locationKey,
+  );
 
   @GET('/forecasts/v1/daily/45day/{locationKey}')
-  Future<DailyForecast> get45DaysForecast(@Path('locationKey') String locationKey);
+  Future<DailyForecast> get45DaysForecast(
+    @Path('locationKey') String locationKey,
+  );
 
   @GET('/climo/v1/summary/{year}/{month}/{day}/{locationKey}')
   Future<ClimoSummary> getClimoSummary({
@@ -59,11 +70,113 @@ abstract class ApiClient {
 
   // Current condition
   @GET('/currentconditions/v1/{locationKey}')
-  Future<List<CurrentConditions>> getCurrentConditions(@Path('locationKey') String locationKey);
+  Future<List<CurrentConditions>> getCurrentConditions(
+    @Path('locationKey') String locationKey,
+  );
 
   @GET('/airquality/v2/currentconditions/{locationKey}')
   Future<CurrentAirQuality> getCurrentAirQuality(
-    @Path('locationKey') String locationKey, {
-    @Query('pollutants') String pollutants = 'true',
+    @Path('locationKey') String locationKey,
+  );
+
+  // Radar
+  @GET('/maps/v1/radar/futureSIR/zxy/{dateTime}/{z}/{x}/{y}.png')
+  @DioResponseType(ResponseType.bytes)
+  Future<List<int>> getFutureRadar({
+    @Path('dateTime') required String dateTime,
+    @Path('z') required int z,
+    @Path('x') required int x,
+    @Path('y') required int y,
+    @Query('colortable') String colortable = 'off',
+    @Query('display_mode') String displayMode = '',
+    @Query('display_products') String displayProducts = '',
+  });
+
+  @GET('/maps/v1/satellite/globalColor/zxy/{dateTime}/{z}/{x}/{y}.png')
+  @DioResponseType(ResponseType.bytes)
+  Future<List<int>> getCloudSatellite({
+    @Path('dateTime') required String dateTime,
+    @Path('z') required int z,
+    @Path('x') required int x,
+    @Path('y') required int y,
+    @Query('display_mode') String displayMode = '10',
+    @Query('display_products') String displayProducts = '',
+  });
+
+  @GET('/maps/v1/satellite/globalWV/zxy/{dateTime}/{z}/{x}/{y}.png')
+  @DioResponseType(ResponseType.bytes)
+  Future<List<int>> getWaterVapor({
+    @Path('dateTime') required String dateTime,
+    @Path('z') required int z,
+    @Path('x') required int x,
+    @Path('y') required int y,
+    @Query('display_mode') String displayMode = '10',
+    @Query('display_products') String displayProducts = '',
+  });
+
+  @GET('/maps/v1/models/gfs/zxy/{dateTime}/{z}/{x}/{y}.png')
+  @DioResponseType(ResponseType.bytes)
+  Future<List<int>> getCurrentTemperature({
+    @Path('dateTime') required String dateTime,
+    @Path('z') required int z,
+    @Path('x') required int x,
+    @Path('y') required int y,
+    @Query('colortable') String colortable = 'off',
+    @Query('display_mode') String displayMode = '',
+    @Query('display_products') String displayProducts = '26-1010',
+  });
+
+  @GET('/maps/v1//tropical/hurricane/zxy/{z}/{x}/{y}.png')
+  @DioResponseType(ResponseType.bytes)
+  Future<List<int>> getRiskTropical({
+    @Path('z') required int z,
+    @Path('x') required int x,
+    @Path('y') required int y,
+    @Query('categories') String categories = 'RISK_TO_LIFE_PROPERTY',
+  });
+
+  @GET('/maps/v1//tropical/hurricane/zxy/{z}/{x}/{y}.png')
+  @DioResponseType(ResponseType.bytes)
+  Future<List<int>> getRainFallAmounts({
+    @Path('z') required int z,
+    @Path('x') required int x,
+    @Path('y') required int y,
+    @Query('categories') String categories = 'RAINFALL',
+  });
+
+  @GET('/maps/v1//tropical/hurricane/zxy/{z}/{x}/{y}.png')
+  @DioResponseType(ResponseType.bytes)
+  Future<List<int>> getMaximumSustainedWinds({
+    @Path('z') required int z,
+    @Path('x') required int x,
+    @Path('y') required int y,
+    @Query('categories') String categories = 'MAXIMUM_SUSTAINED_WINDS',
+  });
+
+  @GET('/maps/v1//tropical/hurricane/zxy/{z}/{x}/{y}.png')
+  @DioResponseType(ResponseType.bytes)
+  Future<List<int>> getMaximumWindGusts({
+    @Path('z') required int z,
+    @Path('x') required int x,
+    @Path('y') required int y,
+    @Query('categories') String categories = 'MAXIMUM_WIND_GUSTS',
+  });
+
+  @GET('/maps/v1//tropical/hurricane/zxy/{z}/{x}/{y}.png')
+  @DioResponseType(ResponseType.bytes)
+  Future<List<int>> getStormSurge({
+    @Path('z') required int z,
+    @Path('x') required int x,
+    @Path('y') required int y,
+    @Query('categories') String categories = 'STORM_SURGE',
+  });
+
+  @GET('/maps/v1//alerts/globalWarnings/zxy/{z}/{x}/{y}.png')
+  @DioResponseType(ResponseType.bytes)
+  Future<List<int>> getWatchesAndWarnings({
+    @Path('z') required int z,
+    @Path('x') required int x,
+    @Path('y') required int y,
+    @Query('borders') String border = 'false',
   });
 }
