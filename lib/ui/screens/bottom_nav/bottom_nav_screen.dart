@@ -129,7 +129,6 @@ class _BottomNavViewState extends State<BottomNavView> {
       HourlyScreen(),
       DailyScreen(),
       RadarScreen(),
-      MorePage(),
     ];
   }
 
@@ -205,7 +204,6 @@ class _BottomNavViewState extends State<BottomNavView> {
                     BottomNavigationBarItem(icon: Icon(Icons.schedule), label: 'Hourly'),
                     BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Daily'),
                     BottomNavigationBarItem(icon: Icon(Icons.radar), label: 'Radar'),
-                    BottomNavigationBarItem(icon: Icon(Icons.more_horiz), label: 'More'),
                   ],
                 ),
               ),

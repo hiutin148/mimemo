@@ -1,0 +1,7 @@
+{
+  "imports": {
+    "https://deno.land/x/google_auth_library/mod.ts": "https://deno.land/x/google_auth_library@v0.3.1/mod.ts",
+    "https://esm.sh/@supabase/supabase-js@2": "https://esm.sh/@supabase/supabase-js@2.44.2",
+    "./CurrentWeather": "./CurrentWeather"
+  }
+}

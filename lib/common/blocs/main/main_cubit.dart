@@ -9,6 +9,7 @@ import 'package:mimemo/models/enums/load_status.dart';
 import 'package:mimemo/repositories/forecast_repository.dart';
 import 'package:mimemo/repositories/position_repository.dart';
 import 'package:mimemo/services/geolocation_service.dart';
+import 'package:mimemo/services/supabase_function_service.dart';
 
 part 'main_state.dart';
 
@@ -17,13 +18,16 @@ class MainCubit extends BaseCubit<MainState> {
     required PositionRepository positionRepository,
     required GeoLocationService geoLocationService,
     required ForecastRepository forecastRepository,
+    required SupabaseFunctionService supabaseFunctionService,
   }) : _positionRepository = positionRepository,
        _geoLocationService = geoLocationService,
        _forecastRepository = forecastRepository,
+       _supabaseFunctionService = supabaseFunctionService,
        super(const MainState());
   final PositionRepository _positionRepository;
   final GeoLocationService _geoLocationService;
   final ForecastRepository _forecastRepository;
+  final SupabaseFunctionService _supabaseFunctionService;
 
   Future<void> init() async {
     if (state.loadStatus == LoadStatus.loading) return;
@@ -35,7 +39,7 @@ class MainCubit extends BaseCubit<MainState> {
         _getPositionInfo(),
         _forecastRepository.getMinuteColors(),
       ).wait;
-
+      unawaited(_supabaseFunctionService.saveLocationKey(positionInfo.key));
       unawaited(_positionRepository.setSavedLocationKey(positionInfo.key ?? ''));
       unawaited(_positionRepository.insertRecentPosition(positionInfo));
       emit(
