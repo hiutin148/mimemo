@@ -6,6 +6,8 @@ import 'package:mimemo/ui/screens/home/widgets/current_condition_gauge_chart.dar
 import 'package:mimemo/ui/screens/home/widgets/home_current_conditions.dart';
 import 'package:mimemo/ui/screens/home/widgets/home_daily_forecast.dart';
 import 'package:mimemo/ui/screens/home/widgets/home_hourly_forecast.dart';
+import 'package:mimemo/ui/screens/home/widgets/sun_moon_status.dart';
+import 'package:mimemo/ui/widgets/widgets.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -32,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
       body: Container(
         decoration: const BoxDecoration(color: AppColors.surface),
         child: SafeArea(
-          child: RefreshIndicator(
+          child: AppRefreshIndicator(
             onRefresh: () => _cubit.init(),
             child: const SingleChildScrollView(
               child: Padding(
@@ -43,6 +45,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                   children: [
                     CurrentConditionGaugeChart(),
                     HomeCurrentConditions(),
+                    SunMoonStatus(),
                     HomeHourlyForecast(),
                     HomeDailyForecast(),
                   ],

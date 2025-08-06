@@ -7,18 +7,14 @@ import 'package:mimemo/models/entities/daily_forecast/daily_forecast.dart';
 import 'package:mimemo/ui/screens/bottom_nav/bottom_nav_cubit.dart';
 import 'package:mimemo/ui/screens/bottom_nav/bottom_nav_tab.dart';
 import 'package:mimemo/ui/screens/daily/daily_cubit.dart';
+import 'package:mimemo/ui/screens/home/widgets/home_card.dart';
 import 'package:mimemo/ui/widgets/widgets.dart';
 
 class HomeDailyForecast extends StatelessWidget {
   const HomeDailyForecast({super.key});
 
-  static const _borderRadius = 16.0;
   static const _padding = 16.0;
   static const _iconSize = 16.0;
-
-  void _onViewAllTapped(BuildContext context) {
-    context.read<BottomNavCubit>().switchTab(BottomNavTab.daily.index);
-  }
 
   void _onForecastItemTapped(BuildContext context, ForecastDay forecastDay, int index) {
     context.read<DailyCubit>().changeSelectedDay(forecastDay);
@@ -28,60 +24,28 @@ class HomeDailyForecast extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<DailyCubit, DailyState>(
-      buildWhen:
-          (previous, current) =>
-              previous.loadStatus != current.loadStatus ||
-              previous.dailyForecast != current.dailyForecast,
+      buildWhen: (previous, current) =>
+          previous.loadStatus != current.loadStatus ||
+          previous.dailyForecast != current.dailyForecast,
       builder: (context, state) {
-        final forecasts =
-            state.dailyForecast?.dailyForecasts?.getRange(0, 14).whereType<ForecastDay>().toList();
+        final forecasts = state.dailyForecast?.dailyForecasts
+            ?.getRange(0, 14)
+            .whereType<ForecastDay>()
+            .toList();
 
         if (forecasts == null || forecasts.isEmpty) {
           return const SizedBox.shrink();
         }
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [const Gap(16), _buildForecastContainer(context, forecasts)],
+        return HomeCard(
+          cardContentPadding: 0,
+          onTap: () {
+            context.read<BottomNavCubit>().switchTab(BottomNavTab.hourly.index);
+          },
+          title: 'Daily Forecast',
+          child: _buildForecastList(context, forecasts),
         );
       },
-    );
-  }
-
-  Widget _buildForecastContainer(BuildContext context, List<ForecastDay> forecasts) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.cardBackground,
-        borderRadius: BorderRadius.circular(_borderRadius),
-      ),
-      child: Column(children: [_buildHeader(context), _buildForecastList(context, forecasts)]),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(_padding),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            'Daily Forecast',
-            style: context.textTheme.headlineSmall?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          AppInkWell(
-            onTap: () => _onViewAllTapped(context),
-            child: Text(
-              'View All',
-              style: context.textTheme.bodyMedium?.copyWith(
-                color: Colors.white.withValues(alpha: 0.8),
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -91,8 +55,8 @@ class HomeDailyForecast extends StatelessWidget {
       itemCount: forecasts.length,
       shrinkWrap: true,
       itemBuilder: (context, index) => _buildForecastItem(context, forecasts[index], index),
-      separatorBuilder:
-          (context, index) => const Divider(thickness: 1, height: 1, color: Colors.white24),
+      separatorBuilder: (context, index) =>
+          const Divider(thickness: 1, height: 1, color: Colors.white24),
     );
   }
 
@@ -106,10 +70,6 @@ class HomeDailyForecast extends StatelessWidget {
 
     return AppInkWell(
       onTap: () => _onForecastItemTapped(context, forecastDay, index),
-      decoration:
-          index == 0
-              ? const BoxDecoration(border: Border(top: BorderSide(color: Colors.white24)))
-              : null,
       padding: const EdgeInsets.all(_padding),
       child: Row(
         children: [

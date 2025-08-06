@@ -54,7 +54,7 @@ class _HourlyScreenState extends State<HourlyScreen> with AutomaticKeepAliveClie
   }
 
   Widget _buildSuccessState(BuildContext context) {
-    return RefreshIndicator(
+    return AppRefreshIndicator(
       onRefresh: () => context.read<HourlyCubit>().refresh(),
       child: BottomSheetBar(
         controller: _cubit.bottomSheetBarController,

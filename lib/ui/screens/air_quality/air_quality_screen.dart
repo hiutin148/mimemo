@@ -9,6 +9,7 @@ import 'package:mimemo/ui/screens/air_quality/widgets/air_quality_report_chart.d
 import 'package:mimemo/ui/screens/air_quality/widgets/air_quality_scale.dart';
 import 'package:mimemo/ui/screens/air_quality/widgets/pollutants_list.dart';
 import 'package:mimemo/ui/screens/home/home_cubit.dart';
+import 'package:mimemo/ui/widgets/widgets.dart';
 
 @RoutePage()
 class AirQualityScreen extends StatelessWidget {
@@ -41,7 +42,7 @@ class AirQualityView extends StatelessWidget {
           ),
           body: LayoutBuilder(
             builder: (context, constraints) {
-              return RefreshIndicator(
+              return AppRefreshIndicator(
                 onRefresh: context.read<HomeCubit>().getAirQuality,
                 child: SingleChildScrollView(
                   child: Padding(

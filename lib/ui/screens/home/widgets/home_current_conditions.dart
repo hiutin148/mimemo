@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mimemo/core/const/consts.dart';
+import 'package:mimemo/ui/screens/bottom_nav/bottom_nav_cubit.dart';
+import 'package:mimemo/ui/screens/bottom_nav/bottom_nav_tab.dart';
+import 'package:mimemo/ui/screens/daily/daily_cubit.dart';
 import 'package:mimemo/ui/screens/home/home_cubit.dart';
+import 'package:mimemo/ui/screens/home/widgets/home_card.dart';
 import 'package:mimemo/ui/widgets/widgets.dart';
 
 class HomeCurrentConditions extends StatelessWidget {
   const HomeCurrentConditions({super.key});
+
+  void _onCardTap(BuildContext context) {
+    final dailyCubit = context.read<DailyCubit>();
+    final forecastDay = dailyCubit.state.dailyForecast?.dailyForecasts?.firstOrNull;
+    dailyCubit.changeSelectedDay(forecastDay);
+    context.read<BottomNavCubit>().switchTab(BottomNavTab.daily.index);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,24 +25,12 @@ class HomeCurrentConditions extends StatelessWidget {
           previous.currentConditionsStatus != current.currentConditionsStatus,
       builder: (context, state) {
         final currentConditions = state.currentConditions;
-        return Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: AppColors.cardBackground,
-            borderRadius: BorderRadius.circular(16),
-          ),
+        return HomeCard(
+          title: 'Current conditions',
+          onTap: () => _onCardTap(context),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 16,
             children: [
-              const Text(
-                'Current conditions',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const Gap(16),
               Row(
                 children: [
                   Expanded(
@@ -51,7 +49,6 @@ class HomeCurrentConditions extends StatelessWidget {
                   ),
                 ],
               ),
-              const Gap(16),
               Row(
                 children: [
                   Expanded(
@@ -70,7 +67,6 @@ class HomeCurrentConditions extends StatelessWidget {
                   ),
                 ],
               ),
-              const Gap(16),
               Row(
                 children: [
                   Expanded(

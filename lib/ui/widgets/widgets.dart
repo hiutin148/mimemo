@@ -4,6 +4,7 @@ export 'app_button.dart';
 export 'app_custom_scroll_view.dart';
 export 'app_icon.dart';
 export 'app_inkwell.dart';
+export 'app_refresh_indicator.dart';
 export 'app_text_field.dart';
 export 'bottom_sheet_bar.dart';
 export 'load_error_widget.dart';

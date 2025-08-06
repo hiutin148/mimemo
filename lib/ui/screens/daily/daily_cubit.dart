@@ -13,14 +13,14 @@ part 'daily_state.dart';
 
 class DailyCubit extends BaseCubit<DailyState> {
   DailyCubit({required this.forecastRepository, required this.mainCubit})
-      : super(const DailyState());
+    : super(const DailyState());
   final ForecastRepository forecastRepository;
   final MainCubit mainCubit;
-  late final BottomSheetBarController bottomSheetBarController;
+  BottomSheetBarController? bottomSheetBarController;
 
   Future<void> init() async {
     try {
-      bottomSheetBarController = BottomSheetBarController();
+      bottomSheetBarController ??= BottomSheetBarController();
       emit(state.copyWith(loadStatus: LoadStatus.loading));
       final locationKey = mainCubit.state.positionInfo?.key ?? '';
       final dailyForecast = await forecastRepository.get45DaysForecast(locationKey);
@@ -70,7 +70,7 @@ class DailyCubit extends BaseCubit<DailyState> {
       date.month.toString(),
       date.day.toString(),
     );
-    bottomSheetBarController.expand();
+    bottomSheetBarController?.expand();
     emit(state.copyWith(selectedDayClimo: climo));
   }
 }

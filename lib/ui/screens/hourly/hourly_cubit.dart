@@ -24,10 +24,10 @@ class HourlyCubit extends BaseCubit<HourlyState> {
   final MainCubit mainCubit;
   final ForecastRepository forecastRepository;
 
-  late final BottomSheetBarController bottomSheetBarController;
+  BottomSheetBarController? bottomSheetBarController;
 
   Future<void> init() async {
-    bottomSheetBarController = BottomSheetBarController()..minSize = 0;
+    bottomSheetBarController ??= BottomSheetBarController()..minSize = 0;
     return _fetch(LoadStatus.loading);
   }
 
@@ -144,7 +144,7 @@ class HourlyCubit extends BaseCubit<HourlyState> {
   }
 
   void selectForecast(HourlyForecast forecast) {
-    bottomSheetBarController.expand();
+    bottomSheetBarController?.expand();
     emit(state.copyWith(selectedForecast: forecast));
   }
 }
