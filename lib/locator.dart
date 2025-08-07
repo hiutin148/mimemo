@@ -7,8 +7,11 @@ import 'package:mimemo/repositories/radar_repository.dart';
 import 'package:mimemo/repositories/search_location_repository.dart';
 import 'package:mimemo/services/api/api_client.dart';
 import 'package:mimemo/services/api/dio_client.dart';
+import 'package:mimemo/services/fcm_service.dart';
 import 'package:mimemo/services/geolocation_service.dart';
+import 'package:mimemo/services/local_notification_service.dart';
 import 'package:mimemo/services/shared_preference_service.dart';
+import 'package:mimemo/services/supabase_function_service.dart';
 
 final GetIt locator = GetIt.instance;
 
@@ -47,5 +50,11 @@ void initLocator() {
     )
     ..registerLazySingleton<RadarRepository>(
       () => RadarRepositoryImpl(apiClient: locator<ApiClient>()),
-    );
+    )
+    ..registerLazySingleton(
+      SupabaseFunctionService.new,
+    )
+    ..registerLazySingleton(
+      FcmService.new,
+    )..registerLazySingleton(LocalNotificationService.new);
 }

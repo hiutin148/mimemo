@@ -27,11 +27,14 @@ class HomeCubit extends BaseCubit<HomeState> {
 
   Future<void> init() async {
     try {
-      unawaited(getOneMinuteCast());
-      unawaited(getCurrentConditions());
-      unawaited(getAirQuality());
-      unawaited(getNext12HoursForecast());
-      unawaited(getDailyForecast());
+      await Future.wait([
+        getOneMinuteCast(),
+        getCurrentConditions(),
+        getAirQuality(),
+        getNext12HoursForecast(),
+        getDailyForecast(),
+      ]);
+      emit(state.copyWith(lastUpdate: DateTime.now()));
     } on Exception catch (e) {
       logger.e(e);
     }

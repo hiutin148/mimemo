@@ -4,17 +4,13 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:mimemo/common/utils/logger.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 /// Singleton service class for handling local notifications
 /// Provides optimized performance and follows Flutter best practices
-class NotificationService {
-
-  NotificationService._();
-  static NotificationService? _instance;
-  static final NotificationService instance = _instance ??= NotificationService._();
-
+class LocalNotificationService {
   final FlutterLocalNotificationsPlugin _notifications = FlutterLocalNotificationsPlugin();
 
   // Cache for notification settings to avoid repeated permission checks
@@ -105,13 +101,15 @@ class NotificationService {
 
     try {
       if (Platform.isIOS || Platform.isMacOS) {
-        final granted = await _notifications
-            .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
-            ?.requestPermissions(
-          alert: true,
-          badge: true,
-          sound: true,
-        ) ?? false;
+        final granted =
+            await _notifications
+                .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
+                ?.requestPermissions(
+                  alert: true,
+                  badge: true,
+                  sound: true,
+                ) ??
+            false;
 
         _permissionsGranted = granted;
         _lastPermissionCheck = DateTime.now();
@@ -122,8 +120,8 @@ class NotificationService {
       _permissionsGranted = true;
       _lastPermissionCheck = DateTime.now();
       return true;
-    } on Exception catch(e) {
-      debugPrint('NotificationService: Permission request failed - $e');
+    } on Exception catch (e) {
+      logger.e('NotificationService: Permission request failed - $e');
       return false;
     }
   }
@@ -178,7 +176,7 @@ class NotificationService {
 
       await _notifications.show(id, title, body, details, payload: payload);
     } catch (e) {
-      debugPrint('NotificationService: Failed to show notification - $e');
+      logger.e('NotificationService: Failed to show notification - $e');
       rethrow;
     }
   }
@@ -231,9 +229,10 @@ class NotificationService {
         payload: payload,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         matchDateTimeComponents: matchDateTimeComponents,
+        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
       );
     } catch (e) {
-      debugPrint('NotificationService: Failed to schedule notification - $e');
+      logger.e('NotificationService: Failed to schedule notification - $e');
       rethrow;
     }
   }
@@ -284,7 +283,7 @@ class NotificationService {
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       );
     } catch (e) {
-      debugPrint('NotificationService: Failed to schedule periodic notification - $e');
+      logger.e('NotificationService: Failed to schedule periodic notification - $e');
       rethrow;
     }
   }
@@ -296,7 +295,7 @@ class NotificationService {
     try {
       await _notifications.cancel(id);
     } on Exception catch (e) {
-      debugPrint('NotificationService: Failed to cancel notification $id - $e');
+      logger.e('NotificationService: Failed to cancel notification $id - $e');
     }
   }
 
@@ -307,7 +306,7 @@ class NotificationService {
     try {
       await _notifications.cancelAll();
     } on Exception catch (e) {
-      debugPrint('NotificationService: Failed to cancel all notifications - $e');
+      logger.e('NotificationService: Failed to cancel all notifications - $e');
     }
   }
 
@@ -318,7 +317,7 @@ class NotificationService {
     try {
       return await _notifications.pendingNotificationRequests();
     } on Exception catch (e) {
-      debugPrint('NotificationService: Failed to get pending notifications - $e');
+      logger.e('NotificationService: Failed to get pending notifications - $e');
       return [];
     }
   }
@@ -330,7 +329,7 @@ class NotificationService {
     try {
       return await _notifications.getActiveNotifications();
     } on Exception catch (e) {
-      debugPrint('NotificationService: Failed to get active notifications - $e');
+      logger.e('NotificationService: Failed to get active notifications - $e');
       return [];
     }
   }
@@ -364,7 +363,7 @@ class NotificationService {
           .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
           ?.createNotificationChannel(androidChannel);
     } on Exception catch (e) {
-      debugPrint('NotificationService: Failed to create notification channel - $e');
+      logger.e('NotificationService: Failed to create notification channel - $e');
     }
   }
 
@@ -377,7 +376,7 @@ class NotificationService {
           .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
           ?.deleteNotificationChannel(channelId);
     } on Exception catch (e) {
-      debugPrint('NotificationService: Failed to delete notification channel - $e');
+      logger.e('NotificationService: Failed to delete notification channel - $e');
     }
   }
 
@@ -388,12 +387,13 @@ class NotificationService {
     try {
       if (Platform.isAndroid) {
         return await _notifications
-            .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-            ?.areNotificationsEnabled() ?? false;
+                .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+                ?.areNotificationsEnabled() ??
+            false;
       }
       return _permissionsGranted ?? false;
     } on Exception catch (e) {
-      debugPrint('NotificationService: Failed to check notification status - $e');
+      logger.e('NotificationService: Failed to check notification status - $e');
       return false;
     }
   }

@@ -1,1 +1,1 @@
-enum BottomNavTab { home, hourly, daily, radar, more }
+enum BottomNavTab { home, hourly, daily, radar }

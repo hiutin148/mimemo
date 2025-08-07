@@ -1,0 +1,6 @@
+
+[functions.weather-notifier]
+enabled = true
+verify_jwt = true
+import_map = "./functions/weather-notifier/deno.json"
+entrypoint = "./functions/weather-notifier/index.ts"

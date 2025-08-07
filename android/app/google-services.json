@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "604086667595",
+    "project_id": "mimemo-436a9",
+    "storage_bucket": "mimemo-436a9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:604086667595:android:1c75e4ef375fc406ad40ce",
+        "android_client_info": {
+          "package_name": "com.hiutin.mimemo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBhFL0rNdq3uiTJYt8ntQcQ94zfsRZcBvE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

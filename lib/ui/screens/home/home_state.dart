@@ -13,6 +13,7 @@ class HomeState extends Equatable {
     this.next12HoursForecast = const [],
     this.dailyForecastStatus = LoadStatus.initial,
     this.dailyForecast,
+    this.lastUpdate,
   });
   final LoadStatus oneMinuteCastStatus;
   final OneMinuteCast? oneMinuteCast;
@@ -24,6 +25,7 @@ class HomeState extends Equatable {
   final List<HourlyForecast> next12HoursForecast;
   final LoadStatus dailyForecastStatus;
   final DailyForecast? dailyForecast;
+  final DateTime? lastUpdate;
 
   @override
   List<Object?> get props => [
@@ -37,6 +39,7 @@ class HomeState extends Equatable {
     next12HoursForecast,
     dailyForecastStatus,
     dailyForecast,
+    lastUpdate,
   ];
 
   HomeState copyWith({
@@ -50,6 +53,7 @@ class HomeState extends Equatable {
     LoadStatus? next12HoursForecastStatus,
     LoadStatus? dailyForecastStatus,
     DailyForecast? dailyForecast,
+    DateTime? lastUpdate,
   }) => HomeState(
     oneMinuteCast: oneMinuteCast ?? this.oneMinuteCast,
     oneMinuteCastStatus: oneMinuteCastStatus ?? this.oneMinuteCastStatus,
@@ -61,5 +65,6 @@ class HomeState extends Equatable {
     next12HoursForecast: next12HoursForecast ?? this.next12HoursForecast,
     dailyForecastStatus: dailyForecastStatus ?? this.dailyForecastStatus,
     dailyForecast: dailyForecast ?? this.dailyForecast,
+    lastUpdate: lastUpdate ?? this.lastUpdate,
   );
 }

@@ -14,11 +14,10 @@ class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create:
-          (context) => SplashCubit(
-            appSettingRepository: locator<AppSettingRepository>(),
-            mainCubit: context.read<MainCubit>(),
-          )..init(),
+      create: (context) => SplashCubit(
+        appSettingRepository: locator<AppSettingRepository>(),
+        mainCubit: context.read<MainCubit>(),
+      )..init(),
       child: const SplashView(),
     );
   }

@@ -29,7 +29,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => OnboardingCubit(appSettingRepository: locator<AppSettingRepository>()),
+      create: (context) => OnboardingCubit(
+        appSettingRepository: locator<AppSettingRepository>(),
+        mainCubit: context.read<MainCubit>(),
+      ),
       child: Scaffold(
         body: PageView(
           controller: _pageController,
@@ -59,8 +62,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 }
 
 class WelcomeScreen extends StatelessWidget {
-
   const WelcomeScreen({required this.onNext, super.key});
+
   final VoidCallback onNext;
 
   @override
@@ -143,8 +146,8 @@ class WelcomeScreen extends StatelessWidget {
 }
 
 class FeaturesScreen extends StatelessWidget {
-
   const FeaturesScreen({required this.onNext, required this.onSkip, super.key});
+
   final VoidCallback onNext;
   final VoidCallback onSkip;
 
@@ -260,8 +263,8 @@ class FeaturesScreen extends StatelessWidget {
 }
 
 class LocationPermissionScreen extends StatelessWidget {
-
   const LocationPermissionScreen({required this.onNext, required this.onSkip, super.key});
+
   final VoidCallback onNext;
   final VoidCallback onSkip;
 
@@ -269,7 +272,7 @@ class LocationPermissionScreen extends StatelessWidget {
     try {
       await OverlayLoading.runWithLoading(context, () => context.read<MainCubit>().init());
       onNext.call();
-    } on Exception catch(e) {
+    } on Exception catch (e) {
       logger.e(e);
     }
   }
@@ -306,7 +309,11 @@ class LocationPermissionScreen extends StatelessWidget {
 
               Text(
                 S.of(context).enableLocationAccess,
-                style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
                 textAlign: TextAlign.center,
               ),
 
@@ -378,10 +385,18 @@ class LocationPermissionScreen extends StatelessWidget {
 }
 
 class NotificationPermissionScreen extends StatelessWidget {
-
   const NotificationPermissionScreen({required this.onNext, required this.onSkip, super.key});
+
   final VoidCallback onNext;
   final VoidCallback onSkip;
+
+  Future<void> _initNotification(BuildContext context) async {
+    await OverlayLoading.runWithLoading(
+      context,
+      () => context.read<OnboardingCubit>().initNotification(),
+    );
+    onNext.call();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -480,7 +495,7 @@ class NotificationPermissionScreen extends StatelessWidget {
                 child: AppButton(
                   padding: const EdgeInsets.symmetric(vertical: 8),
 
-                  onPressed: onNext,
+                  onPressed: () => _initNotification(context),
                   child: Text(
                     S.of(context).enableNotifications,
                     style: context.textTheme.bodyLarge?.w700,
@@ -582,19 +597,17 @@ class GetStartedScreen extends StatelessWidget {
 class CloudPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint =
-        Paint()
-          ..color = Colors.white
-          ..style = PaintingStyle.fill;
+    final paint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill;
 
     final path = Path()
-
-    // Cloud shape
-    ..addOval(Rect.fromCircle(center: const Offset(20, 30), radius: 15))
-    ..addOval(Rect.fromCircle(center: const Offset(35, 25), radius: 20))
-    ..addOval(Rect.fromCircle(center: const Offset(55, 25), radius: 18))
-    ..addOval(Rect.fromCircle(center: const Offset(75, 30), radius: 15))
-    ..addOval(Rect.fromCircle(center: const Offset(45, 40), radius: 25));
+      // Cloud shape
+      ..addOval(Rect.fromCircle(center: const Offset(20, 30), radius: 15))
+      ..addOval(Rect.fromCircle(center: const Offset(35, 25), radius: 20))
+      ..addOval(Rect.fromCircle(center: const Offset(55, 25), radius: 18))
+      ..addOval(Rect.fromCircle(center: const Offset(75, 30), radius: 15))
+      ..addOval(Rect.fromCircle(center: const Offset(45, 40), radius: 25));
 
     canvas.drawPath(path, paint);
   }

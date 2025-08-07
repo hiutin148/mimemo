@@ -76,8 +76,9 @@ abstract class ApiClient {
 
   @GET('/airquality/v2/currentconditions/{locationKey}')
   Future<CurrentAirQuality> getCurrentAirQuality(
-    @Path('locationKey') String locationKey,
-  );
+    @Path('locationKey') String locationKey, {
+    @Query('pollutants') String pollutants = 'true',
+  });
 
   // Radar
   @GET('/maps/v1/radar/futureSIR/zxy/{dateTime}/{z}/{x}/{y}.png')
