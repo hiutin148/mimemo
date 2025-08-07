@@ -3,15 +3,19 @@ import 'package:mimemo/core/base/bases.dart';
 import 'package:mimemo/repositories/app_setting_repository.dart';
 
 class SplashCubit extends BaseCubit<bool?> {
-  SplashCubit({required this.appSettingRepository, required this.mainCubit}) : super(null);
-  final AppSettingRepository appSettingRepository;
-  final MainCubit mainCubit;
+  SplashCubit({required AppSettingRepository appSettingRepository, required MainCubit mainCubit})
+    : _mainCubit = mainCubit,
+      _appSettingRepository = appSettingRepository,
+      super(null);
+  final AppSettingRepository _appSettingRepository;
+  final MainCubit _mainCubit;
 
   Future<void> init() async {
     await Future<void>.delayed(const Duration(seconds: 2));
-    final isFirstTime = await appSettingRepository.isFirstTimeOpenApp();
+    final isFirstTime = await _appSettingRepository.isFirstTimeOpenApp();
     if (!isFirstTime) {
-      await mainCubit.init();
+      await _mainCubit.init();
+      await _mainCubit.initFcm();
     }
     emit(isFirstTime);
   }

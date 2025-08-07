@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -15,7 +14,9 @@ import 'package:mimemo/locator.dart';
 import 'package:mimemo/repositories/forecast_repository.dart';
 import 'package:mimemo/repositories/position_repository.dart';
 import 'package:mimemo/router/app_router.dart';
+import 'package:mimemo/services/fcm_service.dart';
 import 'package:mimemo/services/geolocation_service.dart';
+import 'package:mimemo/services/local_notification_service.dart';
 import 'package:mimemo/services/supabase_function_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -31,25 +32,11 @@ void main() async {
     anonKey: Config.supabaseAnonKey,
   );
   unawaited(MobileAds.instance.initialize());
-  unawaited(setupNotifications());
   Bloc.observer = AppBlocObserver();
   initLocator();
   runApp(WeatherApp());
 }
 
-Future<void> setupNotifications() async {
-  final messaging = FirebaseMessaging.instance;
-
-  await messaging.requestPermission();
-
-  final fcmToken = await messaging.getToken();
-  if (fcmToken != null) {
-    logger.d('FCM Token: $fcmToken');
-    await locator<SupabaseFunctionService>().saveFcmToken(fcmToken);
-  }
-
-  messaging.onTokenRefresh.listen(locator<SupabaseFunctionService>().saveFcmToken);
-}
 
 class WeatherApp extends StatelessWidget {
   WeatherApp({super.key});
@@ -70,6 +57,8 @@ class WeatherApp extends StatelessWidget {
               geoLocationService: locator<GeoLocationService>(),
               forecastRepository: locator<ForecastRepository>(),
               supabaseFunctionService: locator<SupabaseFunctionService>(),
+              fcmService: locator<FcmService>(),
+              localNotificationService: locator<LocalNotificationService>()
             ),
           ),
         ],

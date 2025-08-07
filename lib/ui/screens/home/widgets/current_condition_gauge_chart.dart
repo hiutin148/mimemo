@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:mimemo/common/utils/utils.dart';
-import 'package:mimemo/core/extension/context_extension.dart';
-import 'package:mimemo/core/extension/text_style_extension.dart';
+import 'package:mimemo/core/const/consts.dart';
+import 'package:mimemo/core/extension/extensions.dart';
 import 'package:mimemo/models/enums/aqi.dart';
 import 'package:mimemo/router/app_router.gr.dart';
 import 'package:mimemo/ui/screens/home/home_cubit.dart';
@@ -26,7 +26,6 @@ class _CurrentConditionGaugeChartState extends State<CurrentConditionGaugeChart>
   static const String _rainConditionButtonText = '4 hours';
   static const String _airQualityButtonText = 'See more';
   static const String _airQualityTitle = 'Current air pollutants are';
-  static const String _lastUpdatedText = 'Last updated at 11h37'; // TODO: Make dynamic
   static const String _excellentLabel = 'EXCELLENT';
   static const String _dangerousLabel = 'DANGEROUS';
 
@@ -203,7 +202,10 @@ class _CurrentConditionGaugeChartState extends State<CurrentConditionGaugeChart>
             _currentButtonText,
             style: context.textTheme.bodyMedium?.white,
           ),
-          const Icon(Icons.keyboard_arrow_right_outlined, color: Colors.white,),
+          const Icon(
+            Icons.keyboard_arrow_right_outlined,
+            color: Colors.white,
+          ),
         ],
       ),
     );
@@ -217,19 +219,31 @@ class _CurrentConditionGaugeChartState extends State<CurrentConditionGaugeChart>
   }
 
   Widget _buildRainFooter(BuildContext context) {
-    return Text(
-      _lastUpdatedText,
-      style: context.textTheme.bodyMedium?.white.w400,
+    return BlocSelector<HomeCubit, HomeState, DateTime>(
+      builder: (context, lastUpdate) {
+        final lastUpdateTime = lastUpdate.toFormatedString(DateFormatPattern.time);
+        return Text(
+          'Last updated at $lastUpdateTime',
+          style: context.textTheme.bodyMedium?.white.w400,
+        );
+      },
+      selector: (state) => state.lastUpdate ?? DateTime.now(),
     );
   }
 
   Widget _buildAirQualityFooter(BuildContext context) {
-    return Column(
-      spacing: 4,
-      children: [
-        _buildAqiScale(context),
-        Text(_lastUpdatedText, style: context.textTheme.bodyMedium?.white.w400),
-      ],
+    return BlocSelector<HomeCubit, HomeState, DateTime>(
+      builder: (context, lastUpdate) {
+        final lastUpdateTime = lastUpdate.toFormatedString(DateFormatPattern.time);
+        return Column(
+          spacing: 4,
+          children: [
+            _buildAqiScale(context),
+            Text('Last updated at $lastUpdateTime', style: context.textTheme.bodyMedium?.white.w400),
+          ],
+        );
+      },
+      selector: (state) => state.lastUpdate ?? DateTime.now(),
     );
   }
 
