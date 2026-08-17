@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mimemo/common/blocs/main/main_cubit.dart';
 import 'package:mimemo/core/const/consts.dart';
 import 'package:mimemo/ui/screens/home/home_cubit.dart';
 import 'package:mimemo/ui/screens/home/widgets/current_condition_gauge_chart.dart';
@@ -16,39 +17,42 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMixin {
+class _HomeScreenState extends State<HomeScreen>
+    with AutomaticKeepAliveClientMixin {
   late final HomeCubit _cubit;
 
   @override
   void initState() {
     super.initState();
     _cubit = context.read<HomeCubit>();
-    _cubit.init();
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
 
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(color: AppColors.surface),
-        child: SafeArea(
-          child: AppRefreshIndicator(
-            onRefresh: () => _cubit.init(),
-            child: const SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.all(16),
-                child: Column(
-                  spacing: 24,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CurrentConditionGaugeChart(),
-                    HomeCurrentConditions(),
-                    SunMoonStatus(),
-                    HomeHourlyForecast(),
-                    HomeDailyForecast(),
-                  ],
+    return BlocListener<MainCubit, MainState>(
+      listener: (context, state) => _cubit.init(),
+      child: Scaffold(
+        body: Container(
+          decoration: const BoxDecoration(color: AppColors.surface),
+          child: SafeArea(
+            child: AppRefreshIndicator(
+              onRefresh: () => _cubit.init(),
+              child: const SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Column(
+                    spacing: 24,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CurrentConditionGaugeChart(),
+                      HomeCurrentConditions(),
+                      SunMoonStatus(),
+                      HomeHourlyForecast(),
+                      HomeDailyForecast(),
+                    ],
+                  ),
                 ),
               ),
             ),

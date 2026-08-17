@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mimemo/common/blocs/main/main_cubit.dart';
 import 'package:mimemo/core/const/consts.dart';
 import 'package:mimemo/core/extension/extensions.dart';
 import 'package:mimemo/models/entities/hourly_forecast/hourly_forecast.dart';
@@ -16,7 +17,8 @@ class HourlyScreen extends StatefulWidget {
   State<HourlyScreen> createState() => _HourlyScreenState();
 }
 
-class _HourlyScreenState extends State<HourlyScreen> with AutomaticKeepAliveClientMixin {
+class _HourlyScreenState extends State<HourlyScreen>
+    with AutomaticKeepAliveClientMixin {
   late final HourlyCubit _cubit;
 
   @override
@@ -28,14 +30,17 @@ class _HourlyScreenState extends State<HourlyScreen> with AutomaticKeepAliveClie
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return BlocSelector<HourlyCubit, HourlyState, LoadStatus>(
-      selector: (state) => state.loadStatus,
-      builder: (context, loadStatus) {
-        return Scaffold(
-          backgroundColor: AppColors.surface,
-          body: _buildBody(context, loadStatus),
-        );
-      },
+    return BlocListener<MainCubit, MainState>(
+      listener: (context, state) => _cubit.init(),
+      child: BlocSelector<HourlyCubit, HourlyState, LoadStatus>(
+        selector: (state) => state.loadStatus,
+        builder: (context, loadStatus) {
+          return Scaffold(
+            backgroundColor: AppColors.surface,
+            body: _buildBody(context, loadStatus),
+          );
+        },
+      ),
     );
   }
 
@@ -60,9 +65,11 @@ class _HourlyScreenState extends State<HourlyScreen> with AutomaticKeepAliveClie
         controller: _cubit.bottomSheetBarController,
         header: _buildBottomSheetHeader(context),
         body: HourlyList(
-          onItemTap: (forecast) => context.read<HourlyCubit>().selectForecast(forecast),
+          onItemTap: (forecast) =>
+              context.read<HourlyCubit>().selectForecast(forecast),
         ),
-        expandedBuilder: (context, scrollController) => const SelectedHourDetail(),
+        expandedBuilder: (context, scrollController) =>
+            const SelectedHourDetail(),
         bodyBottomPadding: 0,
       ),
     );

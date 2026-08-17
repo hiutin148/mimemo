@@ -24,7 +24,7 @@ class HourlyList extends StatelessWidget {
             .toList();
 
         if (filteredDates.isEmpty) {
-          return const SliverToBoxAdapter(child: SizedBox.shrink());
+          return  const SizedBox.shrink();
         }
 
         return DefaultStickyHeaderController(

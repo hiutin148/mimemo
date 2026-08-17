@@ -1,42 +1,78 @@
 import 'dart:convert';
-
 import 'package:mimemo/common/utils/logger.dart';
 import 'package:mimemo/models/entities/position_info/position_info.dart';
 import 'package:mimemo/services/api/api_client.dart';
+import 'package:mimemo/services/geolocation_service.dart'; // <-- Import thêm
 import 'package:mimemo/services/shared_preference_service.dart';
 
 abstract class PositionRepository {
+  Future<PositionInfo> getCurrentPositionInfo();
+  Future<bool> changeLocation(double lat, double long);
   Future<PositionInfo> getGeoPosition({required double lat, required double long});
-
   Future<PositionInfo> getPositionByLocationKey(String locationKey);
-
   Future<String?> getSavedLocationKey();
-
   Future<bool> setSavedLocationKey(String key);
-
   Future<bool> removeSavedLocationKey();
-
   Future<bool> setSavedLatLong(double lat, double long);
-
   Future<(double lat, double long)?> getSavedLatLong();
-
   Future<List<PositionInfo>> getSavedRecentPositions();
-
   Future<void> insertRecentPosition(PositionInfo position);
-
   Future<void> clearRecentPositions();
 }
 
 class PositionRepositoryImpl extends PositionRepository {
-  PositionRepositoryImpl({required this.apiClient, required this.sharedPreferencesService});
+  PositionRepositoryImpl({
+    required this.apiClient,
+    required this.sharedPreferencesService,
+    required this.geoLocationService,
+  });
 
   final SharedPreferencesService sharedPreferencesService;
-
   final ApiClient apiClient;
+  final GeoLocationService geoLocationService;
 
   final savedLocationKeyKey = 'savedLocationKey';
   final savedLatLongKey = 'savedLatLong';
   final savedRecentPositionKey = 'savedRecentPosition';
+
+
+  @override
+  Future<PositionInfo> getCurrentPositionInfo() async {
+    try {
+      // 1. Luôn ưu tiên lấy GPS thực tế mới nhất từ thiết bị
+      final currentGps = await geoLocationService.getCurrentPosition();
+      return await getGeoPosition(
+        lat: currentGps.latitude,
+        long: currentGps.longitude,
+      );
+    } catch (e) {
+      logger.w('Không lấy được GPS, chuyển sang dùng dữ liệu Cache/Local: $e');
+
+      // 2. Fallback 1: Dùng Lat/Long đã lưu lần gần nhất
+      final coordinates = await getSavedLatLong();
+      if (coordinates != null) {
+        return getGeoPosition(lat: coordinates.$1, long: coordinates.$2);
+      }
+
+      // 3. Fallback 2: Dùng Location Key đã lưu lần gần nhất
+      final savedLocationKey = await getSavedLocationKey();
+      if (savedLocationKey != null && savedLocationKey.isNotEmpty) {
+        return getPositionByLocationKey(savedLocationKey);
+      }
+
+      // 4. Nếu cả GPS lẫn Local đều không có gì -> Ném ngoại lệ để Cubit emit UI Failure
+      rethrow;
+    }
+  }
+
+  @override
+  Future<bool> changeLocation(double lat, double long) async {
+    final isRemoved = await removeSavedLocationKey();
+    if (isRemoved) {
+      return setSavedLatLong(lat, long);
+    }
+    return false;
+  }
 
   @override
   Future<PositionInfo> getGeoPosition({required double lat, required double long}) {
@@ -82,7 +118,6 @@ class PositionRepositoryImpl extends PositionRepository {
       }
 
       final latLongMap = decodedJson;
-
       final dynamic latValue = latLongMap['lat'];
       final dynamic longValue = latLongMap['long'];
 
@@ -136,13 +171,13 @@ class PositionRepositoryImpl extends PositionRepository {
       return decodedJson
           .whereType<Map<String, dynamic>>()
           .map((item) {
-            try {
-              return PositionInfo.fromJson(item);
-            } on Exception catch (e, s) {
-              logger.e(e, stackTrace: s);
-              return null;
-            }
-          })
+        try {
+          return PositionInfo.fromJson(item);
+        } on Exception catch (e, s) {
+          logger.e(e, stackTrace: s);
+          return null;
+        }
+      })
           .where((position) => position != null)
           .cast<PositionInfo>()
           .toList();
@@ -160,7 +195,6 @@ class PositionRepositoryImpl extends PositionRepository {
       currentPositions.insert(0, position);
 
       final limitedPositions = currentPositions.take(5).toList();
-
       final jsonList = limitedPositions.map((pos) => pos.toJson()).toList();
       final jsonString = jsonEncode(jsonList);
 

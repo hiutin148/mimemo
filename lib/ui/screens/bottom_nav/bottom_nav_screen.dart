@@ -1,15 +1,16 @@
+// bottom_nav_screen.dart
 import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:mimemo/common/blocs/main/main_cubit.dart';
-import 'package:mimemo/common/utils/utils.dart';
 import 'package:mimemo/core/const/consts.dart';
 import 'package:mimemo/locator.dart';
 import 'package:mimemo/main.dart';
-import 'package:mimemo/models/entities/position_info/position_info.dart';
+import 'package:mimemo/models/enums/load_status.dart';
 import 'package:mimemo/repositories/current_condition_repository.dart';
 import 'package:mimemo/repositories/forecast_repository.dart';
 import 'package:mimemo/router/app_router.gr.dart';
@@ -21,6 +22,7 @@ import 'package:mimemo/ui/screens/home/home_screen.dart';
 import 'package:mimemo/ui/screens/hourly/hourly_cubit.dart';
 import 'package:mimemo/ui/screens/hourly/hourly_screen.dart';
 import 'package:mimemo/ui/screens/radar/radar_screen.dart';
+import 'package:mimemo/ui/widgets/error_view.dart';
 
 @RoutePage()
 class BottomNavScreen extends StatefulWidget {
@@ -30,17 +32,22 @@ class BottomNavScreen extends StatefulWidget {
   State<BottomNavScreen> createState() => _BottomNavScreenState();
 }
 
-class _BottomNavScreenState extends State<BottomNavScreen> with RouteAware, WidgetsBindingObserver {
+class _BottomNavScreenState extends State<BottomNavScreen>
+    with RouteAware, WidgetsBindingObserver {
   late final DailyCubit _dailyCubit;
   late final MainCubit _mainCubit;
   late final HomeCubit _homeCubit;
   late final HourlyCubit _hourlyCubit;
+
+  DateTime? _lastFetchTime;
+  static const _refreshThreshold = Duration(minutes: 15);
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _mainCubit = context.read<MainCubit>();
+
     _dailyCubit = DailyCubit(
       forecastRepository: locator<ForecastRepository>(),
       mainCubit: _mainCubit,
@@ -55,6 +62,16 @@ class _BottomNavScreenState extends State<BottomNavScreen> with RouteAware, Widg
       forecastRepository: locator<ForecastRepository>(),
       mainCubit: _mainCubit,
     );
+
+    _initialLoad();
+  }
+
+  Future<void> _initialLoad() async {
+    _lastFetchTime = DateTime.now();
+    await _mainCubit.init();
+    _homeCubit.init();
+    _dailyCubit.init();
+    _hourlyCubit.init();
   }
 
   @override
@@ -70,31 +87,32 @@ class _BottomNavScreenState extends State<BottomNavScreen> with RouteAware, Widg
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     routeObserver.unsubscribe(this);
+    _dailyCubit.close();
+    _homeCubit.close();
+    _hourlyCubit.close();
     super.dispose();
   }
 
   @override
   void didPopNext() {
-    refreshData();
     super.didPopNext();
+    _checkAndRefreshData();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
-      refreshData();
+      _checkAndRefreshData();
     }
   }
 
-  Future<void> refreshData() async {
-    await OverlayLoading.runWithLoading(
-      context,
-      () async {
-        await _mainCubit.init();
-      },
-    );
-    await Future.wait([_homeCubit.init(), _dailyCubit.init(), _hourlyCubit.init()]);
+  void _checkAndRefreshData() {
+    if (_lastFetchTime == null ||
+        DateTime.now().difference(_lastFetchTime!) > _refreshThreshold) {
+      _lastFetchTime = DateTime.now();
+      _mainCubit.refresh();
+    }
   }
 
   @override
@@ -102,9 +120,9 @@ class _BottomNavScreenState extends State<BottomNavScreen> with RouteAware, Widg
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => BottomNavCubit()),
-        BlocProvider(create: (_) => _homeCubit..init()),
-        BlocProvider(create: (_) => _dailyCubit..init()),
-        BlocProvider(create: (_) => _hourlyCubit..init()),
+        BlocProvider.value(value: _homeCubit),
+        BlocProvider.value(value: _dailyCubit),
+        BlocProvider.value(value: _hourlyCubit),
       ],
       child: const BottomNavView(),
     );
@@ -132,14 +150,57 @@ class _BottomNavViewState extends State<BottomNavView> {
     ];
   }
 
+  Widget _buildBody(MainState state, int bottomNavIndex) {
+    if (state.loadStatus == LoadStatus.failure) {
+      switch (state.errorType) {
+        case MainErrorType.locationPermissionDenied:
+          return ErrorView(
+            message: state.errorMessage!,
+            buttonText: 'Mở Cài Đặt Quyền',
+            onAction: Geolocator.openAppSettings,
+          );
+        case MainErrorType.locationServiceDisabled:
+          return ErrorView(
+            message: state.errorMessage!,
+            buttonText: 'Bật GPS',
+            onAction: Geolocator.openLocationSettings,
+          );
+        case MainErrorType.networkError:
+        default:
+          return ErrorView(
+            message: state.errorMessage ?? 'Lỗi không xác định',
+            buttonText: 'Thử lại',
+            onAction: () => context.read<MainCubit>().refresh(),
+          );
+      }
+    }
+
+    if (state.loadStatus == LoadStatus.loading && state.positionInfo == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    return IndexedStack(
+      index: bottomNavIndex,
+      children: _screens,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<BottomNavCubit, int>(
+    return BlocConsumer<MainCubit, MainState>(
+      listener: (context, state) {
+        if (state.positionInfo != null &&
+            state.errorType != MainErrorType.none) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.errorMessage ?? 'Lỗi tải dữ liệu')),
+          );
+        }
+      },
       builder: (context, state) {
-        return BlocSelector<MainCubit, MainState, PositionInfo?>(
-          selector: (state) => state.positionInfo,
-          builder: (context, positionInfo) {
-            final position = positionInfo?.localizedName ?? '';
+        return BlocBuilder<BottomNavCubit, int>(
+          builder: (context, bottomNavState) {
+            final positionInfo = state.positionInfo;
+            final position = positionInfo?.localizedName ?? 'Chọn vị trí';
             final city = positionInfo?.parentCity?.localizedName != null
                 ? ', ${positionInfo!.parentCity!.localizedName}'
                 : '';
@@ -151,17 +212,26 @@ class _BottomNavViewState extends State<BottomNavView> {
                 centerTitle: true,
                 bottom: PreferredSize(
                   preferredSize: const Size.fromHeight(0.5),
-                  child: Container(color: AppColors.whiteBorderColor, height: 0.5),
+                  child: Container(
+                    color: AppColors.whiteBorderColor,
+                    height: 0.5,
+                  ),
                 ),
                 title: GestureDetector(
                   behavior: HitTestBehavior.translucent,
                   onTap: () {
-                    context.pushRoute(SearchLocationRoute(homeCubit: context.read<HomeCubit>()));
+                    context.pushRoute(
+                      SearchLocationRoute(homeCubit: context.read<HomeCubit>()),
+                    );
                   },
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.location_on, color: Colors.white, size: 20),
+                      const Icon(
+                        Icons.location_on,
+                        color: Colors.white,
+                        size: 20,
+                      ),
                       const Gap(4),
                       Text(
                         '$position$city',
@@ -172,17 +242,17 @@ class _BottomNavViewState extends State<BottomNavView> {
                         ),
                       ),
                       const Gap(4),
-                      const Icon(Icons.keyboard_arrow_down, color: Colors.white, size: 20),
+                      const Icon(
+                        Icons.keyboard_arrow_down,
+                        color: Colors.white,
+                        size: 20,
+                      ),
                     ],
                   ),
                 ),
               ),
               drawer: const SizedBox.shrink(),
-              body: PageView(
-                physics: const NeverScrollableScrollPhysics(),
-                controller: context.read<BottomNavCubit>().pageController,
-                children: _screens,
-              ),
+              body: _buildBody(state, bottomNavState),
               bottomNavigationBar: Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -195,15 +265,28 @@ class _BottomNavViewState extends State<BottomNavView> {
                   ],
                 ),
                 child: BottomNavigationBar(
-                  currentIndex: state,
-                  onTap: (index) => context.read<BottomNavCubit>().switchTab(index),
+                  currentIndex: bottomNavState,
+                  onTap: (index) =>
+                      context.read<BottomNavCubit>().switchTab(index),
                   type: BottomNavigationBarType.fixed,
                   elevation: 0,
                   items: const [
-                    BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Current'),
-                    BottomNavigationBarItem(icon: Icon(Icons.schedule), label: 'Hourly'),
-                    BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Daily'),
-                    BottomNavigationBarItem(icon: Icon(Icons.radar), label: 'Radar'),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.home),
+                      label: 'Current',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.schedule),
+                      label: 'Hourly',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.calendar_today),
+                      label: 'Daily',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.radar),
+                      label: 'Radar',
+                    ),
                   ],
                 ),
               ),
@@ -211,146 +294,6 @@ class _BottomNavViewState extends State<BottomNavView> {
           },
         );
       },
-    );
-  }
-}
-
-class MorePage extends StatelessWidget {
-  const MorePage({super.key});
-
-  static const List<Map<String, dynamic>> _menuItems = [
-    {
-      'title': 'Severe Weather',
-      'subtitle': 'Alerts and warnings',
-      'icon': Icons.warning,
-      'hasAlert': true,
-    },
-    {
-      'title': 'Air Quality',
-      'subtitle': 'Current air quality index',
-      'icon': Icons.air,
-      'hasAlert': false,
-    },
-    {
-      'title': 'Allergy Tracker',
-      'subtitle': 'Pollen and allergen levels',
-      'icon': Icons.local_florist,
-      'hasAlert': false,
-    },
-    {
-      'title': 'Sun & Moon',
-      'subtitle': 'Sunrise, sunset, moon phases',
-      'icon': Icons.wb_sunny,
-      'hasAlert': false,
-    },
-    {
-      'title': 'Weather Maps',
-      'subtitle': 'Temperature, precipitation maps',
-      'icon': Icons.map,
-      'hasAlert': false,
-    },
-    {
-      'title': 'Weather Videos',
-      'subtitle': 'Latest weather updates',
-      'icon': Icons.play_circle,
-      'hasAlert': false,
-    },
-    {
-      'title': 'Historical Weather',
-      'subtitle': 'Past weather data',
-      'icon': Icons.history,
-      'hasAlert': false,
-    },
-    {'title': 'Settings', 'subtitle': 'App preferences', 'icon': Icons.settings, 'hasAlert': false},
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('More', style: TextStyle(color: Colors.white)),
-        backgroundColor: const Color(0xFF4A90E2),
-        elevation: 0,
-        leading: const SizedBox.shrink(),
-      ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF4A90E2), Color(0xFF1E3A8A)],
-          ),
-        ),
-        child: ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: _menuItems.length,
-          itemBuilder: (context, index) => _MenuItemWidget(
-            item: _menuItems[index],
-            onTap: () => _showItemSnackBar(context, _menuItems[index]['title'].toString()),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _showItemSnackBar(BuildContext context, String title) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Opening $title...'),
-        backgroundColor: const Color(0xFF4A90E2),
-        duration: const Duration(seconds: 1),
-      ),
-    );
-  }
-}
-
-class _MenuItemWidget extends StatelessWidget {
-  const _MenuItemWidget({required this.item, required this.onTap});
-
-  final Map<String, dynamic> item;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-      ),
-      child: ListTile(
-        leading: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(item['icon'] as IconData, color: Colors.white, size: 24),
-        ),
-        title: Text(
-          item['title'].toString(),
-          style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
-        ),
-        subtitle: Text(
-          item['subtitle'].toString(),
-          style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 14),
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (item['hasAlert'] as bool)
-              Container(
-                width: 8,
-                height: 8,
-                decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-              ),
-            if (item['hasAlert'] as bool) const Gap(8),
-            Icon(Icons.arrow_forward_ios, color: Colors.white.withValues(alpha: 0.7), size: 16),
-          ],
-        ),
-        onTap: onTap,
-      ),
     );
   }
 }

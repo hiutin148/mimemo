@@ -3,56 +3,49 @@ import 'dart:async';
 import 'package:equatable/equatable.dart';
 import 'package:mimemo/common/utils/logger.dart';
 import 'package:mimemo/core/base/bases.dart';
+import 'package:mimemo/core/exceptions/app_exceptions.dart';
 import 'package:mimemo/models/entities/minute_color/minute_color.dart';
 import 'package:mimemo/models/entities/position_info/position_info.dart';
 import 'package:mimemo/models/enums/load_status.dart';
 import 'package:mimemo/repositories/forecast_repository.dart';
+import 'package:mimemo/repositories/notification_repository.dart';
 import 'package:mimemo/repositories/position_repository.dart';
-import 'package:mimemo/services/fcm_service.dart';
-import 'package:mimemo/services/geolocation_service.dart';
-import 'package:mimemo/services/local_notification_service.dart';
-import 'package:mimemo/services/supabase_function_service.dart';
 
 part 'main_state.dart';
 
 class MainCubit extends BaseCubit<MainState> {
   MainCubit({
-    required PositionRepository positionRepository,
-    required GeoLocationService geoLocationService,
-    required ForecastRepository forecastRepository,
-    required SupabaseFunctionService supabaseFunctionService,
-    required FcmService fcmService,
-    required LocalNotificationService localNotificationService,
-  }) : _positionRepository = positionRepository,
-       _geoLocationService = geoLocationService,
-       _forecastRepository = forecastRepository,
-       _supabaseFunctionService = supabaseFunctionService,
-       _fcmService = fcmService,
-       _localNotificationService = localNotificationService,
-       super(const MainState());
+    required this._positionRepository,
+    required this._forecastRepository,
+    required this._notificationRepository,
+  }) : super(const MainState());
+
   final PositionRepository _positionRepository;
-  final GeoLocationService _geoLocationService;
   final ForecastRepository _forecastRepository;
-  final SupabaseFunctionService _supabaseFunctionService;
-  final FcmService _fcmService;
-  final LocalNotificationService _localNotificationService;
+  final NotificationRepository _notificationRepository;
 
   Future<void> init() async {
     if (state.loadStatus == LoadStatus.loading) return;
 
-    try {
-      emit(state.copyWith(loadStatus: LoadStatus.loading));
+    emit(
+      state.copyWith(
+        loadStatus: LoadStatus.loading,
+        errorType: MainErrorType.none,
+        errorMessage: null,
+      ),
+    );
 
+    try {
       final (positionInfo, minuteColors) = await (
-        _getPositionInfo(),
-        _forecastRepository.getMinuteColors(),
+        _positionRepository.getCurrentPositionInfo(),
+        _forecastRepository.getMinuteColors().catchError((e) {
+          logger.w('Không tải được forecast, dùng giá trị mặc định: $e');
+          return <MinuteColor>[];
+        }),
       ).wait;
-      final savedToken = await _fcmService.getSavedToken();
-      if (savedToken != null) {
-        unawaited(_supabaseFunctionService.saveLocationKey(positionInfo.key, savedToken));
-      }
-      unawaited(_positionRepository.setSavedLocationKey(positionInfo.key ?? ''));
-      unawaited(_positionRepository.insertRecentPosition(positionInfo));
+
+      _syncBackgroundData(positionInfo);
+
       emit(
         state.copyWith(
           loadStatus: LoadStatus.success,
@@ -60,75 +53,78 @@ class MainCubit extends BaseCubit<MainState> {
           minuteColors: minuteColors,
         ),
       );
-    } on Exception catch (e) {
-      logger.e(e);
-      emit(state.copyWith(loadStatus: LoadStatus.failure));
+    } catch (e, stackTrace) {
+      logger.e('Init MainCubit failed', error: e, stackTrace: stackTrace);
+      _handleError(e);
     }
+  }
+
+  void _handleError(Object error) {
+    MainErrorType errorType = MainErrorType.unknownError;
+    String errorMessage = 'Đã có lỗi xảy ra. Vui lòng thử lại.';
+
+    if (error is LocationPermissionException) {
+      errorType = MainErrorType.locationPermissionDenied;
+      errorMessage = 'Ứng dụng cần quyền vị trí để dự báo thời tiết.';
+    } else if (error is LocationDisabledException) {
+      errorType = MainErrorType.locationServiceDisabled;
+      errorMessage = 'Vui lòng bật định vị (GPS) trên thiết bị.';
+    } else if (error is NetworkException) {
+      errorType = MainErrorType.networkError;
+      errorMessage = 'Mất kết nối Internet. Vui lòng kiểm tra lại mạng.';
+    }
+
+    if (state.positionInfo != null) {
+      emit(
+        state.copyWith(
+          loadStatus: LoadStatus.success,
+          errorType: errorType,
+          errorMessage: errorMessage,
+        ),
+      );
+    } else {
+      emit(
+        state.copyWith(
+          loadStatus: LoadStatus.failure,
+          errorType: errorType,
+          errorMessage: errorMessage,
+        ),
+      );
+    }
+  }
+
+  void _syncBackgroundData(PositionInfo positionInfo) {
+    unawaited(_notificationRepository.syncLocationKey(positionInfo.key));
+    if (positionInfo.key != null) {
+      unawaited(_positionRepository.setSavedLocationKey(positionInfo.key!));
+    }
+    unawaited(_positionRepository.insertRecentPosition(positionInfo));
   }
 
   Future<void> initFcm() async {
-    if (!_fcmService.isInitialized) {
-      await _fcmService.initialize(
-        onNotificationTapped: (data) async {},
-      );
-      await _localNotificationService.initialize();
-      final token = await _fcmService.getToken();
-      if (token != null) {
-        await _supabaseFunctionService.saveFcmToken(token);
-        await _supabaseFunctionService.saveLocationKey(state.positionInfo?.key, token);
-      }
-      _fcmService.onForegroundMessage.listen(
-        (message) {
-          if (message.notification != null) {
-            _localNotificationService.showNotification(
-              id: 0,
-              title: message.notification!.title ?? '',
-              body: message.notification!.body ?? '',
-            );
-          }
-        },
-      );
+    await _notificationRepository.initialize();
+    if (state.positionInfo?.key != null) {
+      await _notificationRepository.syncLocationKey(state.positionInfo!.key);
     }
-  }
-
-  Future<(double lat, double lng)> getCurrentCoordinates() async {
-    final geoPosition = state.positionInfo?.geoPosition;
-    return (geoPosition?.latitude ?? 0.0, geoPosition?.longitude ?? 0.0);
-  }
-
-  Future<void> refresh() async {
-    await init();
   }
 
   Future<void> changeLocation(double lat, double long) async {
     try {
-      if (await _positionRepository.removeSavedLocationKey()) {
-        final result = await _positionRepository.setSavedLatLong(lat, long);
-        if (!result) {
-          logger.e("Can't save new latitude and longitude.");
-        }
-      }
-    } on Exception catch (e) {
-      logger.e(e);
-    }
-  }
-
-  Future<PositionInfo> _getPositionInfo() async {
-    final savedLocationKey = await _positionRepository.getSavedLocationKey();
-    if (savedLocationKey?.isNotEmpty ?? false) {
-      return _positionRepository.getPositionByLocationKey(savedLocationKey!);
-    } else {
-      final coordinates = await _positionRepository.getSavedLatLong();
-      if (coordinates != null) {
-        return _getPositionInfoByLatLong(coordinates.$1, coordinates.$2);
+      final success = await _positionRepository.changeLocation(lat, long);
+      if (success) {
+        await init();
       } else {
-        final coordinates = await _geoLocationService.getCurrentPosition();
-        return _getPositionInfoByLatLong(coordinates.latitude, coordinates.longitude);
+        logger.e("Can't save new latitude and longitude.");
       }
+    } catch (e, stackTrace) {
+      logger.e('Error changing location', error: e, stackTrace: stackTrace);
     }
   }
 
-  Future<PositionInfo> _getPositionInfoByLatLong(double lat, double long) async {
-    return _positionRepository.getGeoPosition(lat: lat, long: long);
+  (double lat, double lng) getCurrentCoordinates() {
+    final geoPosition = state.positionInfo?.geoPosition;
+    return (geoPosition?.latitude ?? 0.0, geoPosition?.longitude ?? 0.0);
   }
+
+  Future<void> refresh() => init();
 }

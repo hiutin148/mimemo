@@ -5,7 +5,7 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.8.1
+  sdk: ^3.13.0
 
 dependencies:
   flutter:
@@ -14,18 +14,18 @@ dependencies:
 
   # Location
   geolocator: ^14.0.1
-  geocoding: ^4.0.0
+  geocoding: ^5.0.0
 
   # Notification
-  flutter_local_notifications: ^18.0.1
-  timezone: ^0.10.1
-  firebase_notifications_handler: ^2.0.2+1
+  flutter_local_notifications: ^22.3.0
+  timezone: ^0.11.1
+  firebase_notifications_handler: ^3.0.3
 
   # Local data
   shared_preferences: ^2.5.3
 
   # Route
-  auto_route: ^10.1.0+1
+  auto_route: ^11.1.0
 
   # Localization
   flutter_localizations:
@@ -41,29 +41,29 @@ dependencies:
 
   # Api
   retrofit: ^4.4.2
-  retrofit_generator: ^9.2.0
+  retrofit_generator: ^10.2.8
   dio: ^5.8.0+1
   pretty_dio_logger: ^1.4.0
 
   # DI
-  get_it: ^8.0.3
+  get_it: ^9.2.1
 
   # Image, Icon
   flutter_svg: ^2.1.0
   cached_network_image: ^3.4.1
 
   # Firebase
-  firebase_core: ^3.15.2
-  firebase_messaging: ^15.1.2
+  firebase_core: ^4.13.0
+  firebase_messaging: ^16.5.0
 
   supabase_flutter: ^2.9.1
 
   # Others
-  google_mobile_ads: ^6.0.0
+  google_mobile_ads: ^9.1.0
   gap: ^3.0.1
   collection: ^1.19.1
   logger: ^2.5.0
-  smooth_page_indicator: ^1.2.1
+  smooth_page_indicator: ^2.0.1
   visibility_detector: ^0.4.0+2
   flutter_staggered_animations: ^1.1.1
   flutter_sticky_header: ^0.8.0
@@ -71,6 +71,7 @@ dependencies:
   scrollable_positioned_list: ^0.3.8
   dotted_line: ^3.2.3
   shimmer: ^3.0.0
+  maplibre: ^0.3.3+2
 
 dev_dependencies:
   flutter_test:
@@ -81,13 +82,14 @@ dev_dependencies:
   auto_route_generator: ^10.1.0
 
   # Lint
-  very_good_analysis: ^9.0.0
+  very_good_analysis: ^10.3.0
   flutter_lints: ^6.0.0
 
 flutter:
   generate: true
   uses-material-design: true
-
+  config:
+    enable-swift-package-manager: true
   assets:
     - assets/icons/
     - assets/map_styles/

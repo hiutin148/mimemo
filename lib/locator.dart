@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 import 'package:mimemo/repositories/app_setting_repository.dart';
 import 'package:mimemo/repositories/current_condition_repository.dart';
 import 'package:mimemo/repositories/forecast_repository.dart';
+import 'package:mimemo/repositories/notification_repository.dart';
 import 'package:mimemo/repositories/position_repository.dart';
 import 'package:mimemo/repositories/radar_repository.dart';
 import 'package:mimemo/repositories/search_location_repository.dart';
@@ -29,6 +30,7 @@ void initLocator() {
       () => PositionRepositoryImpl(
         apiClient: locator<ApiClient>(),
         sharedPreferencesService: locator<SharedPreferencesService>(),
+        geoLocationService: locator<GeoLocationService>(),
       ),
     )
     ..registerLazySingleton<AppSettingRepository>(
@@ -56,5 +58,13 @@ void initLocator() {
     )
     ..registerLazySingleton(
       FcmService.new,
-    )..registerLazySingleton(LocalNotificationService.new);
+    )
+    ..registerLazySingleton(LocalNotificationService.new)
+    ..registerLazySingleton<NotificationRepository>(
+      () => NotificationRepositoryImpl(
+        fcmService: locator<FcmService>(),
+        localNotificationService: locator<LocalNotificationService>(),
+        supabaseFunctionService: locator<SupabaseFunctionService>(),
+      ),
+    );
 }

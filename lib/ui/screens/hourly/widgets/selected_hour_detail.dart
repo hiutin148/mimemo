@@ -25,7 +25,7 @@ class _SelectedHourDetailState extends State<SelectedHourDetail>
       builder: (context, state) {
         final selectedForecast = state.selectedForecast;
         if (selectedForecast == null) {
-          return const SliverToBoxAdapter(child: SizedBox.shrink());
+          return  const SizedBox.shrink();
         }
 
         return ClipRRect(

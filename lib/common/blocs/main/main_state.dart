@@ -1,26 +1,50 @@
 part of 'main_cubit.dart';
 
-class MainState extends Equatable {
+enum MainErrorType {
+  none,
+  locationPermissionDenied, // Người dùng từ chối quyền GPS
+  locationServiceDisabled, // Máy chưa bật GPS
+  networkError, // Mất mạng
+  unknownError, // Lỗi server/chưa xác định
+}
 
+class MainState extends Equatable {
   const MainState({
-    this.positionInfo,
     this.loadStatus = LoadStatus.initial,
+    this.positionInfo,
     this.minuteColors = const [],
+    this.errorType = MainErrorType.none,
+    this.errorMessage,
   });
+
+  final LoadStatus loadStatus;
   final PositionInfo? positionInfo;
   final List<MinuteColor> minuteColors;
-  final LoadStatus loadStatus;
-
-  @override
-  List<Object?> get props => [positionInfo, loadStatus, minuteColors];
+  final MainErrorType errorType;
+  final String? errorMessage;
 
   MainState copyWith({
-    PositionInfo? positionInfo,
     LoadStatus? loadStatus,
+    PositionInfo? positionInfo,
     List<MinuteColor>? minuteColors,
-  }) => MainState(
-    positionInfo: positionInfo ?? this.positionInfo,
-    loadStatus: loadStatus ?? this.loadStatus,
-    minuteColors: minuteColors ?? this.minuteColors,
-  );
+    MainErrorType? errorType,
+    String? errorMessage,
+  }) {
+    return MainState(
+      loadStatus: loadStatus ?? this.loadStatus,
+      positionInfo: positionInfo ?? this.positionInfo,
+      minuteColors: minuteColors ?? this.minuteColors,
+      errorType: errorType ?? this.errorType,
+      errorMessage: errorMessage,
+    );
+  }
+
+  @override
+  List<Object?> get props => [
+    loadStatus,
+    positionInfo,
+    minuteColors,
+    errorType,
+    errorMessage,
+  ];
 }

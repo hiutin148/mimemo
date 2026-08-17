@@ -2,12 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:maplibre/maplibre.dart';
 import 'package:mimemo/common/blocs/main/main_cubit.dart';
 import 'package:mimemo/core/extension/extensions.dart';
-import 'package:mimemo/locator.dart';
 import 'package:mimemo/models/enums/app_map_type.dart';
-import 'package:mimemo/repositories/radar_repository.dart';
 import 'package:mimemo/ui/screens/radar/radar_cubit.dart';
 import 'package:mimemo/ui/screens/radar/widgets/map_type_list.dart';
 import 'package:mimemo/ui/screens/radar/widgets/radar_header.dart';
@@ -20,7 +18,6 @@ class RadarScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => RadarCubit(
-        radarRepository: locator<RadarRepository>(),
         mainCubit: context.read<MainCubit>(),
       ),
       child: const RadarView(),
@@ -36,55 +33,92 @@ class RadarView extends StatefulWidget {
 }
 
 class _RadarViewState extends State<RadarView> {
-  final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
   late final RadarCubit _radarCubit;
-  late CameraPosition _initialCameraPosition;
+  MapController? _mapController;
+  StyleController? _mapStyle;
+  bool _hasOverlay = false;
+
+  static const _overlaySourceId = 'weather-overlay-source';
+  static const _overlayLayerId = 'weather-overlay-layer';
 
   @override
   void initState() {
     super.initState();
     _radarCubit = context.read<RadarCubit>();
     _radarCubit.init();
-    _initialCameraPosition = CameraPosition(
-      target: LatLng(
-        _radarCubit.mainCubit.state.positionInfo?.geoPosition?.latitude ?? 0,
-        _radarCubit.mainCubit.state.positionInfo?.geoPosition?.longitude ?? 0,
-      ),
-      zoom: 8,
-    );
+  }
+
+  Future<void> _applyTileUrl(String? tileUrl) async {
+    debugPrint('_applyTileUrl called with: $tileUrl'); // 1. có được gọi không?
+
+    final style = _mapStyle;
+    debugPrint('_mapStyle is null: ${style == null}'); // 2. style đã sẵn sàng chưa?
+
+    if (style == null || tileUrl == null) {
+      debugPrint('Early return — style or tileUrl is null');
+      return;
+    }
+
+    try {
+      if (_hasOverlay) {
+        await style.removeLayer(_overlayLayerId);
+        await style.removeSource(_overlaySourceId);
+      }
+
+      final overlaySource = RasterSource(
+        id: _overlaySourceId,
+        tiles: [tileUrl],
+        maxZoom: 20,
+        tileSize: 256,
+        attribution: '© Your Provider',
+      );
+      await style.addSource(overlaySource);
+      debugPrint('addSource SUCCESS'); // 3. addSource có throw không?
+
+      const overlayLayer = RasterStyleLayer(
+        id: _overlayLayerId,
+        sourceId: _overlaySourceId,
+      );
+      await style.addLayer(overlayLayer, belowLayerId: 'waterway');
+      debugPrint('addLayer SUCCESS'); // 4. addLayer có throw không?
+      _hasOverlay = true;
+    } catch (e, st) {
+      debugPrint('addSource/addLayer FAILED: $e\n$st'); // 5. bắt lỗi cụ thể
+    }
   }
 
   void _showAllMapTypesBottomSheet() {
-    showModalBottomSheet<void>(
-      isScrollControlled: true,
-      context: context,
-      backgroundColor: Colors.white,
-      useSafeArea: true,
-      builder: (context) {
-        return BlocProvider.value(
-          value: _radarCubit,
-          child: const MapTypeList(),
-        );
-      },
+    unawaited(
+      showModalBottomSheet<void>(
+        isScrollControlled: true,
+        context: context,
+        backgroundColor: Colors.white,
+        useSafeArea: true,
+        builder: (context) {
+          return BlocProvider.value(
+            value: _radarCubit,
+            child: const MapTypeList(),
+          );
+        },
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(),
-      body: DefaultTabController(
-        length: 3,
-        child: Stack(
-          children: [
-            _buildMaps(),
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: _buildMapTypesButton(),
-            ),
-          ],
+    return BlocListener<RadarCubit, RadarState>(
+      listenWhen: (prev, curr) => prev.tileUrl != curr.tileUrl,
+      listener: (context, state) => _applyTileUrl(state.tileUrl),
+      child: Scaffold(
+        appBar: _buildAppBar(),
+        body: DefaultTabController(
+          length: 3,
+          child: Stack(
+            children: [
+              _buildMaps(),
+              Positioned(top: 0, left: 0, right: 0, child: _buildMapTypesButton()),
+            ],
+          ),
         ),
       ),
     );
@@ -166,28 +200,33 @@ class _RadarViewState extends State<RadarView> {
   }
 
   Widget _buildMaps() {
-    return BlocSelector<RadarCubit, RadarState, Set<TileOverlay>>(
-      builder: (context, tileOverlays) {
-        return GoogleMap(
-          myLocationButtonEnabled: false,
-          tileOverlays: tileOverlays,
-          initialCameraPosition: _initialCameraPosition,
-          onMapCreated: _controller.complete,
-          buildingsEnabled: false,
-          myLocationEnabled: true,
-          style: _radarCubit.mapType,
-          markers: {
-            Marker(
-              markerId: const MarkerId('current_position'),
-              position: LatLng(
-                _initialCameraPosition.target.latitude,
-                _initialCameraPosition.target.longitude,
-              ),
-            ),
-          },
-        );
+    return MapLibreMap(
+      options: MapOptions(
+        initStyle: 'https://tiles.openfreemap.org/styles/positron',
+        gestures: const MapGestures(rotate: false, pan: true, zoom: true, pitch: true),
+        initZoom: 10,
+        initCenter: Geographic(
+          lat: _radarCubit.mainCubit.state.positionInfo?.geoPosition?.latitude ?? 0,
+          lon: _radarCubit.mainCubit.state.positionInfo?.geoPosition?.longitude ?? 0,
+        ),
+      ),
+      onMapCreated: (controller) => _mapController = controller,
+      onStyleLoaded: (style) async {
+        _mapStyle = style;
+        try {
+          await _mapController?.enableLocation();
+          await _mapController?.trackLocation();
+        } catch (e, st) {
+          debugPrint('Location init failed: $e\n$st');
+        }
+        await _applyTileUrl(_radarCubit.state.tileUrl);
       },
-      selector: (state) => state.tileOverlays,
+      children: const [
+        MapControlButtons(showTrackLocation: true),
+        MapCompass(),
+        MapScalebar(),
+        SourceAttribution(),
+      ],
     );
   }
 

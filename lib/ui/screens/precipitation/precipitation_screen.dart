@@ -80,7 +80,7 @@ class _PrecipitationViewState extends State<PrecipitationView> {
     if (position?.latitude == null || position?.longitude == null) return;
 
     try {
-      final result = await placemarkFromCoordinates(
+      final result = await Geocoding().placemarkFromCoordinates(
           position!.latitude!,
           position.longitude!
       );

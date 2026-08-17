@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,11 +31,11 @@ class SplashView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocListener<SplashCubit, bool?>(
-      listener: (BuildContext context, bool? state) {
+      listener: (context, state) {
         if (state ?? false) {
-          context.replaceRoute(const OnboardingRoute());
+          unawaited(context.replaceRoute(const OnboardingRoute()));
         } else if (state == false) {
-          context.replaceRoute(const BottomNavRoute());
+          unawaited(context.replaceRoute(const BottomNavRoute()));
         }
       },
       child: const Scaffold(body: Center(child: Text('SPLASH'))),

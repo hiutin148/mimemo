@@ -3,10 +3,8 @@ import 'package:mimemo/core/base/bases.dart';
 import 'package:mimemo/repositories/app_setting_repository.dart';
 
 class SplashCubit extends BaseCubit<bool?> {
-  SplashCubit({required AppSettingRepository appSettingRepository, required MainCubit mainCubit})
-    : _mainCubit = mainCubit,
-      _appSettingRepository = appSettingRepository,
-      super(null);
+  SplashCubit({required this._appSettingRepository, required this._mainCubit})
+    : super(null);
   final AppSettingRepository _appSettingRepository;
   final MainCubit _mainCubit;
 

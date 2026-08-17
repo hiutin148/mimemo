@@ -13,3 +13,10 @@ analyzer:
     - lib/generated/**
     - lib/**/*.g.dart
     - pubspec.yaml
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**

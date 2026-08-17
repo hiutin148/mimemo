@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mimemo/common/blocs/main/main_cubit.dart';
 import 'package:mimemo/core/const/consts.dart';
 import 'package:mimemo/core/extension/extensions.dart';
 import 'package:mimemo/models/entities/daily_forecast/daily_forecast.dart';
@@ -40,19 +41,22 @@ class _DailyViewState extends State<DailyScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            return BottomSheetBar(
-              controller: _dailyCubit.bottomSheetBarController,
-              header: _buildBottomSheetHeader(context),
-              bodyBottomPadding: _currentTab == 0 ? 48 : 0,
-              body: _buildBottomSheetBarBody(),
-              expandedSliver: const SelectedDayDetail(),
-            );
-          },
+    return BlocListener<MainCubit, MainState>(
+      listener: (context, state) => _dailyCubit.init(),
+      child: DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          body: LayoutBuilder(
+            builder: (context, constraints) {
+              return BottomSheetBar(
+                controller: _dailyCubit.bottomSheetBarController,
+                header: _buildBottomSheetHeader(context),
+                bodyBottomPadding: _currentTab == 0 ? 48 : 0,
+                body: _buildBottomSheetBarBody(),
+                expandedSliver: const SelectedDayDetail(),
+              );
+            },
+          ),
         ),
       ),
     );
@@ -83,7 +87,10 @@ class _DailyViewState extends State<DailyScreen>
           borderRadius: BorderRadius.circular(100),
         ),
         child: TabBar(
-          indicator: BoxDecoration(borderRadius: BorderRadius.circular(100), color: Colors.white),
+          indicator: BoxDecoration(
+            borderRadius: BorderRadius.circular(100),
+            color: Colors.white,
+          ),
           padding: EdgeInsets.zero,
           dividerHeight: 0,
           indicatorSize: TabBarIndicatorSize.tab,

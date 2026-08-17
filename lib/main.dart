@@ -12,15 +12,13 @@ import 'package:mimemo/firebase_options.dart';
 import 'package:mimemo/generated/l10n.dart';
 import 'package:mimemo/locator.dart';
 import 'package:mimemo/repositories/forecast_repository.dart';
+import 'package:mimemo/repositories/notification_repository.dart';
 import 'package:mimemo/repositories/position_repository.dart';
 import 'package:mimemo/router/app_router.dart';
-import 'package:mimemo/services/fcm_service.dart';
-import 'package:mimemo/services/geolocation_service.dart';
-import 'package:mimemo/services/local_notification_service.dart';
-import 'package:mimemo/services/supabase_function_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
+final RouteObserver<ModalRoute<void>> routeObserver =
+    RouteObserver<ModalRoute<void>>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,14 +27,13 @@ void main() async {
   );
   await Supabase.initialize(
     url: Config.supabaseUrl,
-    anonKey: Config.supabaseAnonKey,
+    publishableKey: Config.supabaseAnonKey,
   );
   unawaited(MobileAds.instance.initialize());
   Bloc.observer = AppBlocObserver();
   initLocator();
   runApp(WeatherApp());
 }
-
 
 class WeatherApp extends StatelessWidget {
   WeatherApp({super.key});
@@ -54,11 +51,8 @@ class WeatherApp extends StatelessWidget {
           BlocProvider(
             create: (context) => MainCubit(
               positionRepository: locator<PositionRepository>(),
-              geoLocationService: locator<GeoLocationService>(),
               forecastRepository: locator<ForecastRepository>(),
-              supabaseFunctionService: locator<SupabaseFunctionService>(),
-              fcmService: locator<FcmService>(),
-              localNotificationService: locator<LocalNotificationService>()
+              notificationRepository: locator<NotificationRepository>(),
             ),
           ),
         ],
@@ -71,7 +65,9 @@ class WeatherApp extends StatelessWidget {
             GlobalCupertinoLocalizations.delegate,
           ],
           theme: AppTheme.themeData,
-          routerConfig: _appRouter.config(navigatorObservers: () => [routeObserver]),
+          routerConfig: _appRouter.config(
+            navigatorObservers: () => [routeObserver],
+          ),
           debugShowCheckedModeBanner: false,
         ),
       ),
