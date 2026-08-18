@@ -21,11 +21,13 @@ class _DailyViewState extends State<DailyScreen>
     with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   late final DailyCubit _dailyCubit;
   int _currentTab = 0;
+  BottomSheetBarController? _bottomSheetBarController;
 
   @override
   void initState() {
     super.initState();
     _dailyCubit = context.read<DailyCubit>();
+    _bottomSheetBarController ??= BottomSheetBarController();
   }
 
   void _onForecastItemPressed(ForecastDay? day) {
@@ -41,21 +43,31 @@ class _DailyViewState extends State<DailyScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return BlocListener<MainCubit, MainState>(
-      listener: (context, state) => _dailyCubit.init(),
-      child: DefaultTabController(
-        length: 2,
-        child: Scaffold(
-          body: LayoutBuilder(
-            builder: (context, constraints) {
-              return BottomSheetBar(
-                controller: _dailyCubit.bottomSheetBarController,
-                header: _buildBottomSheetHeader(context),
-                bodyBottomPadding: _currentTab == 0 ? 48 : 0,
-                body: _buildBottomSheetBarBody(),
-                expandedSliver: const SelectedDayDetail(),
-              );
-            },
+    return BlocListener<DailyCubit, DailyState>(
+      listener: (context, state) {
+        if (_bottomSheetBarController?.scrollController.hasClients == true) {
+          _bottomSheetBarController?.expand();
+        }
+      },
+      listenWhen: (previous, current) =>
+          previous.selectedDayClimo != current.selectedDayClimo &&
+          current.selectedDayClimo != null,
+      child: BlocListener<MainCubit, MainState>(
+        listener: (context, state) => _dailyCubit.init(),
+        child: DefaultTabController(
+          length: 2,
+          child: Scaffold(
+            body: LayoutBuilder(
+              builder: (context, constraints) {
+                return BottomSheetBar(
+                  controller: _bottomSheetBarController,
+                  header: _buildBottomSheetHeader(context),
+                  bodyBottomPadding: _currentTab == 0 ? 48 : 0,
+                  body: _buildBottomSheetBarBody(),
+                  expandedSliver: const SelectedDayDetail(),
+                );
+              },
+            ),
           ),
         ),
       ),

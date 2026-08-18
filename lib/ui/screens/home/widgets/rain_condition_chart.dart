@@ -32,11 +32,12 @@ class RainConditionChart extends StatelessWidget {
                       values: rainData.values,
                       minValue: 0,
                       maxValue: rainData.maxValue,
-                      colors:
-                          rainData.colors
-                              .where((element) => element.type?.toLowerCase() == 'rain')
-                              .whereType<MinuteColor>()
-                              .toList(),
+                      colors: rainData.colors
+                          .where(
+                            (element) => element.type?.toLowerCase() == 'rain',
+                          )
+                          .whereType<MinuteColor>()
+                          .toList(),
                       strokeWidth: 6,
                     ),
                     child: Container(),
@@ -52,7 +53,10 @@ class RainConditionChart extends StatelessWidget {
 
   RainData _extractRainData(HomeState homeState, MainState mainState) {
     final values =
-        homeState.oneMinuteCast?.intervals?.map((e) => e.dbz ?? 0.0).whereType<double>().toList() ??
+        homeState.oneMinuteCast?.intervals
+            ?.map((e) => e.dbz ?? 0.0)
+            .whereType<double>()
+            .toList() ??
         <double>[];
 
     final maxValue =
@@ -61,13 +65,21 @@ class RainConditionChart extends StatelessWidget {
             ?.endDbz ??
         95.0;
 
-    return RainData(values: values, maxValue: maxValue, colors: mainState.minuteColors);
+    return RainData(
+      values: values,
+      maxValue: maxValue,
+      colors: mainState.minuteColors,
+    );
   }
 }
 
 // Data class to hold processed rain data
 class RainData {
-  const RainData({required this.values, required this.maxValue, required this.colors});
+  const RainData({
+    required this.values,
+    required this.maxValue,
+    required this.colors,
+  });
 
   final List<double> values;
   final double maxValue;
@@ -120,14 +132,18 @@ class RainConditionPainter extends CustomPainter {
   }
 
   void _initializePaints() {
-    _backgroundPaint ??=
-        Paint()
-          ..color = Colors.white24
-          ..strokeWidth = strokeWidth
-          ..strokeCap = StrokeCap.round;
+    _backgroundPaint ??= Paint()
+      ..color = Colors.white24
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
   }
 
-  void _drawSegments(Canvas canvas, Offset center, double radius, int segmentCount) {
+  void _drawSegments(
+    Canvas canvas,
+    Offset center,
+    double radius,
+    int segmentCount,
+  ) {
     // Pre-calculate common values
     final innerRadius = radius - strokeWidth * 4;
     final individualSegmentAngle = strokeWidth * math.pi / 180.0;
@@ -149,7 +165,11 @@ class RainConditionPainter extends CustomPainter {
       final segmentInfo = segmentInfos[i];
 
       // Draw background segment
-      canvas.drawLine(segmentInfo.startPoint, segmentInfo.endPoint, _backgroundPaint!);
+      canvas.drawLine(
+        segmentInfo.startPoint,
+        segmentInfo.endPoint,
+        _backgroundPaint!,
+      );
 
       // Draw progress segment
       final progress = (values[i] / maxValue).clamp(0.0, 1.0);
@@ -184,7 +204,10 @@ class RainConditionPainter extends CustomPainter {
         center.dy + innerRadius * sinAngle,
       );
 
-      final endPoint = Offset(center.dx + radius * cosAngle, center.dy + radius * sinAngle);
+      final endPoint = Offset(
+        center.dx + radius * cosAngle,
+        center.dy + radius * sinAngle,
+      );
 
       final segmentInfo = _SegmentInfo(startPoint, endPoint);
       _segmentCache[i] = segmentInfo;
@@ -194,10 +217,16 @@ class RainConditionPainter extends CustomPainter {
     return segments;
   }
 
-  void _drawProgressSegment(Canvas canvas, _SegmentInfo segmentInfo, double progress) {
+  void _drawProgressSegment(
+    Canvas canvas,
+    _SegmentInfo segmentInfo,
+    double progress,
+  ) {
     final progressEndPoint = Offset(
-      segmentInfo.startPoint.dx + (segmentInfo.endPoint.dx - segmentInfo.startPoint.dx) * progress,
-      segmentInfo.startPoint.dy + (segmentInfo.endPoint.dy - segmentInfo.startPoint.dy) * progress,
+      segmentInfo.startPoint.dx +
+          (segmentInfo.endPoint.dx - segmentInfo.startPoint.dx) * progress,
+      segmentInfo.startPoint.dy +
+          (segmentInfo.endPoint.dy - segmentInfo.startPoint.dy) * progress,
     );
 
     final gradientInfo = _getCachedGradientInfo(progress);
@@ -208,11 +237,10 @@ class RainConditionPainter extends CustomPainter {
       gradientInfo.stops,
     );
 
-    final progressPaint =
-        Paint()
-          ..shader = shader
-          ..strokeWidth = strokeWidth
-          ..strokeCap = StrokeCap.round;
+    final progressPaint = Paint()
+      ..shader = shader
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
 
     canvas.drawLine(segmentInfo.startPoint, progressEndPoint, progressPaint);
   }
@@ -231,7 +259,11 @@ class RainConditionPainter extends CustomPainter {
   void _drawLabels(Canvas canvas, Offset center, double radius) {
     // Use a single TextPainter and reuse it
     final textPainter = TextPainter(textDirection: TextDirection.ltr);
-    const textStyle = TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w500);
+    const textStyle = TextStyle(
+      color: Colors.white70,
+      fontSize: 14,
+      fontWeight: FontWeight.w500,
+    );
 
     for (final label in _labels) {
       textPainter
@@ -239,8 +271,12 @@ class RainConditionPainter extends CustomPainter {
         ..layout();
 
       final labelOffset = Offset(
-        center.dx + (radius + 20) * math.cos(label.angle) - textPainter.width / 2,
-        center.dy + (radius + 20) * math.sin(label.angle) - textPainter.height / 2,
+        center.dx +
+            (radius + 20) * math.cos(label.angle) -
+            textPainter.width / 2,
+        center.dy +
+            (radius + 20) * math.sin(label.angle) -
+            textPainter.height / 2,
       );
 
       textPainter.paint(canvas, labelOffset);

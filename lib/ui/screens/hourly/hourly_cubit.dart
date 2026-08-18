@@ -9,7 +9,6 @@ import 'package:mimemo/models/entities/hourly_forecast/hourly_forecast.dart';
 import 'package:mimemo/models/enums/load_status.dart';
 import 'package:mimemo/repositories/forecast_repository.dart';
 import 'package:mimemo/ui/screens/daily/daily_cubit.dart';
-import 'package:mimemo/ui/widgets/widgets.dart';
 
 part 'hourly_state.dart';
 
@@ -24,10 +23,7 @@ class HourlyCubit extends BaseCubit<HourlyState> {
   final MainCubit mainCubit;
   final ForecastRepository forecastRepository;
 
-  BottomSheetBarController? bottomSheetBarController;
-
   Future<void> init() async {
-    bottomSheetBarController ??= BottomSheetBarController()..minSize = 0;
     return _fetch(LoadStatus.loading);
   }
 
@@ -44,7 +40,7 @@ class HourlyCubit extends BaseCubit<HourlyState> {
         selectedForecast?.dateTime?.reformatDateString(
           newFormat: DateFormatPattern.dayOfWeek,
         ) ??
-            '';
+        '';
     final hourlyDates = _getHourlyDateDataList(hourlyForecasts);
 
     emit(
@@ -59,14 +55,14 @@ class HourlyCubit extends BaseCubit<HourlyState> {
   }, onError: (_) => emit(state.copyWith(loadStatus: LoadStatus.failure)));
 
   List<HourlyDateData> _getHourlyDateDataList(
-      List<HourlyForecast> hourlyForecasts,
-      ) {
+    List<HourlyForecast> hourlyForecasts,
+  ) {
     final dailyForecastMap = _buildDailyForecastMap();
 
     return groupBy(
       hourlyForecasts.getRange(0, 72).where((f) => f.dateTime != null),
-          (HourlyForecast f) =>
-      f.dateTime!.reformatDateString(newFormat: DateFormatPattern.date)!,
+      (HourlyForecast f) =>
+          f.dateTime!.reformatDateString(newFormat: DateFormatPattern.date)!,
     ).entries.map((entry) {
       final dateString = entry.key;
       final forecasts = entry.value;
@@ -114,10 +110,10 @@ class HourlyCubit extends BaseCubit<HourlyState> {
   }
 
   (int riseIndex, int setIndex) _findSunEventIndexes(
-      List<HourlyForecast> forecasts,
-      DateTime? riseDateTime,
-      DateTime? setDateTime,
-      ) {
+    List<HourlyForecast> forecasts,
+    DateTime? riseDateTime,
+    DateTime? setDateTime,
+  ) {
     if (riseDateTime == null && setDateTime == null) return (-1, -1);
 
     var riseIndex = -1;
@@ -142,8 +138,14 @@ class HourlyCubit extends BaseCubit<HourlyState> {
     return (riseIndex, setIndex);
   }
 
-  void selectForecast(HourlyForecast forecast) {
-    bottomSheetBarController?.expand();
+  void selectForecast(HourlyForecast? forecast) {
+    emit(state.copyWith(selectedForecast: forecast));
+  }
+
+  void selectAndForceShowDetail(HourlyForecast? forecast) {
+    if (state.selectedForecast != null) {
+      emit(state.copyWith(selectedForecast: null));
+    }
     emit(state.copyWith(selectedForecast: forecast));
   }
 }

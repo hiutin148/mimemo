@@ -16,8 +16,12 @@ class HomeDailyForecast extends StatelessWidget {
   static const _padding = 16.0;
   static const _iconSize = 16.0;
 
-  void _onForecastItemTapped(BuildContext context, ForecastDay forecastDay, int index) {
-    context.read<DailyCubit>().changeSelectedDay(forecastDay);
+  void _onForecastItemTapped(
+    BuildContext context,
+    ForecastDay forecastDay,
+    int index,
+  ) {
+    context.read<DailyCubit>().selectAndForceShowDetail(forecastDay);
     context.read<BottomNavCubit>().switchTab(BottomNavTab.daily.index);
   }
 
@@ -54,13 +58,18 @@ class HomeDailyForecast extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       itemCount: forecasts.length,
       shrinkWrap: true,
-      itemBuilder: (context, index) => _buildForecastItem(context, forecasts[index], index),
+      itemBuilder: (context, index) =>
+          _buildForecastItem(context, forecasts[index], index),
       separatorBuilder: (context, index) =>
           const Divider(thickness: 1, height: 1, color: Colors.white24),
     );
   }
 
-  Widget _buildForecastItem(BuildContext context, ForecastDay forecastDay, int index) {
+  Widget _buildForecastItem(
+    BuildContext context,
+    ForecastDay forecastDay,
+    int index,
+  ) {
     final dayLabel = _getDayLabel(forecastDay, index);
     final dateString = _getFormattedDate(forecastDay);
     final maxTemp = forecastDay.temperature?.maximum?.value;
@@ -85,7 +94,11 @@ class HomeDailyForecast extends StatelessWidget {
     );
   }
 
-  Widget _buildDateColumn(BuildContext context, String? dayLabel, String? dateString) {
+  Widget _buildDateColumn(
+    BuildContext context,
+    String? dayLabel,
+    String? dateString,
+  ) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,7 +111,12 @@ class HomeDailyForecast extends StatelessWidget {
             ),
           ),
           if (dateString != null)
-            Text(dateString, style: context.textTheme.labelSmall?.copyWith(color: Colors.white70)),
+            Text(
+              dateString,
+              style: context.textTheme.labelSmall?.copyWith(
+                color: Colors.white70,
+              ),
+            ),
         ],
       ),
     );
@@ -108,7 +126,11 @@ class HomeDailyForecast extends StatelessWidget {
     return AppIcon(icon: Utils.getIconAsset(iconCode));
   }
 
-  Widget _buildTemperatureRow(BuildContext context, dynamic maxTemp, dynamic minTemp) {
+  Widget _buildTemperatureRow(
+    BuildContext context,
+    dynamic maxTemp,
+    dynamic minTemp,
+  ) {
     return Expanded(
       flex: 2,
       child: Row(
@@ -123,7 +145,9 @@ class HomeDailyForecast extends StatelessWidget {
           const Gap(8),
           Text(
             '${minTemp ?? '--'}°',
-            style: context.textTheme.bodyMedium?.copyWith(color: Colors.white70),
+            style: context.textTheme.bodyMedium?.copyWith(
+              color: Colors.white70,
+            ),
           ),
         ],
       ),
@@ -134,7 +158,11 @@ class HomeDailyForecast extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Icon(Icons.water_drop_outlined, color: Colors.white54, size: _iconSize),
+        const Icon(
+          Icons.water_drop_outlined,
+          color: Colors.white54,
+          size: _iconSize,
+        ),
         const Gap(4),
         Text(
           '${humidity ?? '--'}%',
@@ -150,6 +178,8 @@ class HomeDailyForecast extends StatelessWidget {
   }
 
   String? _getFormattedDate(ForecastDay forecastDay) {
-    return forecastDay.date?.reformatDateString(newFormat: DateFormatPattern.dateShort);
+    return forecastDay.date?.reformatDateString(
+      newFormat: DateFormatPattern.dateShort,
+    );
   }
 }

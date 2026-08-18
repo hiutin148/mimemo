@@ -20,10 +20,12 @@ class HourlyScreen extends StatefulWidget {
 class _HourlyScreenState extends State<HourlyScreen>
     with AutomaticKeepAliveClientMixin {
   late final HourlyCubit _cubit;
+  BottomSheetBarController? _bottomSheetBarController;
 
   @override
   void initState() {
     super.initState();
+    _bottomSheetBarController ??= BottomSheetBarController()..minSize = 0;
     _cubit = context.read<HourlyCubit>();
   }
 
@@ -32,14 +34,23 @@ class _HourlyScreenState extends State<HourlyScreen>
     super.build(context);
     return BlocListener<MainCubit, MainState>(
       listener: (context, state) => _cubit.init(),
-      child: BlocSelector<HourlyCubit, HourlyState, LoadStatus>(
-        selector: (state) => state.loadStatus,
-        builder: (context, loadStatus) {
+      child: BlocConsumer<HourlyCubit, HourlyState>(
+        buildWhen: (previous, current) =>
+            previous.loadStatus != current.loadStatus,
+        builder: (context, state) {
           return Scaffold(
             backgroundColor: AppColors.surface,
-            body: _buildBody(context, loadStatus),
+            body: _buildBody(context, state.loadStatus),
           );
         },
+        listener: (context, state) {
+          if (_bottomSheetBarController?.scrollController.hasClients == true) {
+            _bottomSheetBarController?.expand();
+          }
+        },
+        listenWhen: (previous, current) =>
+            previous.selectedForecast != current.selectedForecast &&
+            current.selectedForecast != null,
       ),
     );
   }
@@ -62,7 +73,7 @@ class _HourlyScreenState extends State<HourlyScreen>
     return AppRefreshIndicator(
       onRefresh: () => context.read<HourlyCubit>().refresh(),
       child: BottomSheetBar(
-        controller: _cubit.bottomSheetBarController,
+        controller: _bottomSheetBarController,
         header: _buildBottomSheetHeader(context),
         body: HourlyList(
           onItemTap: (forecast) =>

@@ -35,7 +35,7 @@ class DailyState extends Equatable {
       loadStatus: loadStatus ?? this.loadStatus,
       dailyForecast: dailyForecast ?? this.dailyForecast,
       selectedDay: selectedDay ?? this.selectedDay,
-      selectedDayClimo: selectedDayClimo ?? this.selectedDayClimo,
+      selectedDayClimo: selectedDayClimo,
       displayingMonth: displayingMonth ?? this.displayingMonth,
     );
   }

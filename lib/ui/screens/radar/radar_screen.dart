@@ -9,6 +9,7 @@ import 'package:mimemo/models/enums/app_map_type.dart';
 import 'package:mimemo/ui/screens/radar/radar_cubit.dart';
 import 'package:mimemo/ui/screens/radar/widgets/map_type_list.dart';
 import 'package:mimemo/ui/screens/radar/widgets/radar_header.dart';
+import 'package:mimemo/ui/screens/radar/widgets/radar_timeline.dart';
 import 'package:mimemo/ui/widgets/app_button.dart';
 
 class RadarScreen extends StatelessWidget {
@@ -49,13 +50,9 @@ class _RadarViewState extends State<RadarView> {
   }
 
   Future<void> _applyTileUrl(String? tileUrl) async {
-    debugPrint('_applyTileUrl called with: $tileUrl'); // 1. có được gọi không?
-
     final style = _mapStyle;
-    debugPrint('_mapStyle is null: ${style == null}'); // 2. style đã sẵn sàng chưa?
 
     if (style == null || tileUrl == null) {
-      debugPrint('Early return — style or tileUrl is null');
       return;
     }
 
@@ -68,22 +65,18 @@ class _RadarViewState extends State<RadarView> {
       final overlaySource = RasterSource(
         id: _overlaySourceId,
         tiles: [tileUrl],
-        maxZoom: 20,
-        tileSize: 256,
         attribution: '© Your Provider',
       );
       await style.addSource(overlaySource);
-      debugPrint('addSource SUCCESS'); // 3. addSource có throw không?
 
       const overlayLayer = RasterStyleLayer(
         id: _overlayLayerId,
         sourceId: _overlaySourceId,
       );
       await style.addLayer(overlayLayer, belowLayerId: 'waterway');
-      debugPrint('addLayer SUCCESS'); // 4. addLayer có throw không?
       _hasOverlay = true;
     } catch (e, st) {
-      debugPrint('addSource/addLayer FAILED: $e\n$st'); // 5. bắt lỗi cụ thể
+      debugPrint('addSource/addLayer FAILED: $e\n$st');
     }
   }
 
@@ -116,7 +109,18 @@ class _RadarViewState extends State<RadarView> {
           child: Stack(
             children: [
               _buildMaps(),
-              Positioned(top: 0, left: 0, right: 0, child: _buildMapTypesButton()),
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: _buildMapTypesButton(),
+              ),
+              const Positioned(
+                left: 12,
+                right: 12,
+                bottom: 24,
+                child: RadarTimeline(),
+              ),
             ],
           ),
         ),
@@ -136,14 +140,17 @@ class _RadarViewState extends State<RadarView> {
               end: Alignment.bottomCenter,
             ),
           ),
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            spacing: 8,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildAllMapsButton(context),
-              ..._buildMapTypeButtons(context, type),
-            ],
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              spacing: 8,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildAllMapsButton(context),
+                ..._buildMapTypeButtons(context, type),
+              ],
+            ),
           ),
         );
       },
@@ -203,11 +210,26 @@ class _RadarViewState extends State<RadarView> {
     return MapLibreMap(
       options: MapOptions(
         initStyle: 'https://tiles.openfreemap.org/styles/positron',
-        gestures: const MapGestures(rotate: false, pan: true, zoom: true, pitch: true),
-        initZoom: 10,
+        gestures: const MapGestures(
+          rotate: false,
+          pan: true,
+          zoom: true,
+          pitch: false,
+        ),
+        initZoom: 8,
+        initBearing: 0,
         initCenter: Geographic(
-          lat: _radarCubit.mainCubit.state.positionInfo?.geoPosition?.latitude ?? 0,
-          lon: _radarCubit.mainCubit.state.positionInfo?.geoPosition?.longitude ?? 0,
+          lat:
+              _radarCubit.mainCubit.state.positionInfo?.geoPosition?.latitude ??
+              0,
+          lon:
+              _radarCubit
+                  .mainCubit
+                  .state
+                  .positionInfo
+                  ?.geoPosition
+                  ?.longitude ??
+              0,
         ),
       ),
       onMapCreated: (controller) => _mapController = controller,
@@ -221,12 +243,6 @@ class _RadarViewState extends State<RadarView> {
         }
         await _applyTileUrl(_radarCubit.state.tileUrl);
       },
-      children: const [
-        MapControlButtons(showTrackLocation: true),
-        MapCompass(),
-        MapScalebar(),
-        SourceAttribution(),
-      ],
     );
   }
 

@@ -69,9 +69,6 @@ class _BottomNavScreenState extends State<BottomNavScreen>
   Future<void> _initialLoad() async {
     _lastFetchTime = DateTime.now();
     await _mainCubit.init();
-    _homeCubit.init();
-    _dailyCubit.init();
-    _hourlyCubit.init();
   }
 
   @override

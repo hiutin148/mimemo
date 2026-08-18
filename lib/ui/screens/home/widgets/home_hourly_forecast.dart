@@ -50,7 +50,9 @@ class HomeHourlyForecast extends StatelessWidget {
                     context.read<BottomNavCubit>().switchTab(
                       BottomNavTab.hourly.index,
                     );
-                    context.read<HourlyCubit>().selectForecast(forecast);
+                    context.read<HourlyCubit>().selectAndForceShowDetail(
+                      forecast,
+                    );
                   },
                   padding: const EdgeInsets.symmetric(
                     vertical: 16,
@@ -91,8 +93,7 @@ class HomeHourlyForecast extends StatelessWidget {
                   ),
                 );
               },
-              separatorBuilder: (BuildContext context, int index) =>
-                  const Gap(12),
+              separatorBuilder: (context, index) => const Gap(12),
             ),
           ),
         );

@@ -72,6 +72,7 @@ dependencies:
   dotted_line: ^3.2.3
   shimmer: ^3.0.0
   maplibre: ^0.3.3+2
+  home_widget: ^0.9.3
 
 dev_dependencies:
   flutter_test:

@@ -38,7 +38,7 @@ class HourlyState extends Equatable {
     return HourlyState(
       loadStatus: loadStatus ?? this.loadStatus,
       hourlyForecasts: hourlyForecasts ?? this.hourlyForecasts,
-      selectedForecast: selectedForecast ?? this.selectedForecast,
+      selectedForecast: selectedForecast,
       currentDay: currentDay ?? this.currentDay,
       weekdayIndices: weekdayIndices ?? this.weekdayIndices,
       hourlyDates: hourlyDates ?? this.hourlyDates,
